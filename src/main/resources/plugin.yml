@@ -1,0 +1,4 @@
+name: CreativePlus
+version: '${project.version}'
+main: ru.rstudios.creativeplus.CreativePlus
+api-version: '1.20'
