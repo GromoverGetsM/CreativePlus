@@ -1,13 +1,19 @@
 package ru.rstudios.creativeplus;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.rstudios.creativeplus.events.Event;
 
 public final class CreativePlus extends JavaPlugin {
 
+    public static JavaPlugin plugin;
+
     @Override
     public void onEnable() {
-        // Plugin startup logic
+        plugin = this;
 
+        saveResource("messages.yml", false);
+
+        getServer().getPluginManager().registerEvents(new Event(), this);
     }
 
     @Override
