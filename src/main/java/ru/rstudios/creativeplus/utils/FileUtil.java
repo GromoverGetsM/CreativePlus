@@ -27,4 +27,26 @@ public class FileUtil {
         }
     }
 
+    public static void moveFilesTo (File fromFolder, File destinationFolder) {
+        File[] files = fromFolder.listFiles();
+
+        if (files != null && files.length != 0) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    try {
+                        org.apache.commons.io.FileUtils.moveDirectory(f, destinationFolder);
+                    } catch (IOException e) {
+                        plugin.getLogger().severe(e.getLocalizedMessage());
+                    }
+                } else {
+                    try {
+                        org.apache.commons.io.FileUtils.moveFile(f, destinationFolder);
+                    } catch (IOException e) {
+                        plugin.getLogger().severe(e.getLocalizedMessage());
+                    }
+                }
+            }
+        }
+    }
+
 }
