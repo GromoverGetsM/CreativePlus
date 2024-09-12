@@ -1,8 +1,15 @@
 package ru.rstudios.creativeplus.creative.plots;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
+import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class DevPlot {
 
@@ -17,8 +24,33 @@ public class DevPlot {
     }
 
     private void create (Plot linked) {
-        devPlotName = linked.getPlotName().replace("_CraftPlot", "_dev");
+        this.devPlotName = linked.getPlotName().replace("_CraftPlot", "_dev");
 
+        File template = new File(plugin.getDataFolder() + File.separator + "templates" + File.separator + "dev" + File.separator);
+        File dev = new File(Bukkit.getWorldContainer() + File.separator + this.devPlotName);
+        FileUtil.copyFilesTo(template, dev);
+
+    }
+
+    private boolean exists() {
+        List<File> files = new LinkedList<>();
+        files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).toList());
+        files.addAll(Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles()).filter(File::isDirectory).toList());
+
+        boolean found = false;
+
+        if (devPlotName == null || devPlotName.isEmpty()) {
+            return false;
+        } else {
+            for (File file : files) {
+                if (file.getName().equalsIgnoreCase(devPlotName)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        return found;
     }
 
 }

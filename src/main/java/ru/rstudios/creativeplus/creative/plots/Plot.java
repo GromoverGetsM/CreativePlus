@@ -42,7 +42,7 @@ public class Plot {
         return linkedPlots.get(linked);
     }
 
-    public Plot (String plotName, Player owner) {
+    public Plot (@Nullable String plotName, Player owner) {
         List<File> files = new LinkedList<>();
         files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).toList());
         files.addAll(Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles()).filter(File::isDirectory).toList());
@@ -50,27 +50,33 @@ public class Plot {
         boolean found = false;
         File f = null;
 
-        for (File file : files) {
-            if (file.getName().equalsIgnoreCase(plotName)) {
-                f = new File(file + File.separator + "settings.yml");
-                found = true;
-                break;
-            }
-        }
+        if (plotName == null || plotName.isEmpty()) {
 
-        if (found) {
-            init(plotName, f, owner);
         } else {
-            create(plotName, owner);
+            for (File file : files) {
+                if (file.getName().equalsIgnoreCase(plotName)) {
+                    f = new File(file + File.separator + "settings.yml");
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                init(plotName, f, owner);
+            } else {
+                create(owner);
+            }
         }
     }
 
-    private void create (String plotName, Player owner) {
-        FileConfiguration fc = FileUtil.loadConfiguration(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds" + File.separator + plotName + File.separator + "settings.yml"));
+    private void create (Player owner) {
         FileConfiguration config = FileUtil.loadConfiguration("config.yml");
 
         int id = config.getInt("lastWorldId", 0) + 1;
         config.set("lastWorldId", id);
+
+        String plotName = "world_plot_" + id + "_CraftPlot";
+        FileConfiguration fc = FileUtil.loadConfiguration(new File(Bukkit.getWorldContainer() + File.separator + plotName + File.separator + "settings.yml"));
 
         fc.set("name", plotName);
         fc.set("id", id);
@@ -149,27 +155,27 @@ public class Plot {
     }
 
     public String getOwner() {
-        return plotSettings.getString("owner", "Unknown");
+        return plotSettings.getString("owner", this.owner.isEmpty() ? "Unknown" : this.owner);
     }
 
     public String getCustomId() {
-        return plotSettings.getString("customId", "Plot has no custom ids");
+        return plotSettings.getString("customId", this.customId.isEmpty() ? "Plot has no custom ids" : this.customId);
     }
 
     public Integer getId() {
-        return plotSettings.getInt("id", 0);
+        return this.id != plotSettings.getInt("id", 0) ? plotSettings.getInt("id", 0) : this.id;
     }
 
     public GameCategories getCategory() {
-        return GameCategories.valueOf(plotSettings.getString("category", "SANDBOX"));
+        return this.category != GameCategories.valueOf(plotSettings.getString("category", "SANDBOX")) ? GameCategories.valueOf(plotSettings.getString("category", "SANDBOX")) : this.category;
     }
 
     public List<String> getAllowedDevs() {
-        return plotSettings.getStringList("allowedDevs").isEmpty() ? new LinkedList<>() : plotSettings.getStringList("allowedDevs");
+        return plotSettings.getStringList("allowedDevs").isEmpty() ? this.allowedDevs.isEmpty() ? new LinkedList<>() : this.allowedDevs : plotSettings.getStringList("allowedDevs");
     }
 
     public List<String> getAllowedBuilders() {
-        return plotSettings.getStringList("allowedBuilders").isEmpty() ? new LinkedList<>() : plotSettings.getStringList("allowedBuilders");
+        return plotSettings.getStringList("allowedBuilders").isEmpty() ? this.allowedBuilders.isEmpty() ? new LinkedList<>() : this.allowedBuilders : plotSettings.getStringList("allowedBuilders");
     }
 
     public World getPlotWorld() {
@@ -178,5 +184,14 @@ public class Plot {
 
     public boolean getPlotLoaded() {
         return this.isLoaded;
+    }
+
+    public DevPlot getLinkedDevPlot() {
+        return this.linked;
+    }
+
+    public void setPlotName (String plotName) {
+        this.plotName = plotName;
+        plotSettings.set("name", plotName);
     }
 }

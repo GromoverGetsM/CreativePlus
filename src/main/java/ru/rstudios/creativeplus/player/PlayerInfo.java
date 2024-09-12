@@ -29,7 +29,7 @@ public class PlayerInfo {
     }
 
     public PlayerInfo (String name) {
-        File f = new File(plugin.getDataFolder() + File.separator + "players" + File.separator + name + ".yml")
+        File f = new File(plugin.getDataFolder() + File.separator + "players" + File.separator + name + ".yml");
 
         if (!f.exists() || f.length() == 0) {
             create(name, f);

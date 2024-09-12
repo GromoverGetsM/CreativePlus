@@ -43,8 +43,19 @@
     </plugins>
     <resources>
       <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
+          <directory>src/main/resources</directory>
+          <filtering>false</filtering>
+          <includes>
+              <include>**/*</include>
+          </includes>
+          <excludes>
+              <exclude>**/*.dat</exclude>
+              <exclude>**/*.png</exclude>
+              <exclude>**/*.jpg</exclude>
+              <exclude>**/*.jpeg</exclude>
+              <exclude>**/*.gif</exclude>
+              <exclude>**/*.zip</exclude>
+          </excludes>
       </resource>
     </resources>
   </build>

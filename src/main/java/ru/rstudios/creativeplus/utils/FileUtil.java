@@ -4,7 +4,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
@@ -46,6 +53,78 @@ public class FileUtil {
                     }
                 }
             }
+        }
+    }
+
+    public static void copyFilesTo (File fromFolder, File destinationFolder) {
+        File[] files = fromFolder.listFiles();
+
+        if (files != null && files.length != 0) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    try {
+                        org.apache.commons.io.FileUtils.copyDirectoryToDirectory(f, destinationFolder);
+                    } catch (IOException e) {
+                        plugin.getLogger().severe(e.getLocalizedMessage());
+                    }
+                } else {
+                    try {
+                        org.apache.commons.io.FileUtils.copyFileToDirectory(f, destinationFolder);
+                    } catch (IOException e) {
+                        plugin.getLogger().severe(e.getLocalizedMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    public static void createStarterFolder(String folderName) {
+        File folder = new File(plugin.getDataFolder(), folderName);
+        if (folder.exists()) {
+            if (folder.isFile()) {
+                folder.delete();
+                folder.mkdir();
+            }
+        } else {
+            folder.mkdir();
+        }
+    }
+
+
+    public static void saveResourceFolder(String resourcePath, File destination) throws IOException {
+        if (!destination.exists()) {
+            destination.mkdirs();
+        }
+
+        try {
+            File jarFile = new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+            if (jarFile.isFile()) {
+                try (JarFile jar = new JarFile(jarFile)) {
+                    Enumeration<JarEntry> entries = jar.entries();
+
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        String entryName = entry.getName();
+
+                        if (entryName.startsWith(resourcePath)) {
+                            File entryDestination = new File(destination, entryName.substring(resourcePath.length()));
+
+                            if (entry.isDirectory()) {
+                                entryDestination.mkdirs();
+                            } else {
+                                try (InputStream entryStream = jar.getInputStream(entry)) {
+                                    Files.copy(entryStream, entryDestination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                throw new IOException("Плагин не запущен из JAR-файла");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Ошибка при загрузке ресурса папки: " + resourcePath);
         }
     }
 
