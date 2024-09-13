@@ -111,7 +111,7 @@ public class PlayerInfo {
 
     public void addPlot (int plot) {
         this.plots.add(plot);
-        getConfiguration().set("plots", plots);
+        getConfiguration().set("plots", this.plots);
         saveConfiguration();
     }
 

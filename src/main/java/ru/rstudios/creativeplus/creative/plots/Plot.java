@@ -27,7 +27,9 @@ public class Plot implements Listener {
     private Integer id;
     private String customId;
     private String owner;
-    private ItemStack icon;
+    private Material icon;
+    private String iconName;
+    private List<String> iconLore;
     private GameCategories category;
     private List<String> allowedDevs;
     private List<String> allowedBuilders;
@@ -130,11 +132,9 @@ public class Plot implements Listener {
         fc.set("id", id);
         fc.set("owner", owner);
         fc.set("category", GameCategories.SANDBOX.toString());
-        try {
-            fc.set("icon", ItemStackSerializer.toBase64(createWorldIcon()));
-        } catch (IOException e) {
-            plugin.getLogger().severe("Error in Plot :123 - " + e.getLocalizedMessage());
-        }
+        fc.set("icon", Material.GRASS_BLOCK.toString());
+        fc.set("iconName", "§fИгра от игрока §e" + owner);
+        fc.set("iconLore", new ArrayList<>());
         fc.createSection("allowedDevs");
         fc.createSection("allowedBuilders");
 
@@ -151,7 +151,9 @@ public class Plot implements Listener {
         this.plotSettings = fc;
         this.plotSettingsF = new File(Bukkit.getWorldContainer() + File.separator + plotName + File.separator + "settings.yml");
         this.linked = new DevPlot(this);
-        this.icon = createWorldIcon();
+        this.icon = Material.GRASS_BLOCK;
+        this.iconName = "§fИгра от игрока §e" + owner;
+        this.iconLore = new ArrayList<>();
 
         PlayerInfo.getPlayerInfo(Bukkit.getPlayer(owner)).addPlot(id);
         plots.putIfAbsent(plotName, this);
@@ -169,7 +171,9 @@ public class Plot implements Listener {
         this.category = GameCategories.valueOf(fc.getString("category", null));
         this.allowedDevs = fc.getStringList("allowedDevs").isEmpty() ? new LinkedList<>() : fc.getStringList("allowedDevs");
         this.allowedBuilders = fc.getStringList("allowedBuilders").isEmpty() ? new LinkedList<>() : fc.getStringList("allowedBuilders");
-        this.icon = ItemStackSerializer.fromBase64(fc.getString("icon"));
+        this.icon = Material.valueOf(fc.getString("icon"));
+        this.iconName = fc.getString("iconName");
+        this.iconLore = fc.getStringList("iconLore");
         this.plotSettings = fc;
         this.plotSettingsF = f;
         this.linked = new DevPlot(this);
@@ -255,8 +259,22 @@ public class Plot implements Listener {
         return this.linked;
     }
 
-    public ItemStack getIcon() {
+    public Material getIconMaterial() {
         return this.icon;
+    }
+
+    public ItemStack getIcon() {
+        ItemStack icon = new ItemStack(this.icon);
+        ItemMeta iconMeta = icon.getItemMeta();
+        iconMeta.setDisplayName(this.iconName);
+        List<String> iconLore = this.iconLore;
+        iconLore.add("§f");
+        iconLore.add("§aИдентификатор: §e" + this.id);
+        iconLore.add("§e» Клик, чтобы зайти");
+        iconMeta.setLore(this.iconLore);
+        icon.setItemMeta(iconMeta);
+
+        return icon;
     }
 
     public Integer getPlotOnline() {
@@ -333,24 +351,12 @@ public class Plot implements Listener {
         this.linked = dev;
     }
 
-    public void setIcon (ItemStack icon) {
+    public void setIcon (Material icon) {
         this.icon = icon;
-        try {
-            plotSettings.set("icon", ItemStackSerializer.toBase64(icon));
-        } catch (IOException e) {
-            plugin.getLogger().severe("Error in Plot :339 - " + e.getLocalizedMessage());
-        }
+        plotSettings.set("icon", icon);
         savePlotSettings();
     }
 
-    private ItemStack createWorldIcon() {
-        ItemStack i = new ItemStack(Material.GRASS_BLOCK);
-        ItemMeta meta = i.getItemMeta();
-        meta.setDisplayName("§fИгра от игрока §e" + this.owner);
-        meta.setLore(Arrays.asList("§8§oАвтор: " + this.owner, "§f", "§aИдентификатор: §e" + this.id, "§e» Клик, чтобы зайти"));
-        i.setItemMeta(meta);
-        return i;
-    }
 
     public static void teleportToPlot (Plot plot, Player player) {
         Location teleport = plot.getPlotWorld().getSpawnLocation();

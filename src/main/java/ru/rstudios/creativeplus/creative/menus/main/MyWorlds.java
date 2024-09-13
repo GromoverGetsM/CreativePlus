@@ -96,7 +96,7 @@ public class MyWorlds extends CreativeSystemMenu implements Listener {
                 if (event.isCancelled()) return;
                 event.setCancelled(true);
                 event.getWhoClicked().closeInventory();
-                new Plot(Plot.getNextPlotName(), (Player) event.getWhoClicked());
+                new Plot(Plot.getNextPlotName(), event.getWhoClicked().getName());
             }
         }
     }
