@@ -19,6 +19,7 @@ public final class CreativePlus extends JavaPlugin {
         FileUtil.createStarterFolder("templates");
         try {
             FileUtil.saveResourceFolder("dev", new File(getDataFolder() + File.separator + "templates" + File.separator + "dev"));
+            FileUtil.saveResourceFolder("menus", new File(getDataFolder() + File.separator + "menus"));
         } catch (IOException e) {
             getLogger().severe(e.getLocalizedMessage());
         }

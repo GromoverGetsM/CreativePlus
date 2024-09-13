@@ -1,14 +1,17 @@
 package ru.rstudios.creativeplus.creative.plots;
 
+import com.jeff_media.jefflib.ItemStackSerializer;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.tech.GameCategories;
 import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
@@ -19,11 +22,13 @@ public class Plot {
     private @NotNull Integer id;
     private String customId;
     private String owner;
+    private ItemStack icon;
     private GameCategories category;
     private List<String> allowedDevs;
     private List<String> allowedBuilders;
     private DevPlot linked;
     private FileConfiguration plotSettings;
+    private File plotSettingsF;
     private World plot;
     private boolean isLoaded = false;
 
@@ -82,6 +87,11 @@ public class Plot {
         fc.set("id", id);
         fc.set("owner", owner);
         fc.set("category", GameCategories.SANDBOX);
+        try {
+            fc.set("icon", ItemStackSerializer.toBase64(new ItemStack(Material.GRASS_BLOCK)));
+        } catch (IOException e) {
+            plugin.getLogger().severe(e.getLocalizedMessage());
+        }
         fc.createSection("allowedDevs");
         fc.createSection("allowedBuilders");
 
@@ -96,6 +106,9 @@ public class Plot {
         this.allowedDevs = new LinkedList<>();
         this.allowedBuilders = new LinkedList<>();
         this.plotSettings = fc;
+        this.plotSettingsF = new File(Bukkit.getWorldContainer() + File.separator + plotName + File.separator + "settings.yml");
+        this.linked = new DevPlot(this);
+        this.icon = new ItemStack(Material.GRASS_BLOCK);
 
         plots.putIfAbsent(plotName, this);
         load(plotName);
@@ -111,7 +124,10 @@ public class Plot {
         this.category = GameCategories.valueOf(fc.getString("category", null));
         this.allowedDevs = fc.getStringList("allowedDevs").isEmpty() ? new LinkedList<>() : fc.getStringList("allowedDevs");
         this.allowedBuilders = fc.getStringList("allowedBuilders").isEmpty() ? new LinkedList<>() : fc.getStringList("allowedBuilders");
+        this.icon = ItemStackSerializer.fromBase64(fc.getString("icon"));
         this.plotSettings = fc;
+        this.plotSettingsF = f;
+        this.linked = new DevPlot(this);
 
         plots.putIfAbsent(plotName, this);
         load(plotName);
@@ -148,6 +164,14 @@ public class Plot {
         }
 
         isLoaded = true;
+    }
+
+    private void savePlotSettings() {
+        try {
+            this.plotSettings.save(this.plotSettingsF);
+        } catch (IOException e) {
+            plugin.getLogger().severe(e.getLocalizedMessage());
+        }
     }
 
     public String getPlotName() {
@@ -190,8 +214,87 @@ public class Plot {
         return this.linked;
     }
 
+    public ItemStack getIcon() {
+        return this.icon;
+    }
+
     public void setPlotName (String plotName) {
         this.plotName = plotName;
         plotSettings.set("name", plotName);
+        savePlotSettings();
+    }
+
+    public void setOwner (String ownerName) {
+        this.owner = ownerName;
+        plotSettings.set("owner", ownerName);
+        savePlotSettings();
+    }
+
+    public void setCustomId (String customId) {
+        this.customId = customId;
+        plotSettings.set("customId", customId);
+        savePlotSettings();
+    }
+
+    public void setId (Integer id) {
+        this.id = id;
+        plotSettings.set("id", id);
+        savePlotSettings();
+    }
+
+    public void setCategory (GameCategories category) {
+        this.category = category;
+        plotSettings.set("category", category);
+        savePlotSettings();
+    }
+
+    public void setAllowedDevs (List<String> allowedDevs) {
+        this.allowedDevs = allowedDevs;
+        plotSettings.set("allowedDevs", allowedDevs);
+        savePlotSettings();
+    }
+
+    public void addAllowedDev (String playerName) {
+        this.allowedDevs.add(playerName);
+        plotSettings.set("allowedDevs", this.allowedDevs);
+        savePlotSettings();
+    }
+
+    public void removeAllowedDev (String playerName) {
+        this.allowedDevs.remove(playerName);
+        plotSettings.set("allowedDevs", this.allowedDevs);
+        savePlotSettings();
+    }
+
+    public void setAllowedBuilders (List<String> allowedBuilders) {
+        this.allowedBuilders = allowedBuilders;
+        plotSettings.set("allowedDevs", allowedBuilders);
+        savePlotSettings();
+    }
+
+    public void addAllowedBuilder (String playerName) {
+        this.allowedBuilders.add(playerName);
+        plotSettings.set("allowedDevs", this.allowedBuilders);
+        savePlotSettings();
+    }
+
+    public void removeAllowedBuilder (String playerName) {
+        this.allowedBuilders.remove(playerName);
+        plotSettings.set("allowedDevs", this.allowedBuilders);
+        savePlotSettings();
+    }
+
+    public void setLinked (DevPlot dev) {
+        this.linked = dev;
+    }
+
+    public void setIcon (ItemStack icon) {
+        this.icon = icon;
+        try {
+            plotSettings.set("icon", ItemStackSerializer.toBase64(icon));
+        } catch (IOException e) {
+            plugin.getLogger().severe(e.getLocalizedMessage());
+        }
+        savePlotSettings();
     }
 }
