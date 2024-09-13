@@ -3,6 +3,7 @@ package ru.rstudios.creativeplus.commands;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,8 +34,12 @@ import static ru.rstudios.creativeplus.CreativePlus.plugin;
 public class CreateInventory implements CommandExecutor, Listener {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-        if (args.length == 2) {
-            Inventory inventory = Bukkit.createInventory(new UniversalMenuHolder(), Integer.parseInt(args[0]), args[1]);
+        if (args.length >= 2) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 1; i < args.length; i++) {
+                builder.append(" ").append(args[i]);
+            }
+            Inventory inventory = Bukkit.createInventory(new UniversalMenuHolder(), Integer.parseInt(args[0]), builder.toString().replace("&", "§").trim());
             if (sender instanceof Player player) {
                 player.openInventory(inventory);
             }

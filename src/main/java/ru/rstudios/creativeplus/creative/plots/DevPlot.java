@@ -40,7 +40,7 @@ public class DevPlot {
         try {
             if (jsonCode.createNewFile()) this.jsonCode = jsonCode;
         } catch (IOException e) {
-            plugin.getLogger().severe(e.getLocalizedMessage());
+            plugin.getLogger().severe("Error in DevPlot :43 - " + e.getLocalizedMessage());
         }
     }
 
@@ -76,6 +76,14 @@ public class DevPlot {
         }
 
         return found;
+    }
+
+    public String getDevPlotName() {
+        return this.devPlotName;
+    }
+
+    public World getWorld() {
+        return this.world;
     }
 
 }

@@ -2,10 +2,12 @@ package ru.rstudios.creativeplus.player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
@@ -14,6 +16,8 @@ public class PlayerInfo {
 
     private String name;
     private List<Integer> plots;
+    private int plotLimit;
+    private File playerData;
 
     private static Map<Player, PlayerInfo> playerInfoMap = new HashMap<>();
 
@@ -30,6 +34,7 @@ public class PlayerInfo {
 
     public PlayerInfo (String name) {
         File f = new File(plugin.getDataFolder() + File.separator + "players" + File.separator + name + ".yml");
+        this.playerData = f;
 
         if (!f.exists() || f.length() == 0) {
             create(name, f);
@@ -42,10 +47,12 @@ public class PlayerInfo {
         FileConfiguration fc = FileUtil.loadConfiguration(file);
         fc.set("name", name);
         fc.set("plots", new ArrayList<>());
+        fc.set("plotLimit", 3);
         FileUtil.save(file);
 
         this.name = name;
         this.plots = new LinkedList<>();
+        this.plotLimit = 3;
         if (Bukkit.getPlayer(name) != null && Bukkit.getPlayer(name).isOnline()) {
             playerInfoMap.putIfAbsent(Bukkit.getPlayer(name), this);
         }
@@ -57,9 +64,60 @@ public class PlayerInfo {
 
         this.name = name;
         this.plots = plots;
+        this.plotLimit = fc.getInt("plotLimit");
         if (Bukkit.getPlayer(name) != null && Bukkit.getPlayer(name).isOnline()) {
             playerInfoMap.putIfAbsent(Bukkit.getPlayer(name), this);
         }
+    }
+
+    private void saveConfiguration() {
+        FileUtil.save(playerData);
+    }
+
+    private FileConfiguration getConfiguration() {
+        return YamlConfiguration.loadConfiguration(playerData);
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public List<Integer> getPlots() {
+        return this.plots;
+    }
+
+    public int getPlotLimit() {
+        return this.plotLimit;
+    }
+
+    public void setName (String name) {
+        this.name = name;
+        getConfiguration().set("name", name);
+        saveConfiguration();
+    }
+
+    public void setPlots (List<Integer> plots) {
+        this.plots = plots;
+        getConfiguration().set("plots", plots);
+        saveConfiguration();
+    }
+
+    public void addPlot (int plot) {
+        this.plots.add(plot);
+        getConfiguration().set("plots", plots);
+        saveConfiguration();
+    }
+
+    public void removePlot (int plot) {
+        this.plots.remove(plot);
+        getConfiguration().set("plots", plots);
+        saveConfiguration();
+    }
+
+    public void setPlotLimit (int plotLimit) {
+        this.plotLimit = plotLimit;
+        getConfiguration().set("plotLimit", plotLimit);
+        saveConfiguration();
     }
 
 

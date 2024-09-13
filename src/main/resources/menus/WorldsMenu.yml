@@ -1,0 +1,40 @@
+size: 54
+title: Миры игроков
+items:
+    slot0:
+      type: GRAY_STAINED_GLASS_PANE
+      amount: 1
+      name: '§8 '
+      slots:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 17
+        - 18
+        - 26
+        - 27
+        - 35
+        - 36
+        - 44
+        - 45
+        - 46
+        - 47
+        - 48
+        - 50
+        - 51
+        - 52
+        - 53
+    slot49:
+      type: CHISELED_BOOKSHELF
+      amount: 1
+      name: '§e Мои миры '
+      lore:
+        - §f Открывает список ваших миров
+      slot: 49

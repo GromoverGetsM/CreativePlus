@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -141,10 +142,8 @@ public class InventoryUtil {
         }
     }
 
-    public static Inventory getInventory (FileConfiguration menuConfig) {
-        UniversalMenuHolder holder = new UniversalMenuHolder();
-
-        Inventory inv = Bukkit.createInventory(holder.getInventory().getHolder(), menuConfig.getInt("size"), menuConfig.getString("title"));
+    public static Inventory getInventory (FileConfiguration menuConfig, InventoryHolder holder) {
+        Inventory inv = Bukkit.createInventory(holder, menuConfig.getInt("size"), menuConfig.getString("title"));
         ConfigurationSection itemsSection = menuConfig.getConfigurationSection("items");
 
         if (itemsSection != null) {
@@ -223,6 +222,16 @@ public class InventoryUtil {
                     }
 
                     item.setItemMeta(meta);
+
+                    if (itemsSection.isList(key + ".slots")) {
+                        List<Integer> slots = itemsSection.getIntegerList(key + ".slots");
+                        for (int slot : slots) {
+                            inv.setItem(slot, item);
+                        }
+                    } else {
+                        int slot = itemsSection.getInt(key + ".slot", 1);
+                        inv.setItem(slot, item);
+                    }
                 }
             }
         }

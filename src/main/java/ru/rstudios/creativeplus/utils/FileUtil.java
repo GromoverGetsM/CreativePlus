@@ -1,5 +1,6 @@
 package ru.rstudios.creativeplus.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -9,7 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -30,7 +34,7 @@ public class FileUtil {
         try {
             fc.save(f);
         } catch (IOException e) {
-            plugin.getLogger().severe(e.getLocalizedMessage());
+            plugin.getLogger().severe("Error in FileUtil :37 - " + e.getLocalizedMessage());
         }
     }
 
@@ -43,13 +47,13 @@ public class FileUtil {
                     try {
                         org.apache.commons.io.FileUtils.moveDirectory(f, destinationFolder);
                     } catch (IOException e) {
-                        plugin.getLogger().severe(e.getLocalizedMessage());
+                        plugin.getLogger().severe("Error in FileUtil :50 - " + e.getLocalizedMessage());
                     }
                 } else {
                     try {
                         org.apache.commons.io.FileUtils.moveFile(f, destinationFolder);
                     } catch (IOException e) {
-                        plugin.getLogger().severe(e.getLocalizedMessage());
+                        plugin.getLogger().severe("Error in FileUtil :56 - " + e.getLocalizedMessage());
                     }
                 }
             }
@@ -65,13 +69,13 @@ public class FileUtil {
                     try {
                         org.apache.commons.io.FileUtils.copyDirectoryToDirectory(f, destinationFolder);
                     } catch (IOException e) {
-                        plugin.getLogger().severe(e.getLocalizedMessage());
+                        plugin.getLogger().severe("Error in FileUtil :72 - " + e.getLocalizedMessage());
                     }
                 } else {
                     try {
                         org.apache.commons.io.FileUtils.copyFileToDirectory(f, destinationFolder);
                     } catch (IOException e) {
-                        plugin.getLogger().severe(e.getLocalizedMessage());
+                        plugin.getLogger().severe("Error in FileUtil :78 - " + e.getLocalizedMessage());
                     }
                 }
             }
@@ -126,6 +130,14 @@ public class FileUtil {
             e.printStackTrace();
             throw new IOException("Ошибка при загрузке ресурса папки: " + resourcePath);
         }
+    }
+
+    public static List<File> getWorldsList (boolean includeUnloaded) {
+        List<File> files = new LinkedList<>();
+        files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).toList());
+        if (includeUnloaded) files.addAll(Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles()).filter(File::isDirectory).toList());
+
+        return files;
     }
 
 }

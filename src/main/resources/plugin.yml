@@ -2,3 +2,8 @@ name: CreativePlus
 version: '${project.version}'
 main: ru.rstudios.creativeplus.CreativePlus
 api-version: '1.20'
+commands:
+  ic:
+    permission: creative.ic
+  world:
+    permission: creative.world

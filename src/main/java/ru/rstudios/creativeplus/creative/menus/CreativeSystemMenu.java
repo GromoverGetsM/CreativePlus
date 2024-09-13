@@ -76,7 +76,7 @@ public abstract class CreativeSystemMenu implements InventoryHolder, Listener {
                 }
             }
         } else {
-            i = InventoryUtil.getInventory(YamlConfiguration.loadConfiguration(inventory));
+            i = InventoryUtil.getInventory(YamlConfiguration.loadConfiguration(inventory), this);
         }
 
         return i;

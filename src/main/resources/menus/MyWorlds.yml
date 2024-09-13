@@ -1,0 +1,27 @@
+size: 54
+title: Мои миры
+items:
+  slot10:
+    type: WHITE_STAINED_GLASS
+    amount: 1
+    name: '§e Свободный слот§r '
+    lore:
+      - '§f Нажмите, чтобы создать плоский '
+      - §f мир
+    slot: 10
+  slot11:
+    type: WHITE_STAINED_GLASS
+    amount: 1
+    name: '§e Свободный слот§r '
+    lore:
+      - '§f Нажмите, чтобы создать плоский '
+      - §f мир
+    slot: 11
+  slot12:
+    type: WHITE_STAINED_GLASS
+    amount: 1
+    name: '§e Свободный слот§r '
+    lore:
+      - '§f Нажмите, чтобы создать плоский '
+      - §f мир
+    slot: 12

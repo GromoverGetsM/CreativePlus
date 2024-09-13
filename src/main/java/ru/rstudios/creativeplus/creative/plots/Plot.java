@@ -4,10 +4,14 @@ import com.jeff_media.jefflib.ItemStackSerializer;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.tech.GameCategories;
+import ru.rstudios.creativeplus.player.PlayerInfo;
 import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
@@ -16,10 +20,10 @@ import java.util.*;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
-public class Plot {
+public class Plot implements Listener {
 
     private String plotName;
-    private @NotNull Integer id;
+    private Integer id;
     private String customId;
     private String owner;
     private ItemStack icon;
@@ -46,18 +50,40 @@ public class Plot {
     public static @Nullable DevPlot getLinkedDevPlot (Plot linked) {
         return linkedPlots.get(linked);
     }
+    public static @Nullable Plot getById (Integer id) {
+        Plot plot1 = null;
+        for (Plot plot : plots.values()) {
+            if (Objects.equals(plot.getId(), id)) plot1 = plot;
+        }
+        return plot1;
+    }
+
+    public static @Nullable Plot getByWorld (World world) {
+        Plot plot1 = null;
+        for (Plot plot : plots.values()) {
+            if (Objects.equals(plot.getPlotWorld(), world) || Objects.equals(plot.linked.getWorld(), world)) plot1 = plot;
+        }
+
+        return plot1;
+    }
+
+    public static @Nullable Plot getByPlayer (Player player) {
+        return getByWorld(player.getWorld());
+    }
+
+    public static String getNextPlotName() {
+        FileConfiguration config = FileUtil.loadConfiguration("config.yml");
+        return "world_plot_" + (config.getInt("lastWorldId", 0) + 1) + "_CraftPlot";
+    }
 
     public Plot (@Nullable String plotName, Player owner) {
-        List<File> files = new LinkedList<>();
-        files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).toList());
-        files.addAll(Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles()).filter(File::isDirectory).toList());
+        registerEvents();
+        List<File> files = FileUtil.getWorldsList(true);
 
         boolean found = false;
         File f = null;
 
-        if (plotName == null || plotName.isEmpty()) {
-
-        } else {
+        if (plotName != null || !plotName.isEmpty()) {
             for (File file : files) {
                 if (file.getName().equalsIgnoreCase(plotName)) {
                     f = new File(file + File.separator + "settings.yml");
@@ -79,6 +105,11 @@ public class Plot {
 
         int id = config.getInt("lastWorldId", 0) + 1;
         config.set("lastWorldId", id);
+        try {
+            config.save(new File(plugin.getDataFolder() + File.separator + "config.yml"));
+        } catch (IOException e) {
+            plugin.getLogger().severe("Error in Plot :110 - " + e.getLocalizedMessage());
+        }
 
         String plotName = "world_plot_" + id + "_CraftPlot";
         FileConfiguration fc = FileUtil.loadConfiguration(new File(Bukkit.getWorldContainer() + File.separator + plotName + File.separator + "settings.yml"));
@@ -88,14 +119,14 @@ public class Plot {
         fc.set("owner", owner);
         fc.set("category", GameCategories.SANDBOX);
         try {
-            fc.set("icon", ItemStackSerializer.toBase64(new ItemStack(Material.GRASS_BLOCK)));
+            fc.set("icon", ItemStackSerializer.toBase64(createWorldIcon()));
         } catch (IOException e) {
-            plugin.getLogger().severe(e.getLocalizedMessage());
+            plugin.getLogger().severe("Error in Plot :123 - " + e.getLocalizedMessage());
         }
         fc.createSection("allowedDevs");
         fc.createSection("allowedBuilders");
 
-        FileUtil.save(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds" + File.separator + plotName + File.separator + "settings.yml"));
+        FileUtil.save(new File(Bukkit.getWorldContainer() + File.separator + plotName + File.separator + "settings.yml"));
         FileUtil.save(new File(plugin.getDataFolder() + File.separator + "config.yml"));
 
         this.plotName = plotName;
@@ -108,10 +139,12 @@ public class Plot {
         this.plotSettings = fc;
         this.plotSettingsF = new File(Bukkit.getWorldContainer() + File.separator + plotName + File.separator + "settings.yml");
         this.linked = new DevPlot(this);
-        this.icon = new ItemStack(Material.GRASS_BLOCK);
+        this.icon = createWorldIcon();
 
+        PlayerInfo.getPlayerInfo(owner).addPlot(id);
         plots.putIfAbsent(plotName, this);
         load(plotName);
+        teleportToPlot(this, owner);
     }
 
     private void init (String plotName, File f, Player owner) {
@@ -130,13 +163,12 @@ public class Plot {
         this.linked = new DevPlot(this);
 
         plots.putIfAbsent(plotName, this);
-        load(plotName);
+        if (!isLoaded) load(plotName);
+        teleportToPlot(this, owner);
     }
 
     private void load (String worldName) {
-        List<File> files = new LinkedList<>();
-        files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).toList());
-        files.addAll(Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles()).filter(File::isDirectory).toList());
+        List<File> files = FileUtil.getWorldsList(true);
 
         boolean found = false;
         File folder = null;
@@ -149,19 +181,16 @@ public class Plot {
             }
         }
 
+        World w;
+
         if (found && folder.isDirectory()) {
             if (folder.getPath().contains(plugin.getDataFolder().getName())) FileUtil.moveFilesTo(folder, Bukkit.getWorldContainer());
-            this.plot = Bukkit.createWorld(new WorldCreator(worldName));
+            w = Bukkit.createWorld(new WorldCreator(worldName).type(WorldType.FLAT).generateStructures(false));
         } else {
-            this.plot = Bukkit.createWorld(new WorldCreator(worldName).type(WorldType.FLAT));
-            this.plot.getWorldBorder().setSize(1024);
-            this.plot.setGameRule(GameRule.SPAWN_RADIUS, 0);
-            this.plot.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
-            this.plot.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-            this.plot.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
-            this.plot.setGameRule(GameRule.DISABLE_RAIDS, true);
-            this.plot.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
+            w = Bukkit.createWorld(new WorldCreator(worldName).type(WorldType.FLAT).generateStructures(false));
         }
+
+        this.plot = w;
 
         isLoaded = true;
     }
@@ -170,7 +199,7 @@ public class Plot {
         try {
             this.plotSettings.save(this.plotSettingsF);
         } catch (IOException e) {
-            plugin.getLogger().severe(e.getLocalizedMessage());
+            plugin.getLogger().severe("Error in Plot :212 - " + e.getLocalizedMessage());
         }
     }
 
@@ -216,6 +245,10 @@ public class Plot {
 
     public ItemStack getIcon() {
         return this.icon;
+    }
+
+    public Integer getPlotOnline() {
+        return (Bukkit.getWorld(this.plotName) == null ? 0 : Bukkit.getWorld(this.plotName).getPlayers().size()) + (Bukkit.getWorld(this.linked.getDevPlotName()) == null ? 0 : Bukkit.getWorld(this.linked.getDevPlotName()).getPlayers().size());
     }
 
     public void setPlotName (String plotName) {
@@ -293,8 +326,51 @@ public class Plot {
         try {
             plotSettings.set("icon", ItemStackSerializer.toBase64(icon));
         } catch (IOException e) {
-            plugin.getLogger().severe(e.getLocalizedMessage());
+            plugin.getLogger().severe("Error in Plot :339 - " + e.getLocalizedMessage());
         }
         savePlotSettings();
+    }
+
+    private ItemStack createWorldIcon() {
+        ItemStack i = new ItemStack(Material.GRASS_BLOCK);
+        ItemMeta meta = i.getItemMeta();
+        meta.setDisplayName("§fИгра от игрока §e" + this.owner);
+        meta.setLore(Arrays.asList("§8§oАвтор: " + this.owner, "§f", "§aИдентификатор: §e" + this.id, "§e» Клик, чтобы зайти"));
+        i.setItemMeta(meta);
+        return i;
+    }
+
+    public static void teleportToPlot (Plot plot, Player player) {
+        Location teleport = plot.getPlotWorld().getSpawnLocation();
+
+        player.getInventory().clear();
+        player.clearTitle();
+        player.clearActivePotionEffects();
+        player.closeInventory();
+        player.setHealth(player.getMaxHealth());
+        player.setFoodLevel(20);
+        player.setGameMode(GameMode.ADVENTURE);
+
+        player.teleport(teleport);
+        player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE,100,2);
+    }
+
+    private void registerEvents() {
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    @EventHandler
+    public void onWorldLoaded (WorldLoadEvent event) {
+        World w = event.getWorld();
+        if (w.getName().equalsIgnoreCase(this.plotName)) {
+            w.getWorldBorder().setSize(1024);
+            w.setGameRule(GameRule.SPAWN_RADIUS, 0);
+            w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
+            w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+            w.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+            w.setGameRule(GameRule.DISABLE_RAIDS, true);
+            w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
+            w.setDifficulty(Difficulty.PEACEFUL);
+        }
     }
 }
