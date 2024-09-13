@@ -21,9 +21,9 @@ import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class WorldsMenu extends CreativeSystemMenu implements Listener {
 
-    private String name;
-    private int rows;
-    private HashMap<Integer, ItemStack> items;
+    private final String name;
+    private final int rows;
+    private final HashMap<Integer, ItemStack> items;
 
     public WorldsMenu (String name) {
         this(name, 1);
@@ -80,6 +80,7 @@ public class WorldsMenu extends CreativeSystemMenu implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() != null && event.getClickedInventory().getHolder() instanceof WorldsMenu) {
+            event.setCancelled(true);
             if (event.getSlot() == 49) {
                 MyWorlds mw = new MyWorlds("Мои миры");
                 mw.setPlayer((Player) event.getWhoClicked());

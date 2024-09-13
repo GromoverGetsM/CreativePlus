@@ -30,6 +30,7 @@ import static ru.rstudios.creativeplus.CreativePlus.plugin;
 public class InventoryUtil {
 
     public static Inventory getInventory (String configName, Player player) {
+
         FileConfiguration menuConfig = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder() + File.separator + "messages.yml"));
         ConfigurationSection menuSection = menuConfig.getConfigurationSection("creative.menus." + configName);
 

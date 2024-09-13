@@ -3,6 +3,7 @@ package ru.rstudios.creativeplus.creative.plots;
 import com.jeff_media.jefflib.ItemStackSerializer;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -76,6 +77,17 @@ public class Plot implements Listener {
         return "world_plot_" + (config.getInt("lastWorldId", 0) + 1) + "_CraftPlot";
     }
 
+    public static void loadPlots() {
+        List<File> files = FileUtil.getWorldsList(true);
+
+        if (!files.isEmpty()) {
+            for (File file : files) {
+                FileConfiguration settings = YamlConfiguration.loadConfiguration(new File(file + File.separator + "settings.yml"));
+                new Plot(file.getName(), Bukkit.getPlayer(settings.getString("owner", "Unknown")));
+            }
+        }
+    }
+
     public Plot (@Nullable String plotName, Player owner) {
         registerEvents();
         List<File> files = FileUtil.getWorldsList(true);
@@ -116,8 +128,8 @@ public class Plot implements Listener {
 
         fc.set("name", plotName);
         fc.set("id", id);
-        fc.set("owner", owner);
-        fc.set("category", GameCategories.SANDBOX);
+        fc.set("owner", owner.getName());
+        fc.set("category", GameCategories.SANDBOX.toString());
         try {
             fc.set("icon", ItemStackSerializer.toBase64(createWorldIcon()));
         } catch (IOException e) {
@@ -126,8 +138,8 @@ public class Plot implements Listener {
         fc.createSection("allowedDevs");
         fc.createSection("allowedBuilders");
 
-        FileUtil.save(new File(Bukkit.getWorldContainer() + File.separator + plotName + File.separator + "settings.yml"));
-        FileUtil.save(new File(plugin.getDataFolder() + File.separator + "config.yml"));
+        FileUtil.save(fc, new File(Bukkit.getWorldContainer() + File.separator + plotName + File.separator + "settings.yml"));
+        FileUtil.save(config, new File(plugin.getDataFolder() + File.separator + "config.yml"));
 
         this.plotName = plotName;
         this.id = id;
@@ -353,6 +365,20 @@ public class Plot implements Listener {
 
         player.teleport(teleport);
         player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE,100,2);
+    }
+
+    public void teleportToDev (Player player) {
+        player.getInventory().clear();
+        player.clearTitle();
+        player.clearActivePotionEffects();
+        player.closeInventory();
+        player.setHealth(player.getMaxHealth());
+        player.setFoodLevel(20);
+        player.setGameMode(GameMode.CREATIVE);
+
+        this.linked.load();
+
+        player.teleport(this.linked.getWorld().getSpawnLocation());
     }
 
     private void registerEvents() {

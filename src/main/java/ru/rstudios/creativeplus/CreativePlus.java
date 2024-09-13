@@ -3,6 +3,10 @@ package ru.rstudios.creativeplus;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.rstudios.creativeplus.commands.CreateInventory;
 import ru.rstudios.creativeplus.commands.WorldCommand;
+import ru.rstudios.creativeplus.commands.creative.Games;
+import ru.rstudios.creativeplus.commands.creative.devCommand;
+import ru.rstudios.creativeplus.commands.creative.playCommand;
+import ru.rstudios.creativeplus.creative.plots.Plot;
 import ru.rstudios.creativeplus.events.Event;
 import ru.rstudios.creativeplus.utils.FileUtil;
 
@@ -35,6 +39,11 @@ public final class CreativePlus extends JavaPlugin {
         Objects.requireNonNull(getCommand("ic")).setExecutor(new CreateInventory());
         Objects.requireNonNull(getCommand("world")).setExecutor(new WorldCommand());
         Objects.requireNonNull(getCommand("world")).setTabCompleter(new WorldCommand());
+        Objects.requireNonNull(getCommand("games")).setExecutor(new Games());
+        Objects.requireNonNull(getCommand("dev")).setExecutor(new devCommand());
+        Objects.requireNonNull(getCommand("play")).setExecutor(new playCommand());
+
+        Plot.loadPlots();
     }
 
     @Override

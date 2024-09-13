@@ -18,16 +18,15 @@ import ru.rstudios.creativeplus.utils.InventoryUtil;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class MyWorlds extends CreativeSystemMenu implements Listener {
 
-    private String name;
-    private int rows;
-    private HashMap<Integer, ItemStack> items;
+    private final String name;
+    private final int rows;
+    private final HashMap<Integer, ItemStack> items;
     private Player player;
 
     public MyWorlds (String name) {

@@ -15,7 +15,7 @@ import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class DevPlot {
 
-    private Plot linked;
+    private final Plot linked;
     private File chestsFolder;
     private File jsonCode;
     private String devPlotName;

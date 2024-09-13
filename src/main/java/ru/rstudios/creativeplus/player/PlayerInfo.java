@@ -18,6 +18,7 @@ public class PlayerInfo {
     private List<Integer> plots;
     private int plotLimit;
     private File playerData;
+    private FileConfiguration playerDataConfiguration;
 
     private static Map<Player, PlayerInfo> playerInfoMap = new HashMap<>();
 
@@ -29,12 +30,18 @@ public class PlayerInfo {
     }
 
     public static void removePlayer (Player player) {
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
+        if (info != null) {
+            info.saveConfiguration();
+        }
+
         playerInfoMap.remove(player);
     }
 
     public PlayerInfo (String name) {
         File f = new File(plugin.getDataFolder() + File.separator + "players" + File.separator + name + ".yml");
         this.playerData = f;
+        this.playerDataConfiguration = YamlConfiguration.loadConfiguration(f);
 
         if (!f.exists() || f.length() == 0) {
             create(name, f);
@@ -45,10 +52,10 @@ public class PlayerInfo {
 
     private void create (String name, File file) {
         FileConfiguration fc = FileUtil.loadConfiguration(file);
-        fc.set("name", name);
-        fc.set("plots", new ArrayList<>());
-        fc.set("plotLimit", 3);
-        FileUtil.save(file);
+        playerDataConfiguration.set("name", name);
+        playerDataConfiguration.set("plots", new ArrayList<>());
+        playerDataConfiguration.set("plotLimit", 3);
+        FileUtil.save(fc, file);
 
         this.name = name;
         this.plots = new LinkedList<>();
@@ -71,7 +78,7 @@ public class PlayerInfo {
     }
 
     private void saveConfiguration() {
-        FileUtil.save(playerData);
+        FileUtil.save(playerDataConfiguration, playerData);
     }
 
     private FileConfiguration getConfiguration() {

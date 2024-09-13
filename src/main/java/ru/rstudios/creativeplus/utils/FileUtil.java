@@ -29,8 +29,7 @@ public class FileUtil {
         return YamlConfiguration.loadConfiguration(file);
     }
 
-    public static void save (File f) {
-        FileConfiguration fc = YamlConfiguration.loadConfiguration(f);
+    public static void save (FileConfiguration fc, File f) {
         try {
             fc.save(f);
         } catch (IOException e) {
@@ -134,8 +133,8 @@ public class FileUtil {
 
     public static List<File> getWorldsList (boolean includeUnloaded) {
         List<File> files = new LinkedList<>();
-        files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).toList());
-        if (includeUnloaded) files.addAll(Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles()).filter(File::isDirectory).toList());
+        files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).filter(File -> File.getName().endsWith("CraftPlot")).toList());
+        if (includeUnloaded) files.addAll(Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles()).filter(File::isDirectory).filter(File -> File.getName().endsWith("CraftPlot")).toList());
 
         return files;
     }

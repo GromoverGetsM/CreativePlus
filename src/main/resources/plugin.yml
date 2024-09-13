@@ -7,3 +7,12 @@ commands:
     permission: creative.ic
   world:
     permission: creative.world
+  games:
+    aliases:
+      - g
+  dev:
+    aliases:
+      - вум
+  play:
+    aliases:
+      - здфн
