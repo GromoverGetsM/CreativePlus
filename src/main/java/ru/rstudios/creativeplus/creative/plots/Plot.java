@@ -83,12 +83,12 @@ public class Plot implements Listener {
         if (!files.isEmpty()) {
             for (File file : files) {
                 FileConfiguration settings = YamlConfiguration.loadConfiguration(new File(file + File.separator + "settings.yml"));
-                new Plot(file.getName(), Bukkit.getPlayer(settings.getString("owner", "Unknown")));
+                new Plot(file.getName(), settings.getString("owner", "Unknown"));
             }
         }
     }
 
-    public Plot (@Nullable String plotName, Player owner) {
+    public Plot (@Nullable String plotName, String owner) {
         registerEvents();
         List<File> files = FileUtil.getWorldsList(true);
 
@@ -112,7 +112,7 @@ public class Plot implements Listener {
         }
     }
 
-    private void create (Player owner) {
+    private void create (String owner) {
         FileConfiguration config = FileUtil.loadConfiguration("config.yml");
 
         int id = config.getInt("lastWorldId", 0) + 1;
@@ -128,7 +128,7 @@ public class Plot implements Listener {
 
         fc.set("name", plotName);
         fc.set("id", id);
-        fc.set("owner", owner.getName());
+        fc.set("owner", owner);
         fc.set("category", GameCategories.SANDBOX.toString());
         try {
             fc.set("icon", ItemStackSerializer.toBase64(createWorldIcon()));
@@ -144,7 +144,7 @@ public class Plot implements Listener {
         this.plotName = plotName;
         this.id = id;
         this.customId = null;
-        this.owner = owner.getName();
+        this.owner = owner;
         this.category = GameCategories.SANDBOX;
         this.allowedDevs = new LinkedList<>();
         this.allowedBuilders = new LinkedList<>();
@@ -153,19 +153,19 @@ public class Plot implements Listener {
         this.linked = new DevPlot(this);
         this.icon = createWorldIcon();
 
-        PlayerInfo.getPlayerInfo(owner).addPlot(id);
+        PlayerInfo.getPlayerInfo(Bukkit.getPlayer(owner)).addPlot(id);
         plots.putIfAbsent(plotName, this);
         load(plotName);
-        teleportToPlot(this, owner);
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline()) teleportToPlot(this, Bukkit.getPlayer(owner));
     }
 
-    private void init (String plotName, File f, Player owner) {
+    private void init (String plotName, File f, String owner) {
         FileConfiguration fc = FileUtil.loadConfiguration(f);
 
         this.plotName = plotName;
         this.id = fc.getInt("id", 0);
         this.customId = fc.getString("customId", null);
-        this.owner = owner.getName();
+        this.owner = owner;
         this.category = GameCategories.valueOf(fc.getString("category", null));
         this.allowedDevs = fc.getStringList("allowedDevs").isEmpty() ? new LinkedList<>() : fc.getStringList("allowedDevs");
         this.allowedBuilders = fc.getStringList("allowedBuilders").isEmpty() ? new LinkedList<>() : fc.getStringList("allowedBuilders");
@@ -176,7 +176,7 @@ public class Plot implements Listener {
 
         plots.putIfAbsent(plotName, this);
         if (!isLoaded) load(plotName);
-        teleportToPlot(this, owner);
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline()) teleportToPlot(this, Bukkit.getPlayer(owner));
     }
 
     private void load (String worldName) {
