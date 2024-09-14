@@ -1,12 +1,14 @@
 package ru.rstudios.creativeplus.creative.plots;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,12 +17,12 @@ import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class DevPlot {
 
-    private final Plot linked;
-    private File chestsFolder;
-    private File jsonCode;
-    private String devPlotName;
-    private World world;
-    private boolean isLoaded;
+    public final Plot linked;
+    public File chestsFolder;
+    public File jsonCode;
+    public String devPlotName;
+    public World world;
+    public boolean isLoaded;
 
     public DevPlot (Plot linked) {
         this.linked = linked;
@@ -84,6 +86,51 @@ public class DevPlot {
 
     public World getWorld() {
         return this.world;
+    }
+
+    public static List<Material> getStarterBlocks() {
+        List<Material> list = new ArrayList<>();
+        list.add(Material.DIAMOND_BLOCK);
+        return list;
+    }
+
+    public static List<Material> getActionBlocks() {
+        List<Material> list = new ArrayList<>();
+        list.add(Material.COBBLESTONE);
+        return list;
+    }
+
+    public static List<Material> getAllowedBlocks() {
+        List<Material> list = new ArrayList<>();
+        list.addAll(getStarterBlocks());
+        list.addAll(getActionBlocks());
+        list.add(Material.CRAFTING_TABLE);
+        list.add(Material.ANVIL);
+        list.add(Material.CHIPPED_ANVIL);
+        list.add(Material.DAMAGED_ANVIL);
+        list.add(Material.ENDER_CHEST);
+        list.add(Material.PISTON);
+        list.add(Material.FURNACE);
+        list.add(Material.SHULKER_BOX);
+        list.add(Material.BLACK_SHULKER_BOX);
+        list.add(Material.BLUE_SHULKER_BOX);
+        list.add(Material.LIGHT_BLUE_SHULKER_BOX);
+        list.add(Material.CYAN_SHULKER_BOX);
+        list.add(Material.GRAY_SHULKER_BOX);
+        list.add(Material.BROWN_SHULKER_BOX);
+        list.add(Material.GREEN_SHULKER_BOX);
+        list.add(Material.LIGHT_GRAY_SHULKER_BOX);
+        list.add(Material.LIME_SHULKER_BOX);
+        list.add(Material.MAGENTA_SHULKER_BOX);
+        list.add(Material.ORANGE_SHULKER_BOX);
+        list.add(Material.YELLOW_SHULKER_BOX);
+        list.add(Material.WHITE_SHULKER_BOX);
+        list.add(Material.RED_SHULKER_BOX);
+        list.add(Material.PURPLE_SHULKER_BOX);
+        list.add(Material.LOOM);
+        list.add(Material.BREWING_STAND);
+        list.add(Material.GRINDSTONE);
+        return list;
     }
 
 }

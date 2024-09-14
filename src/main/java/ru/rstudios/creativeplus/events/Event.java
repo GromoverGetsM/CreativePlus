@@ -1,7 +1,14 @@
 package ru.rstudios.creativeplus.events;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.World;
 import org.bukkit.Material;
 import org.bukkit.WorldBorder;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,11 +18,16 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.rstudios.creativeplus.creative.menus.main.WorldsMenu;
+import ru.rstudios.creativeplus.creative.plots.DevPlot;
+import ru.rstudios.creativeplus.creative.plots.Plot;
 import ru.rstudios.creativeplus.player.PlayerInfo;
+import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class Event implements Listener {
 
@@ -38,6 +50,13 @@ public class Event implements Listener {
     public void onPlayerLeft (PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PlayerInfo.removePlayer(player);
+
+        if (player.getWorld().getName().endsWith("_dev") || player.getWorld().getName().endsWith("_CraftPlot")) {
+            Plot plot = Plot.getByPlayer(event.getPlayer());
+            if (plot == null || plot.getPlotOnline() == 0) {
+                plot.unload();
+            }
+        }
     }
 
     @EventHandler
@@ -63,33 +82,53 @@ public class Event implements Listener {
     public void onWorldChanged (PlayerChangedWorldEvent event) {
         String from = event.getFrom().getName();
         String destination = event.getPlayer().getWorld().getName();
+        boolean inPlot;
 
-        if (from.endsWith("_dev") && destination.endsWith("_CraftPlot") && !from.replace("_dev", "_CraftPlot").equals(destination)) {
+        if (
+                (from.endsWith("_CraftPlot") && destination.endsWith("_dev") && from.replace("_CraftPlot", "_dev").equalsIgnoreCase(destination)) ||
+                        (from.endsWith("_dev") && destination.endsWith("_CraftPlot") && destination.replace("_CraftPlot", "_dev").equalsIgnoreCase(from))
+        ) inPlot = true;
+        else inPlot = !from.endsWith("_dev") && !from.endsWith("_CraftPlot");
 
-        } else if (from.endsWith("_CraftPlot") && destination.endsWith("_dev") && !destination.replace("_dev", "_CraftPlot").equals(from)) {
-
-        } else if ((from.endsWith("_CraftPlot") || from.endsWith("_dev")) && (!destination.endsWith("_CraftPlot") || !destination.endsWith("_dev"))) {
-
+        if (!inPlot) {
+            Plot plot = Plot.getByWorld(event.getFrom());
+            if (plot == null || plot.getPlotOnline() == 0) {
+                plot.unload();
+            }
         }
     }
 
     @EventHandler
     public void onBlockBroken (BlockBreakEvent event) {
         if (event.getPlayer().getWorld().getName().endsWith("_dev")) {
-            if (Arrays.asList(Material.WHITE_STAINED_GLASS, Material.LIGHT_BLUE_STAINED_GLASS, Material.LIGHT_GRAY_STAINED_GLASS).contains(event.getBlock().getType())) event.setCancelled(true);
+            Block b = event.getBlock();
+            Material type = b.getType();
+            if (!DevPlot.getAllowedBlocks().contains(type)) event.setCancelled(true);
+
+            if (DevPlot.getStarterBlocks().contains(type)) {
+                BlockVector3 pos1 = BlockVector3.at(b.getX(), b.getY(), b.getZ());
+                BlockVector3 pos2 = BlockVector3.at(b.getX() - 124, b.getY() + 1, b.getZ() -1);
+
+                if (WorldEditPlugin.getPlugin(WorldEditPlugin.class).isEnabled()) plugin.getLogger().warning("WorldEdit enabled");
+                else {
+                    plugin.getLogger().severe("WorldEdit Disabled. Return");
+                    return;
+                }
+
+                CodingHandleUtils.setBlocks(new BukkitWorld(b.getWorld()), pos1, pos2);
+            }
         }
     }
 
     @EventHandler
     public void onBlockPlaced (BlockPlaceEvent event) {
         if (event.getPlayer().getWorld().getName().endsWith("_dev")) {
-            List<Material> allowedBlock = new ArrayList<>();
-            allowedBlock.add(Material.ENDER_CHEST);
-            allowedBlock.add(Material.CRAFTING_TABLE);
-            allowedBlock.add(Material.SHULKER_BOX);
-            allowedBlock.add(Material.ANVIL);
+            Material block = event.getBlock().getType();
+            List<Material> allowedBlock = DevPlot.getAllowedBlocks();
 
-            if (!allowedBlock.contains(event.getBlock().getType())) event.setCancelled(true);
+            if (!allowedBlock.contains(block)) event.setCancelled(true);
+            else if (DevPlot.getStarterBlocks().contains(block) && !event.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LIGHT_BLUE_STAINED_GLASS)) event.setCancelled(true);
+            else if (DevPlot.getActionBlocks().contains(block) && !event.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LIGHT_GRAY_STAINED_GLASS)) event.setCancelled(true);
         }
     }
 }

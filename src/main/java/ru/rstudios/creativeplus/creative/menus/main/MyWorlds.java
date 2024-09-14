@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
 import ru.rstudios.creativeplus.creative.plots.Plot;
+import ru.rstudios.creativeplus.creative.plots.PlotInitializeReason;
 import ru.rstudios.creativeplus.player.PlayerInfo;
 import ru.rstudios.creativeplus.utils.InventoryUtil;
 
@@ -96,7 +97,17 @@ public class MyWorlds extends CreativeSystemMenu implements Listener {
                 if (event.isCancelled()) return;
                 event.setCancelled(true);
                 event.getWhoClicked().closeInventory();
-                new Plot(Plot.getNextPlotName(), event.getWhoClicked().getName());
+                new Plot(Plot.getNextPlotName(), event.getWhoClicked().getName(), PlotInitializeReason.PLAYER_PLOT_CREATED);
+            } else if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.WHITE_STAINED_GLASS) {
+                List<String> lore = event.getCurrentItem().getItemMeta().getLore();
+                int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
+                Plot plot = Plot.getById(id);
+                if (plot != null) {
+                    event.getWhoClicked().closeInventory();
+                    if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
+                    Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
+                }
+                event.setCancelled(true);
             }
         }
     }

@@ -73,6 +73,10 @@
           <id>jeff-media-gbr</id>
           <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
       </repository>
+      <repository>
+          <id>enginehub</id>
+          <url>https://maven.enginehub.org/repo/</url>
+      </repository>
   </repositories>
 
   <dependencies>
@@ -92,6 +96,11 @@
           <artifactId>jefflib</artifactId>
           <version>14.2.0</version>
           <scope>compile</scope>
+      </dependency>
+      <dependency>
+          <groupId>com.sk89q.worldedit</groupId>
+          <artifactId>worldedit-bukkit</artifactId>
+          <version>7.2.6</version>
       </dependency>
   </dependencies>
 </project>

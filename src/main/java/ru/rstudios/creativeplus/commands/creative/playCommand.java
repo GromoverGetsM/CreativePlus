@@ -14,8 +14,8 @@ public class playCommand implements CommandExecutor {
         if (sender instanceof Player player) {
             if (args.length == 0) {
                 Plot plot = Plot.getByPlayer(player);
-                if (plot != null && (plot.getAllowedDevs().contains(player.getName()) || plot.getOwner().equalsIgnoreCase(player.getName()))) {
-                    plot.teleportToDev(player);
+                if (plot != null) {
+                    Plot.teleportToPlot(plot, player);
                 }
             }
         }

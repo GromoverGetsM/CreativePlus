@@ -8,15 +8,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.tech.GameCategories;
 import ru.rstudios.creativeplus.player.PlayerInfo;
 import ru.rstudios.creativeplus.utils.FileUtil;
+import ru.rstudios.creativeplus.creative.plots.PlotInitializeReason;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
@@ -37,6 +41,7 @@ public class Plot implements Listener {
     private FileConfiguration plotSettings;
     private File plotSettingsF;
     private World plot;
+    private PlotInitializeReason reason;
     private boolean isLoaded = false;
 
     public static Map<String, Plot> plots = new HashMap<>();
@@ -80,19 +85,20 @@ public class Plot implements Listener {
     }
 
     public static void loadPlots() {
-        List<File> files = FileUtil.getWorldsList(true);
+        List<File> files = FileUtil.getWorldsList(true, true);
 
         if (!files.isEmpty()) {
             for (File file : files) {
                 FileConfiguration settings = YamlConfiguration.loadConfiguration(new File(file + File.separator + "settings.yml"));
-                new Plot(file.getName(), settings.getString("owner", "Unknown"));
+                new Plot(file.getName(), settings.getString("owner", "Unknown"), PlotInitializeReason.SERVER_STARTED);
             }
         }
     }
 
-    public Plot (@Nullable String plotName, String owner) {
+    public Plot (String plotName, String owner, PlotInitializeReason reason) {
         registerEvents();
-        List<File> files = FileUtil.getWorldsList(true);
+        this.reason = reason;
+        List<File> files = FileUtil.getWorldsList(true, true);
 
         boolean found = false;
         File f = null;
@@ -107,9 +113,9 @@ public class Plot implements Listener {
             }
 
             if (found) {
-                init(plotName, f, owner);
+                if (load(plotName)) init(plotName, f, owner);
             } else {
-                create(owner);
+                if (load(plotName)) create(owner);
             }
         }
     }
@@ -157,8 +163,8 @@ public class Plot implements Listener {
 
         PlayerInfo.getPlayerInfo(Bukkit.getPlayer(owner)).addPlot(id);
         plots.putIfAbsent(plotName, this);
-        load(plotName);
-        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline()) teleportToPlot(this, Bukkit.getPlayer(owner));
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline() && this.reason != PlotInitializeReason.SERVER_STARTED) teleportToPlot(this, Bukkit.getPlayer(owner));
+        if (this.reason == PlotInitializeReason.SERVER_STARTED) unload();
     }
 
     private void init (String plotName, File f, String owner) {
@@ -179,37 +185,48 @@ public class Plot implements Listener {
         this.linked = new DevPlot(this);
 
         plots.putIfAbsent(plotName, this);
-        if (!isLoaded) load(plotName);
-        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline()) teleportToPlot(this, Bukkit.getPlayer(owner));
+        if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline() && this.reason != PlotInitializeReason.SERVER_STARTED) teleportToPlot(this, Bukkit.getPlayer(owner));
+        if (this.reason == PlotInitializeReason.SERVER_STARTED) unload();
     }
 
-    private void load (String worldName) {
-        List<File> files = FileUtil.getWorldsList(true);
+    public boolean load(String worldName) {
+        File worldFolder = Arrays.stream(Bukkit.getWorldContainer().listFiles())
+                .filter(File::isDirectory)
+                .filter(file -> file.getName().endsWith("_CraftPlot"))
+                .filter(file -> file.getName().equalsIgnoreCase(worldName))
+                .findFirst()
+                .orElse(null);
 
-        boolean found = false;
-        File folder = null;
+        if (worldFolder == null) {
+            worldFolder = Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles())
+                    .filter(File::isDirectory)
+                    .filter(file -> file.getName().endsWith("_CraftPlot"))
+                    .filter(file -> file.getName().equalsIgnoreCase(worldName))
+                    .findFirst()
+                    .orElse(new File(Bukkit.getWorldContainer() + File.separator + worldName));
+        }
 
-        for (File file : files) {
-            if (file.getName().equalsIgnoreCase(plotName) && file.isDirectory()) {
-                found = true;
-                folder = file;
-                break;
+        if (!worldFolder.exists()) {
+            this.plot = Bukkit.createWorld(new WorldCreator(worldName).type(WorldType.FLAT).generateStructures(false));
+        } else if (worldFolder.getParentFile().getName().equalsIgnoreCase("unloadedWorlds")) {
+            File world = new File(Bukkit.getWorldContainer() + File.separator + worldName);
+            try {
+                Files.move(worldFolder.toPath(), world.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                plugin.getLogger().severe(e.getLocalizedMessage());
+                return false;
             }
-        }
-
-        World w;
-
-        if (found && folder.isDirectory()) {
-            if (folder.getPath().contains(plugin.getDataFolder().getName())) FileUtil.moveFilesTo(folder, Bukkit.getWorldContainer());
-            w = Bukkit.createWorld(new WorldCreator(worldName).type(WorldType.FLAT).generateStructures(false));
+            FileUtil.deleteDirectory(worldFolder);
+            this.plot = Bukkit.createWorld(new WorldCreator(worldName));
         } else {
-            w = Bukkit.createWorld(new WorldCreator(worldName).type(WorldType.FLAT).generateStructures(false));
+            this.plot = Bukkit.createWorld(new WorldCreator(worldName));
         }
 
-        this.plot = w;
-
-        isLoaded = true;
+        this.isLoaded = true;
+        return true;
     }
+
+
 
     private void savePlotSettings() {
         try {
@@ -267,18 +284,32 @@ public class Plot implements Listener {
         ItemStack icon = new ItemStack(this.icon);
         ItemMeta iconMeta = icon.getItemMeta();
         iconMeta.setDisplayName(this.iconName);
-        List<String> iconLore = this.iconLore;
-        iconLore.add("§f");
-        iconLore.add("§aИдентификатор: §e" + this.id);
-        iconLore.add("§e» Клик, чтобы зайти");
-        iconMeta.setLore(this.iconLore);
+
+        List<String> lore = new ArrayList<>();
+        lore.add("§8§oАвтор: " + this.owner);
+        lore.add("§f");
+        lore.addAll(this.iconLore);
+        lore.add("§f");
+        lore.add("§aИдентификатор: §e" + this.id);
+        lore.add("§e» Клик, чтобы зайти");
+
+        iconMeta.setLore(lore);
         icon.setItemMeta(iconMeta);
 
         return icon;
     }
 
+
     public Integer getPlotOnline() {
-        return (Bukkit.getWorld(this.plotName) == null ? 0 : Bukkit.getWorld(this.plotName).getPlayers().size()) + (Bukkit.getWorld(this.linked.getDevPlotName()) == null ? 0 : Bukkit.getWorld(this.linked.getDevPlotName()).getPlayers().size());
+        return getPlotOnlineList().isEmpty() ? 0 : getPlotOnlineList().size();
+    }
+
+    public List<Player> getPlotOnlineList() {
+        List<Player> plotPlayers = new ArrayList<>();
+
+        plotPlayers.addAll(Bukkit.getWorld(this.plotName) == null ? new ArrayList<>() : Bukkit.getWorld(this.plotName).getPlayers());
+        plotPlayers.addAll(Bukkit.getWorld(this.linked.getDevPlotName()) == null ? new ArrayList<>() : Bukkit.getWorld(this.linked.getDevPlotName()).getPlayers());
+        return plotPlayers;
     }
 
     public void setPlotName (String plotName) {
@@ -391,6 +422,53 @@ public class Plot implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    public void unload() {
+        for (Player player : getPlotOnlineList()) {
+            player.teleport(Bukkit.getWorld("world").getSpawnLocation());
+
+            player.getInventory().clear();
+            player.clearTitle();
+            player.clearActivePotionEffects();
+            player.closeInventory();
+            player.setHealth(player.getMaxHealth());
+            player.setFoodLevel(20);
+            player.setGameMode(GameMode.ADVENTURE);
+
+            player.sendMessage("§bCreative+ §8» §fМир в котором ты находился выключился, ты был перемещён на спавн");
+        }
+
+        Bukkit.unloadWorld(this.plotName, true);
+        this.isLoaded = false;
+        Bukkit.unloadWorld(this.linked.getDevPlotName(), true);
+        this.linked.isLoaded = false;
+
+    }
+
+    @EventHandler
+    public void onWorldUnloaded (WorldUnloadEvent event) {
+        World world = event.getWorld();
+        if (world.getName().equalsIgnoreCase(this.plotName) || world.getName().equalsIgnoreCase(this.linked.getDevPlotName())) {
+            File worldFile = new File(Bukkit.getWorldContainer(), world.getName());
+            File destination = new File(plugin.getDataFolder() + File.separator + "unloadedWorlds" + File.separator + world.getName());
+
+            if (!destination.exists() || !destination.isDirectory()) {
+                if (!destination.mkdirs()) {
+                    plugin.getLogger().severe("Не удалось сохранить мир " + worldFile + ": Папка для отгруженых миров не существует и ее создание невозможно");
+                    return;
+                }
+            }
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                try {
+                    Files.move(worldFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    plugin.getLogger().severe(e.getLocalizedMessage());
+                }
+                FileUtil.deleteDirectory(worldFile);
+            }, 60L);
+        }
+    }
+
     @EventHandler
     public void onWorldLoaded (WorldLoadEvent event) {
         World w = event.getWorld();
@@ -401,7 +479,7 @@ public class Plot implements Listener {
             w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
             w.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
             w.setGameRule(GameRule.DISABLE_RAIDS, true);
-            w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
+            w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
             w.setDifficulty(Difficulty.PEACEFUL);
         }
     }

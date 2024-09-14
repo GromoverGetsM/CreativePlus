@@ -37,27 +37,54 @@ public class FileUtil {
         }
     }
 
-    public static void moveFilesTo (File fromFolder, File destinationFolder) {
+    public static boolean moveFilesTo(File fromFolder, File destinationFolder) {
         File[] files = fromFolder.listFiles();
+        boolean success = true;
 
         if (files != null && files.length != 0) {
             for (File f : files) {
+                File dest = new File(destinationFolder + File.separator + f.getName());
+
                 if (f.isDirectory()) {
+                    if (dest.exists()) {
+                        try {
+                            org.apache.commons.io.FileUtils.deleteDirectory(dest);
+                        } catch (IOException e) {
+                            plugin.getLogger().severe("Error in FileUtil :52 (delete directory) - " + e.getLocalizedMessage());
+                            success = false;
+                            break;
+                        }
+                    }
+
                     try {
-                        org.apache.commons.io.FileUtils.moveDirectory(f, destinationFolder);
+                        org.apache.commons.io.FileUtils.moveDirectory(f, dest);
                     } catch (IOException e) {
-                        plugin.getLogger().severe("Error in FileUtil :50 - " + e.getLocalizedMessage());
+                        plugin.getLogger().severe("Error in FileUtil :59 (move directory) - " + e.getLocalizedMessage());
+                        success = false;
+                        break;
                     }
                 } else {
+                    if (dest.exists()) {
+                        if (!dest.delete()) {
+                            plugin.getLogger().severe("Error in FileUtil :64 (delete file) - Couldn't delete existing file: " + dest.getPath());
+                            success = false;
+                            break;
+                        }
+                    }
+
                     try {
-                        org.apache.commons.io.FileUtils.moveFile(f, destinationFolder);
+                        org.apache.commons.io.FileUtils.moveFile(f, dest);
                     } catch (IOException e) {
-                        plugin.getLogger().severe("Error in FileUtil :56 - " + e.getLocalizedMessage());
+                        plugin.getLogger().severe("Error in FileUtil :71 (move file) - " + e.getLocalizedMessage());
+                        success = false;
+                        break;
                     }
                 }
             }
         }
+        return success;
     }
+
 
     public static void copyFilesTo (File fromFolder, File destinationFolder) {
         File[] files = fromFolder.listFiles();
@@ -131,12 +158,30 @@ public class FileUtil {
         }
     }
 
-    public static List<File> getWorldsList (boolean includeUnloaded) {
+    public static List<File> getWorldsList (boolean includeUnloaded, boolean includeLoaded) {
         List<File> files = new LinkedList<>();
-        files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).filter(File -> File.getName().endsWith("CraftPlot")).toList());
+        if (includeLoaded) files.addAll(Arrays.stream(Bukkit.getWorldContainer().listFiles()).filter(File::isDirectory).filter(File -> File.getName().endsWith("CraftPlot")).toList());
         if (includeUnloaded) files.addAll(Arrays.stream(new File(plugin.getDataFolder() + File.separator + "unloadedWorlds").listFiles()).filter(File::isDirectory).filter(File -> File.getName().endsWith("CraftPlot")).toList());
 
         return files;
+    }
+
+    public static void deleteDirectory (File directory) {
+        if (!directory.exists()) {
+            return;
+        }
+
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        directory.delete();
     }
 
 }

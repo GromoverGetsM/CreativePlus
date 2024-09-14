@@ -85,6 +85,17 @@ public class WorldsMenu extends CreativeSystemMenu implements Listener {
                 MyWorlds mw = new MyWorlds("Мои миры");
                 mw.setPlayer((Player) event.getWhoClicked());
                 event.getWhoClicked().openInventory(mw.getInventory());
+            } else if (Arrays.asList(20, 21, 22, 23, 24, 29, 30, 31, 32, 33).contains(event.getSlot())) {
+                if (event.getCurrentItem() != null) {
+                    List<String> lore = event.getCurrentItem().getItemMeta().getLore();
+                    int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
+                    Plot plot = Plot.getById(id);
+                    if (plot != null) {
+                        event.getWhoClicked().closeInventory();
+                        if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
+                        Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
+                    }
+                }
             }
         }
     }

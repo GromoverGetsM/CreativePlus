@@ -48,6 +48,10 @@ public final class CreativePlus extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+
+        for (Plot plot : Plot.plots.values()) {
+            if (plot.getPlotLoaded()) plot.unload();
+        }
+
     }
 }

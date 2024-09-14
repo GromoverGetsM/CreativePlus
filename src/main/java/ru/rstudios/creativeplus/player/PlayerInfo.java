@@ -82,7 +82,7 @@ public class PlayerInfo {
     }
 
     private FileConfiguration getConfiguration() {
-        return YamlConfiguration.loadConfiguration(playerData);
+        return playerDataConfiguration;
     }
 
     public String getName() {
