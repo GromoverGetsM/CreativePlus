@@ -1,9 +1,8 @@
 package ru.rstudios.creativeplus.creative.plots;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import org.bukkit.*;
 import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
@@ -131,6 +130,14 @@ public class DevPlot {
         list.add(Material.BREWING_STAND);
         list.add(Material.GRINDSTONE);
         return list;
+    }
+
+    public boolean inTerritory (Location location) {
+        BlockVector3 pos1 = BlockVector3.at(63, -59, 63);
+        BlockVector3 pos2 = BlockVector3.at(-64, 255, -64);
+        CuboidRegion region = new CuboidRegion(pos1, pos2);
+
+        return region.contains(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
     }
 
 }

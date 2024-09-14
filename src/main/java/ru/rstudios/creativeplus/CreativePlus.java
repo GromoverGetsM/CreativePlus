@@ -1,5 +1,6 @@
 package ru.rstudios.creativeplus;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.rstudios.creativeplus.commands.CreateInventory;
 import ru.rstudios.creativeplus.commands.WorldCommand;
@@ -36,6 +37,12 @@ public final class CreativePlus extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new Event(), this);
         getServer().getPluginManager().registerEvents(new CreateInventory(), this);
 
+        boolean isWEEnabled = getServer().getPluginManager().isPluginEnabled("WorldEdit");
+        if (!isWEEnabled) {
+            getLogger().severe("WorldEdit 3.3.0 не найден в списке плагинов. Выключаюсь...");
+            getServer().getPluginManager().disablePlugin(this);
+        }
+
         Objects.requireNonNull(getCommand("ic")).setExecutor(new CreateInventory());
         Objects.requireNonNull(getCommand("world")).setExecutor(new WorldCommand());
         Objects.requireNonNull(getCommand("world")).setTabCompleter(new WorldCommand());
@@ -50,7 +57,7 @@ public final class CreativePlus extends JavaPlugin {
     public void onDisable() {
 
         for (Plot plot : Plot.plots.values()) {
-            if (plot.getPlotLoaded()) plot.unload();
+            if (plot.getPlotLoaded()) plot.unload(true);
         }
 
     }

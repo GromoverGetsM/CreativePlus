@@ -164,7 +164,7 @@ public class Plot implements Listener {
         PlayerInfo.getPlayerInfo(Bukkit.getPlayer(owner)).addPlot(id);
         plots.putIfAbsent(plotName, this);
         if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline() && this.reason != PlotInitializeReason.SERVER_STARTED) teleportToPlot(this, Bukkit.getPlayer(owner));
-        if (this.reason == PlotInitializeReason.SERVER_STARTED) unload();
+        if (this.reason == PlotInitializeReason.SERVER_STARTED) unload(false);
     }
 
     private void init (String plotName, File f, String owner) {
@@ -186,7 +186,7 @@ public class Plot implements Listener {
 
         plots.putIfAbsent(plotName, this);
         if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline() && this.reason != PlotInitializeReason.SERVER_STARTED) teleportToPlot(this, Bukkit.getPlayer(owner));
-        if (this.reason == PlotInitializeReason.SERVER_STARTED) unload();
+        if (this.reason == PlotInitializeReason.SERVER_STARTED) unload(false);
     }
 
     public boolean load(String worldName) {
@@ -422,25 +422,27 @@ public class Plot implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    public void unload() {
-        for (Player player : getPlotOnlineList()) {
-            player.teleport(Bukkit.getWorld("world").getSpawnLocation());
+    public void unload (boolean bypassPlayers) {
+        if (bypassPlayers) {
+            for (Player player : getPlotOnlineList()) {
+                player.teleport(Bukkit.getWorld("world").getSpawnLocation());
 
-            player.getInventory().clear();
-            player.clearTitle();
-            player.clearActivePotionEffects();
-            player.closeInventory();
-            player.setHealth(player.getMaxHealth());
-            player.setFoodLevel(20);
-            player.setGameMode(GameMode.ADVENTURE);
+                player.getInventory().clear();
+                player.clearTitle();
+                player.clearActivePotionEffects();
+                player.closeInventory();
+                player.setHealth(player.getMaxHealth());
+                player.setFoodLevel(20);
+                player.setGameMode(GameMode.ADVENTURE);
 
-            player.sendMessage("§bCreative+ §8» §fМир в котором ты находился выключился, ты был перемещён на спавн");
+                player.sendMessage("§bCreative+ §8» §fМир в котором ты находился выключился, ты был перемещён на спавн");
+            }
+
+            Bukkit.unloadWorld(this.plotName, true);
+            this.isLoaded = false;
+            Bukkit.unloadWorld(this.linked.getDevPlotName(), true);
+            this.linked.isLoaded = false;
         }
-
-        Bukkit.unloadWorld(this.plotName, true);
-        this.isLoaded = false;
-        Bukkit.unloadWorld(this.linked.getDevPlotName(), true);
-        this.linked.isLoaded = false;
 
     }
 

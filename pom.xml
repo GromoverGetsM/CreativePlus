@@ -100,7 +100,13 @@
       <dependency>
           <groupId>com.sk89q.worldedit</groupId>
           <artifactId>worldedit-bukkit</artifactId>
-          <version>7.2.6</version>
+          <version>7.3.0</version>
+          <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.reflections</groupId>
+          <artifactId>reflections</artifactId>
+          <version>0.10.2</version>
       </dependency>
   </dependencies>
 </project>

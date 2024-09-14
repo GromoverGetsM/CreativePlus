@@ -1,14 +1,15 @@
 package ru.rstudios.creativeplus.events;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.World;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,15 +18,15 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.reflections.Reflections;
 import ru.rstudios.creativeplus.creative.menus.main.WorldsMenu;
 import ru.rstudios.creativeplus.creative.plots.DevPlot;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 import ru.rstudios.creativeplus.player.PlayerInfo;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
@@ -54,7 +55,7 @@ public class Event implements Listener {
         if (player.getWorld().getName().endsWith("_dev") || player.getWorld().getName().endsWith("_CraftPlot")) {
             Plot plot = Plot.getByPlayer(event.getPlayer());
             if (plot == null || plot.getPlotOnline() == 0) {
-                plot.unload();
+                plot.unload(true);
             }
         }
     }
@@ -93,7 +94,7 @@ public class Event implements Listener {
         if (!inPlot) {
             Plot plot = Plot.getByWorld(event.getFrom());
             if (plot == null || plot.getPlotOnline() == 0) {
-                plot.unload();
+                plot.unload(true);
             }
         }
     }
@@ -105,17 +106,37 @@ public class Event implements Listener {
             Material type = b.getType();
             if (!DevPlot.getAllowedBlocks().contains(type)) event.setCancelled(true);
 
-            if (DevPlot.getStarterBlocks().contains(type)) {
+            if (DevPlot.getStarterBlocks().contains(type) || (type == Material.OAK_WALL_SIGN && DevPlot.getStarterBlocks().contains(b.getRelative(BlockFace.SOUTH).getType()))) {
+                if (type == Material.OAK_WALL_SIGN) {
+                    b = b.getRelative(BlockFace.SOUTH);
+                }
                 BlockVector3 pos1 = BlockVector3.at(b.getX(), b.getY(), b.getZ());
                 BlockVector3 pos2 = BlockVector3.at(b.getX() - 124, b.getY() + 1, b.getZ() -1);
 
-                if (WorldEditPlugin.getPlugin(WorldEditPlugin.class).isEnabled()) plugin.getLogger().warning("WorldEdit enabled");
-                else {
-                    plugin.getLogger().severe("WorldEdit Disabled. Return");
-                    return;
+                CodingHandleUtils.setBlocks(BukkitAdapter.adapt(b.getWorld()), pos1, pos2);
+            } else if (DevPlot.getActionBlocks().contains(type) || (type == Material.OAK_WALL_SIGN && DevPlot.getActionBlocks().contains(b.getRelative(BlockFace.SOUTH).getType()))) {
+                if (type == Material.OAK_WALL_SIGN) {
+                    type = b.getRelative(BlockFace.SOUTH).getType();
+                    b = b.getRelative(BlockFace.SOUTH);
                 }
 
-                CodingHandleUtils.setBlocks(new BukkitWorld(b.getWorld()), pos1, pos2);
+                Block finalB = b;
+                switch (type) {
+                    case COBBLESTONE -> {
+                        b.getRelative(BlockFace.NORTH).setType(Material.AIR);
+                        b.setType(Material.AIR);
+                        b.getRelative(BlockFace.UP).setType(Material.AIR);
+                        b.getRelative(BlockFace.WEST).setType(Material.AIR);
+
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            Location lastStringBlock = getLastStringBlock(finalB.getLocation());
+                            CodingHandleUtils.moveBlocks(finalB.getLocation().add(-2, 0, 0), lastStringBlock.add(-1, 1, -1), BlockFace.EAST, 2);
+                        }, 5L);
+                    }
+                    default -> {
+                        return;
+                    }
+                }
             }
         }
     }
@@ -129,6 +150,76 @@ public class Event implements Listener {
             if (!allowedBlock.contains(block)) event.setCancelled(true);
             else if (DevPlot.getStarterBlocks().contains(block) && !event.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LIGHT_BLUE_STAINED_GLASS)) event.setCancelled(true);
             else if (DevPlot.getActionBlocks().contains(block) && !event.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LIGHT_GRAY_STAINED_GLASS)) event.setCancelled(true);
+
+            if ((DevPlot.getStarterBlocks().contains(block) && event.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LIGHT_BLUE_STAINED_GLASS)) || (DevPlot.getActionBlocks().contains(block) && event.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LIGHT_GRAY_STAINED_GLASS))) {
+                Material relativeBlock;
+                String blockName;
+                switch (block) {
+                    case DIAMOND_BLOCK -> {
+                        relativeBlock = Material.DIAMOND_ORE;
+                        blockName = "Событие игрока";
+                    }
+                    case COBBLESTONE -> {
+                        relativeBlock = Material.STONE;
+                        blockName = "Действие игрока";
+                    }
+                    default -> {
+                        relativeBlock = Material.AIR;
+                        blockName = "UnknownAction";
+                    }
+                }
+
+                event.setCancelled(!place(event.getBlock().getLocation(), relativeBlock, blockName));
+            } else if ((DevPlot.getStarterBlocks().contains(block) && !event.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LIGHT_BLUE_STAINED_GLASS)) || (DevPlot.getActionBlocks().contains(block) && !event.getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LIGHT_GRAY_STAINED_GLASS))) {
+                event.setCancelled(true);
+            }
         }
+    }
+
+    private boolean place (Location mainBlock, Material additional, String actionName) {
+        if (additional != null && additional != Material.AIR) {
+            if (additional != Material.PISTON) {
+                mainBlock.getBlock().getRelative(BlockFace.WEST).setType(additional);
+            } else {
+                Block relative = mainBlock.getBlock().getRelative(BlockFace.WEST);
+                relative.setType(additional);
+                Directional facing = (Directional) relative.getBlockData();
+                facing.setFacing(BlockFace.WEST);
+                relative.setBlockData(facing);
+
+                Block piston = relative.getRelative(BlockFace.WEST, 2);
+                if (piston.getType() != Material.AIR) {
+                    Location pos1 = piston.getLocation().add(-1, 0, 0);
+                    Location pos2 = getLastStringBlock(piston.getLocation());
+
+                    Location moveTo = pos2.getBlock().getRelative(BlockFace.WEST, 2).getLocation();
+
+                    if (Plot.getByWorld(Bukkit.getWorld(mainBlock.getWorld().getName().replace("_dev", "_CraftPlot"))).getLinkedDevPlot().inTerritory(moveTo)) {
+                        CodingHandleUtils.moveBlocks(pos1, pos2, BlockFace.WEST, 2);
+                    }
+                }
+            }
+        }
+
+        mainBlock.getBlock().getRelative(BlockFace.NORTH).setType(Material.OAK_WALL_SIGN);
+        Sign sign = (Sign) mainBlock.getBlock().getRelative(BlockFace.NORTH).getState();
+        sign.setLine(1, actionName);
+        sign.update();
+
+        return true;
+    }
+
+    private Location getLastStringBlock (Location starterBlock) {
+        Block b = starterBlock.getBlock();
+
+        for (int x = starterBlock.getBlockX(); x > -64; x -= 2) {
+            Location cloned = starterBlock.clone().add(x, 0, 0);
+
+            if (cloned.getBlock().getType() != Material.AIR && cloned.getBlockX() < b.getLocation().getBlockX()) {
+                b = cloned.getBlock();
+            }
+        }
+
+        return b.getLocation();
     }
 }
