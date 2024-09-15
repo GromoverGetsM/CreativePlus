@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.reflections.Reflections;
+import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
 import ru.rstudios.creativeplus.creative.menus.main.WorldsMenu;
 import ru.rstudios.creativeplus.creative.plots.DevPlot;
 import ru.rstudios.creativeplus.creative.plots.Plot;
@@ -26,6 +28,7 @@ import ru.rstudios.creativeplus.player.PlayerInfo;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
@@ -62,9 +65,27 @@ public class Event implements Listener {
 
     @EventHandler
     public void onPlayerInteract (PlayerInteractEvent event) {
+        Block target = event.getPlayer().getTargetBlockExact(5);
 
-        if (event.getAction().isRightClick() && event.getItem() != null && event.getItem().getType().equals(Material.DIAMOND)) {
+        if (event.getPlayer().getWorld().getName().equalsIgnoreCase("world") && event.getAction().isRightClick() && event.getItem() != null && event.getItem().getType().equals(Material.DIAMOND)) {
             event.getPlayer().openInventory(new WorldsMenu("Миры игроков").getInventory());
+        }
+
+        if (event.getAction().isRightClick() && target != null && target.getType() == Material.OAK_WALL_SIGN && event.getPlayer().getWorld().getName().endsWith("_dev")) {
+            event.setCancelled(true);
+            switch (target.getRelative(BlockFace.SOUTH).getType()) {
+                case DIAMOND_BLOCK -> event.getPlayer().openInventory(new PlayerEvent("Событие игрока").getInventory());
+            }
+        } else if (target.getType() == Material.CHEST) {
+            Chest chest = (Chest) target.getState();
+
+            if (!Objects.equals(chest.getBlockInventory().getItem(0), new ItemStack(Material.BARRIER))) {
+                String actionDisplayName = ((Sign) target.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState()).getLine(2);
+                event.getPlayer().openInventory(CodingHandleUtils.loadChestInventory(event.getPlayer().getWorld(), event.getPlayer().getTargetBlockExact(5).getLocation(), actionDisplayName));
+                chest.getBlockInventory().setItem(0, new ItemStack(Material.BARRIER));
+            } else {
+                event.getPlayer().sendMessage("§bCreative+ §8» §fКакой-то игрок §6уже взаимодействует §fс этим сундуком.");
+            }
         }
     }
 
@@ -96,6 +117,10 @@ public class Event implements Listener {
             if (plot == null || plot.getPlotOnline() == 0) {
                 plot.unload(true);
             }
+        }
+
+        if (from.endsWith("_dev") && destination.endsWith("_CraftPlot") && destination.replace("_CraftPlot", "_dev").equalsIgnoreCase(from)) {
+            Plot.getByWorld(event.getPlayer().getWorld()).getHandler().parseCodeBlocks();
         }
     }
 

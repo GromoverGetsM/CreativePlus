@@ -1,0 +1,147 @@
+  size: 45
+  title: Отправить сообщение
+  items:
+    slot0:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 0
+    slot1:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 1
+    slot2:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 2
+    slot3:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 3
+    slot4:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 4
+    slot5:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 5
+    slot6:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 6
+    slot7:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 7
+    slot8:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 8
+    slot36:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 36
+    slot37:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 37
+    slot38:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 38
+    slot39:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 39
+    slot40:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 40
+    slot41:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 41
+    slot42:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 42
+    slot43:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 43
+    slot44:
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      amount: 1
+      name: '§b Текст(-ы) '
+      lore:
+        - '§f§r Положите сюда тексты для отправки '
+        - §f§r игроку
+      slot: 44

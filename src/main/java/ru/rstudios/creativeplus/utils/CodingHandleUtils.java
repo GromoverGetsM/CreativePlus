@@ -1,5 +1,6 @@
 package ru.rstudios.creativeplus.utils;
 
+import com.jeff_media.jefflib.ItemStackSerializer;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
@@ -13,9 +14,17 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Sign;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.util.Vector;
+import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
+import ru.rstudios.creativeplus.creative.menus.coding.CreativeHolder;
 
+import java.io.*;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
@@ -59,6 +68,77 @@ public class CodingHandleUtils {
         } catch (MaxChangedBlocksException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void saveInventoryToChest (org.bukkit.World world, Location chest, Inventory inventory) {
+        File chestsFolder = new File(Bukkit.getWorldContainer(), world.getName() + File.separator + "chests");
+
+        if (!chestsFolder.exists()) {
+            chestsFolder.mkdirs();
+        }
+
+        File chestFile = new File(chestsFolder, chest.toString() + ".txt");
+
+        String chestInventoryString = ItemStackSerializer.toBase64(inventory);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(chestFile))) {
+            writer.write(chestInventoryString);
+        } catch (IOException e) {
+            plugin.getLogger().severe(e.getLocalizedMessage());
+        }
+
+        Block block = chest.getBlock();
+        if (block.getType() == Material.CHEST) {
+            Chest ch = (Chest) block.getState();
+            Inventory chestInventory = ch.getInventory();
+
+            if (chestInventory.getItem(0) != null && chestInventory.getItem(0).getType() == Material.BARRIER) {
+                chestInventory.clear();
+            }
+        }
+    }
+
+    public static Inventory loadChestInventory (org.bukkit.World world, Location chest, String actionDisplayName) {
+        File chestsFolder = new File(Bukkit.getWorldContainer(), world.getName() + File.separator + "chests");
+        File chestFile = new File(chestsFolder, chest.toString() + ".txt");
+
+        Inventory inv = null;
+
+        if (chestFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(chestFile))) {
+                StringBuilder inventoryBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    inventoryBuilder.append(line);
+                }
+                String inventory = inventoryBuilder.toString();
+                if (!inventory.isEmpty()) {
+                    inv = ItemStackSerializer.inventoryFromBase64(inventory);
+                } else {
+                    inv = ActionType.getByDisplayName(actionDisplayName).getmClass().newInstance().getInventory();
+                }
+            } catch (IOException | IllegalAccessException | InstantiationException e) {
+                plugin.getLogger().severe(e.getLocalizedMessage());
+            }
+        } else {
+            try {
+                inv = ActionType.getByDisplayName(actionDisplayName).getmClass().newInstance().getInventory();
+            } catch (InstantiationException | IllegalAccessException e) {
+                plugin.getLogger().severe(e.getLocalizedMessage());
+            }
+        }
+
+        if (inv != null) {
+            Sign sign = (Sign) chest.clone().add(0, -1, 1).getBlock().getState();
+            String name = sign.getLine(2);
+            Inventory newInv = Bukkit.createInventory(new CreativeHolder(), inv.getSize(), name);
+
+            newInv.setContents(inv.getContents());
+
+            inv = newInv;
+        }
+
+        return inv;
     }
 
 }

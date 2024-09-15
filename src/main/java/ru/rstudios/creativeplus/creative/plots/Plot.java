@@ -1,6 +1,5 @@
 package ru.rstudios.creativeplus.creative.plots;
 
-import com.jeff_media.jefflib.ItemStackSerializer;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,10 +11,10 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
+import ru.rstudios.creativeplus.creative.coding.CodeHandler;
 import ru.rstudios.creativeplus.creative.tech.GameCategories;
 import ru.rstudios.creativeplus.player.PlayerInfo;
 import ru.rstudios.creativeplus.utils.FileUtil;
-import ru.rstudios.creativeplus.creative.plots.PlotInitializeReason;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +42,7 @@ public class Plot implements Listener {
     private World plot;
     private PlotInitializeReason reason;
     private boolean isLoaded = false;
+    private CodeHandler handler;
 
     public static Map<String, Plot> plots = new HashMap<>();
     public static Map<Plot, DevPlot> linkedPlots = new HashMap<>();
@@ -164,7 +164,12 @@ public class Plot implements Listener {
         PlayerInfo.getPlayerInfo(Bukkit.getPlayer(owner)).addPlot(id);
         plots.putIfAbsent(plotName, this);
         if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline() && this.reason != PlotInitializeReason.SERVER_STARTED) teleportToPlot(this, Bukkit.getPlayer(owner));
-        if (this.reason == PlotInitializeReason.SERVER_STARTED) unload(false);
+        if (this.reason == PlotInitializeReason.SERVER_STARTED) {
+            linked.load();
+            this.handler = new CodeHandler(this);
+            this.handler.parseCodeBlocks();
+            unload(false);
+        }
     }
 
     private void init (String plotName, File f, String owner) {
@@ -186,7 +191,12 @@ public class Plot implements Listener {
 
         plots.putIfAbsent(plotName, this);
         if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline() && this.reason != PlotInitializeReason.SERVER_STARTED) teleportToPlot(this, Bukkit.getPlayer(owner));
-        if (this.reason == PlotInitializeReason.SERVER_STARTED) unload(false);
+        if (this.reason == PlotInitializeReason.SERVER_STARTED) {
+            linked.load();
+            this.handler = new CodeHandler(this);
+            this.handler.parseCodeBlocks();
+            unload(false);
+        }
     }
 
     public boolean load(String worldName) {
@@ -310,6 +320,10 @@ public class Plot implements Listener {
         plotPlayers.addAll(Bukkit.getWorld(this.plotName) == null ? new ArrayList<>() : Bukkit.getWorld(this.plotName).getPlayers());
         plotPlayers.addAll(Bukkit.getWorld(this.linked.getDevPlotName()) == null ? new ArrayList<>() : Bukkit.getWorld(this.linked.getDevPlotName()).getPlayers());
         return plotPlayers;
+    }
+
+    public CodeHandler getHandler() {
+        return this.handler;
     }
 
     public void setPlotName (String plotName) {
