@@ -17,6 +17,7 @@ import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
 import ru.rstudios.creativeplus.creative.menus.coding.CreativeHolder;
 import ru.rstudios.creativeplus.creative.plots.DevPlot;
 import ru.rstudios.creativeplus.creative.plots.Plot;
+import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 import ru.rstudios.creativeplus.utils.InventoryUtil;
 
 import java.io.File;
@@ -63,8 +64,7 @@ public class CodeHandler {
                 Inventory i = null;
 
                 if (chest.getBlock().getType() == Material.CHEST) {
-                    File chestFile = new File(Bukkit.getWorldContainer() + File.separator + linked.getLinkedDevPlot().devPlotName + File.separator + "chests" + File.separator + chest + ".yml");
-                    i = InventoryUtil.getInventory(YamlConfiguration.loadConfiguration(chestFile), new CreativeHolder());
+                    i = CodingHandleUtils.loadChestInventory(chest.getWorld(), chest, ((Sign) chest.getBlock().getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState()).getLine(2));
                 }
                 
                 Action act = null;
@@ -80,7 +80,6 @@ public class CodeHandler {
 
         }
 
-        System.out.println(starters);
         this.starters = starters;
     }
 

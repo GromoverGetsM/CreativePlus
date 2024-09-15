@@ -20,6 +20,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.reflections.Reflections;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
 import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
 import ru.rstudios.creativeplus.creative.menus.main.WorldsMenu;
 import ru.rstudios.creativeplus.creative.plots.DevPlot;
@@ -75,8 +76,10 @@ public class Event implements Listener {
             event.setCancelled(true);
             switch (target.getRelative(BlockFace.SOUTH).getType()) {
                 case DIAMOND_BLOCK -> event.getPlayer().openInventory(new PlayerEvent("Событие игрока").getInventory());
+                case COBBLESTONE -> event.getPlayer().openInventory(new PlayerAction("Действие игрока").getInventory());
             }
         } else if (target.getType() == Material.CHEST) {
+            event.setCancelled(true);
             Chest chest = (Chest) target.getState();
 
             if (!Objects.equals(chest.getBlockInventory().getItem(0), new ItemStack(Material.BARRIER))) {

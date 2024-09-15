@@ -184,4 +184,26 @@ public class FileUtil {
         directory.delete();
     }
 
+    public static void createNewFile (File folder, String name) throws IOException {
+        if (folder.exists() && folder.isDirectory()) {
+            File file = new File(folder, name);
+            if (!file.exists() || !file.isFile()) {
+                if (!file.createNewFile()) {
+                    plugin.getLogger().severe("Невозможно создать файл");
+                }
+            }
+        } else {
+            if (folder.mkdirs()) {
+                File file = new File(folder, name);
+                if (!file.exists() || !file.isFile()) {
+                    if (!file.createNewFile()) {
+                        plugin.getLogger().severe("Невозможно создать файл");
+                    }
+                }
+            } else {
+                plugin.getLogger().severe("Невозможно создать папку");
+            }
+        }
+    }
+
 }

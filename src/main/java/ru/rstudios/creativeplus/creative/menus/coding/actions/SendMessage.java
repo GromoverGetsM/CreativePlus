@@ -30,6 +30,10 @@ public class SendMessage extends CreativeSystemMenu implements Listener {
     private final HashMap<Integer, ItemStack> items;
     private Player player;
 
+    public SendMessage() {
+        this("Отправить сообщение");
+    }
+
     public SendMessage (String name) {
         this(name, 1);
     }

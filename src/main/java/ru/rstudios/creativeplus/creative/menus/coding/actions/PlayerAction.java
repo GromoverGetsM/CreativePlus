@@ -20,9 +20,11 @@ import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
 import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
+import ru.rstudios.creativeplus.utils.FileUtil;
 import ru.rstudios.creativeplus.utils.InventoryUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
@@ -156,7 +158,16 @@ public class PlayerAction extends CreativeSystemMenu implements Listener {
                     sign.setLine(2, ActionType.getByDisplayName(ChatColor.stripColor(itemDisplayName).trim()).getName());
                     sign.update();
                     if (ActionType.getByDisplayName(ChatColor.stripColor(itemDisplayName).trim()).getNeedChest()) {
-                        targetBlock.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP).setType(Material.CHEST);
+                        Block chest = targetBlock.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP);
+                        chest.setType(Material.CHEST);
+                        File chestsFolder = new File(Bukkit.getWorldContainer() + File.separator + chest.getWorld().getName() + File.separator + "chests");
+                        File chestFileR = new File(chestsFolder, chest.getLocation() + ".txt");
+                        if (chestFileR.exists()) chestFileR.delete();
+                        try {
+                            FileUtil.createNewFile(chestsFolder, chest.getLocation() + ".txt");
+                        } catch (IOException e) {
+                            plugin.getLogger().severe(e.getLocalizedMessage());
+                        }
                     }
                     player.closeInventory();
                     player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);

@@ -90,7 +90,7 @@ public class CodingHandleUtils {
         Block block = chest.getBlock();
         if (block.getType() == Material.CHEST) {
             Chest ch = (Chest) block.getState();
-            Inventory chestInventory = ch.getInventory();
+            Inventory chestInventory = ch.getBlockInventory();
 
             if (chestInventory.getItem(0) != null && chestInventory.getItem(0).getType() == Material.BARRIER) {
                 chestInventory.clear();
@@ -118,20 +118,25 @@ public class CodingHandleUtils {
                     inv = ActionType.getByDisplayName(actionDisplayName).getmClass().newInstance().getInventory();
                 }
             } catch (IOException | IllegalAccessException | InstantiationException e) {
-                plugin.getLogger().severe(e.getLocalizedMessage());
+                e.printStackTrace();
             }
         } else {
             try {
                 inv = ActionType.getByDisplayName(actionDisplayName).getmClass().newInstance().getInventory();
             } catch (InstantiationException | IllegalAccessException e) {
-                plugin.getLogger().severe(e.getLocalizedMessage());
+                e.printStackTrace();
             }
         }
 
         if (inv != null) {
-            Sign sign = (Sign) chest.clone().add(0, -1, 1).getBlock().getState();
+            Sign sign = (Sign) chest.getBlock().getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState();
             String name = sign.getLine(2);
-            Inventory newInv = Bukkit.createInventory(new CreativeHolder(), inv.getSize(), name);
+            Inventory newInv = null;
+            try {
+                newInv = Bukkit.createInventory(ActionType.getByDisplayName(actionDisplayName).getmClass().newInstance().getInventory().getHolder(), inv.getSize(), name);
+            } catch (InstantiationException | IllegalAccessException e) {
+                plugin.getLogger().severe(e.getLocalizedMessage());
+            }
 
             newInv.setContents(inv.getContents());
 
