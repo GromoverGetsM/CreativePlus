@@ -2,10 +2,9 @@ package ru.rstudios.creativeplus.events;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.WorldBorder;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -249,5 +248,44 @@ public class Event implements Listener {
         }
 
         return b.getLocation();
+    }
+
+    @EventHandler
+    public void onPlayerChatted (AsyncChatEvent event) {
+        Player player = event.getPlayer();
+        String message = LegacyComponentSerializer.legacySection().serialize(event.message());
+        if (message.length() > 256) message = message.substring(0, 1024);
+        if (message.contains("&")) message.replace("&", "§");
+
+        if (player.getWorld().getName().endsWith("_dev")) {
+            ItemStack activeItem = player.getActiveItem();
+            if (!activeItem.equals(new ItemStack(Material.AIR))) {
+                switch (activeItem.getType()) {
+                    case BOOK -> {
+                        event.setCancelled(true);
+                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+                        player.sendTitle("§aЗначение установлено", message);
+                        activeItem.getItemMeta().setDisplayName(message);
+                    }
+                    case SLIME_BALL -> {
+                        event.setCancelled(true);
+
+                        try {
+                            double d = Double.parseDouble(message);
+                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+                            player.sendTitle("§aЗначение установлено", String.valueOf(d));
+                            activeItem.getItemMeta().setDisplayName(String.valueOf(d));
+                        } catch (NumberFormatException e) {
+                            player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
+                            player.sendTitle("§cНекорректное значение", "§6" + message);
+                            activeItem.getItemMeta().setDisplayName(message);
+                        }
+                    }
+                    case PAPER -> {
+
+                    }
+                }
+            }
+        }
     }
 }
