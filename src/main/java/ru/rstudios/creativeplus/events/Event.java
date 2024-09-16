@@ -87,6 +87,9 @@ public class Event implements Listener {
             NamespacedKey handlingPaperKey = new NamespacedKey(plugin, "HandlingPaper");
 
             if (pdc.has(isInDev, PersistentDataType.BOOLEAN) && Boolean.TRUE.equals(pdc.get(isInDev, PersistentDataType.BOOLEAN))) {
+                ItemStack item = event.getItem();
+                ItemMeta meta = item.getItemMeta();
+
                 switch (event.getAction()) {
                     case LEFT_CLICK_AIR -> {
                         if (player.getWorld() == plot.getLinkedDevPlot().getWorld()) {
@@ -101,17 +104,19 @@ public class Event implements Listener {
                         if (player.getWorld() == plot.getPlotWorld()) {
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                             player.sendTitle("§aЗначение установлено", player.getLocation().toString());
-                            event.getItem().getItemMeta().setDisplayName(player.getLocation().toString());
+                            meta.setDisplayName(player.getLocation().toString());
                         }
                     }
                     case RIGHT_CLICK_BLOCK -> {
                         if (player.getWorld() == plot.getPlotWorld() && target != null) {
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                             player.sendTitle("§aЗначение установлено", target.getLocation().toString());
-                            event.getItem().getItemMeta().setDisplayName(target.getLocation().toString());
+                            meta.setDisplayName(target.getLocation().toString());
                         }
                     }
                 }
+
+                item.setItemMeta(meta);
             }
         }
 

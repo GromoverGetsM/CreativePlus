@@ -1,26 +1,19 @@
 package ru.rstudios.creativeplus.creative.coding;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
-import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
-import ru.rstudios.creativeplus.creative.menus.coding.CreativeHolder;
 import ru.rstudios.creativeplus.creative.plots.DevPlot;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
-import ru.rstudios.creativeplus.utils.InventoryUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,9 +29,7 @@ public class CodeHandler {
 
     public void parseCodeBlocks() {
         Location startBlock = new Location(linked.getLinkedDevPlot().getWorld(), 60, -59, 60);
-        System.out.println("StartersBefore: " + this.starters);
         if (!this.starters.isEmpty()) this.starters.clear();
-        System.out.println("StartersAfterClear: " + this.starters);
         List<Starter> starters = new ArrayList<>();
 
         for (int dz = 60; dz > -60; dz -= 4) {
@@ -83,7 +74,6 @@ public class CodeHandler {
 
         }
         this.starters.addAll(starters);
-        System.out.println("StartersAfterParse: " + this.starters);
     }
 
     public void sendStarter (GameEvent event) {

@@ -4,7 +4,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.events.BlockEvent;
@@ -15,18 +15,18 @@ import ru.rstudios.creativeplus.creative.plots.Plot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerBreakBlockStarter extends Starter {
+public class PlayerPlaceBlockStarter extends Starter {
 
     private List<Action> actions = new ArrayList<>();
     private List<Entity> selection = new ArrayList<>();
 
-    public PlayerBreakBlockStarter() { this("Сломал блок"); }
+    public PlayerPlaceBlockStarter() { this("Поставил блок"); }
 
-    public PlayerBreakBlockStarter(String name) {
+    public PlayerPlaceBlockStarter(String name) {
         this(name, new ArrayList<>());
     }
 
-    public PlayerBreakBlockStarter (String name, List<Action> actions) {
+    public PlayerPlaceBlockStarter (String name, List<Action> actions) {
         super(name, actions);
     }
 
@@ -47,7 +47,7 @@ public class PlayerBreakBlockStarter extends Starter {
 
     @Override
     public String getName() {
-        return "Сломал блок";
+        return "Поставил блок";
     }
 
     @Override
@@ -76,17 +76,17 @@ public class PlayerBreakBlockStarter extends Starter {
 
         @Override
         public boolean isCancelled() {
-            return ((BlockBreakEvent) this.getHandleEvent()).isCancelled();
+            return ((BlockPlaceEvent) this.getHandleEvent()).isCancelled();
         }
 
         @Override
         public void setCancelled(boolean b) {
-            ((BlockBreakEvent) this.getHandleEvent()).setCancelled(b);
+            ((BlockPlaceEvent) this.getHandleEvent()).setCancelled(b);
         }
 
         @Override
         public Block getBlock() {
-            return ((BlockBreakEvent) this.getHandleEvent()).getBlock();
+            return ((BlockPlaceEvent) this.getHandleEvent()).getBlock();
         }
     }
 

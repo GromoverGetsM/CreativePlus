@@ -1,32 +1,34 @@
-package ru.rstudios.creativeplus.creative.coding.starters.player;
+package ru.rstudios.creativeplus.creative.coding.starters.block;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.events.BlockEvent;
 import ru.rstudios.creativeplus.creative.coding.events.GamePlayerEvent;
+import ru.rstudios.creativeplus.creative.coding.events.ItemEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerBreakBlockStarter extends Starter {
+public class BlockDispenseStarter extends Starter {
 
     private List<Action> actions = new ArrayList<>();
     private List<Entity> selection = new ArrayList<>();
 
-    public PlayerBreakBlockStarter() { this("Сломал блок"); }
+    public BlockDispenseStarter() { this("Блок выдал предмет"); }
 
-    public PlayerBreakBlockStarter(String name) {
+    public BlockDispenseStarter(String name) {
         this(name, new ArrayList<>());
     }
 
-    public PlayerBreakBlockStarter (String name, List<Action> actions) {
+    public BlockDispenseStarter (String name, List<Action> actions) {
         super(name, actions);
     }
 
@@ -47,7 +49,7 @@ public class PlayerBreakBlockStarter extends Starter {
 
     @Override
     public String getName() {
-        return "Сломал блок";
+        return "Блок выдал предмет";
     }
 
     @Override
@@ -67,7 +69,7 @@ public class PlayerBreakBlockStarter extends Starter {
         }
     }
 
-    public static class Event extends GamePlayerEvent implements BlockEvent, Cancellable {
+    public static class Event extends GamePlayerEvent implements BlockEvent, ItemEvent, Cancellable {
 
 
         public Event(Player player, Plot plot, org.bukkit.event.Event event) {
@@ -76,17 +78,27 @@ public class PlayerBreakBlockStarter extends Starter {
 
         @Override
         public boolean isCancelled() {
-            return ((BlockBreakEvent) this.getHandleEvent()).isCancelled();
+            return ((BlockDispenseEvent) this.getHandleEvent()).isCancelled();
         }
 
         @Override
         public void setCancelled(boolean b) {
-            ((BlockBreakEvent) this.getHandleEvent()).setCancelled(b);
+            ((BlockDispenseEvent) this.getHandleEvent()).setCancelled(b);
         }
 
         @Override
         public Block getBlock() {
-            return ((BlockBreakEvent) this.getHandleEvent()).getBlock();
+            return ((BlockDispenseEvent) this.getHandleEvent()).getBlock();
+        }
+
+        @Override
+        public ItemStack getItem() {
+            return ((BlockDispenseEvent) this.getHandleEvent()).getItem();
+        }
+
+        @Override
+        public void setItem(ItemStack item) {
+            ((BlockDispenseEvent) this.getHandleEvent()).setItem(item);
         }
     }
 
