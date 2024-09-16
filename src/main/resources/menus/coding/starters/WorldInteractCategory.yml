@@ -9,3 +9,20 @@
         - '§f Срабатывает, когда игрок заходит '
         - §f в мир
       slot: 10
+    slot11:
+      type: IRON_DOOR
+      amount: 1
+      name: '§e Игрок вышел '
+      lore:
+        - '§f Срабатывает, когда игрок выходит '
+        - §f из мира
+      slot: 11
+    slot12:
+      type: STONE_PICKAXE
+      amount: 1
+      hideAll: true
+      name: '§e Сломал блок '
+      lore:
+        - '§f Срабатывает, когда игрок ломает'
+        - '§f блок в мире'
+      slot: 12

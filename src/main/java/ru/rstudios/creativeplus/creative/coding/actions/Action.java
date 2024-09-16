@@ -14,11 +14,10 @@ public abstract class Action {
     private final Starter starter;
     protected List<Entity> selection;
 
-    public Action (Starter starter, List<Entity> selection, String name, Inventory inventory) {
+    public Action (Starter starter, String name, Inventory inventory) {
         this.name = name;
         this.inventory = inventory;
         this.starter = starter;
-        this.selection = selection;
     }
 
     public abstract ItemStack getIcon();

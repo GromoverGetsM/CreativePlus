@@ -76,12 +76,12 @@ public enum ActionType {
     }
 
 
-    public Action create (Starter starter, List<Entity> selection, Inventory inventory) {
+    public Action create (Starter starter, Inventory inventory) {
         Action a = null;
 
         try {
-            Constructor<? extends Action> constructor = this.aClass.getConstructor(Starter.class, List.class, String.class, Inventory.class);
-            a = constructor.newInstance(starter, selection, this.name, inventory);
+            Constructor<? extends Action> constructor = this.aClass.getConstructor(Starter.class, String.class, Inventory.class);
+            a = constructor.newInstance(starter, this.name, inventory);
         } catch (Exception e) {
             e.printStackTrace();
         }

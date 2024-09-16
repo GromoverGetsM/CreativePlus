@@ -1,10 +1,9 @@
 package ru.rstudios.creativeplus.creative.coding.starters.player;
 
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
@@ -13,23 +12,22 @@ import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
-public class PlayerJoinStarter extends Starter implements Listener {
+public class PlayerQuitStarter extends Starter {
 
     private List<Action> actions = new ArrayList<>();
     private List<Entity> selection = new ArrayList<>();
 
-    public PlayerJoinStarter() { this("Игрок зашёл"); }
+    public PlayerQuitStarter() { this("Игрок вышел"); }
 
-    public PlayerJoinStarter(String name) {
+    public PlayerQuitStarter(String name) {
         this(name, new ArrayList<>());
     }
 
-    public PlayerJoinStarter (String name, List<Action> actions) {
+    public PlayerQuitStarter (String name, List<Action> actions) {
         super(name, actions);
     }
 
@@ -50,7 +48,7 @@ public class PlayerJoinStarter extends Starter implements Listener {
 
     @Override
     public String getName() {
-        return "Вход";
+        return "Выход";
     }
 
     @Override
@@ -76,4 +74,5 @@ public class PlayerJoinStarter extends Starter implements Listener {
             super(player, plot, event);
         }
     }
+
 }

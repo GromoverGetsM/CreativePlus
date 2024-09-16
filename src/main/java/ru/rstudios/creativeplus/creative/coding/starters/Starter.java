@@ -31,7 +31,6 @@ public abstract class Starter implements Listener {
     public abstract List<Action> getActions();
     public abstract String getName();
     public abstract void setActions(List<Action> actions);
-    public abstract void registerEvents();
     public abstract void executeActions();
 
 }

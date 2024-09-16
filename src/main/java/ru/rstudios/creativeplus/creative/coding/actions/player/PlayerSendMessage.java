@@ -12,10 +12,12 @@ import java.util.List;
 public class PlayerSendMessage extends Action {
 
     private final Inventory inventory;
+    private Starter starter;
 
-    public PlayerSendMessage(Starter starter, List<Entity> selection, String name, Inventory inventory) {
-        super(starter, selection, name, inventory);
+    public PlayerSendMessage(Starter starter, String name, Inventory inventory) {
+        super(starter, name, inventory);
         this.inventory = inventory;
+        this.starter = starter;
     }
 
     @Override
@@ -36,6 +38,7 @@ public class PlayerSendMessage extends Action {
     @Override
     public void execute() {
         String message = parseMessage(this.inventory);
+        List<Entity> selection = starter.getSelection();
 
         for (Entity entity : selection) {
             entity.sendMessage(message);

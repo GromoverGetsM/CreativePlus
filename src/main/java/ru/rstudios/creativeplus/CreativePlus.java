@@ -7,6 +7,7 @@ import ru.rstudios.creativeplus.commands.WorldCommand;
 import ru.rstudios.creativeplus.commands.creative.Games;
 import ru.rstudios.creativeplus.commands.creative.devCommand;
 import ru.rstudios.creativeplus.commands.creative.playCommand;
+import ru.rstudios.creativeplus.creative.coding.GlobalEventListener;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 import ru.rstudios.creativeplus.events.Event;
 import ru.rstudios.creativeplus.utils.FileUtil;
@@ -36,6 +37,7 @@ public final class CreativePlus extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new Event(), this);
         getServer().getPluginManager().registerEvents(new CreateInventory(), this);
+        getServer().getPluginManager().registerEvents(new GlobalEventListener(), this);
 
         boolean isWEEnabled = getServer().getPluginManager().isPluginEnabled("WorldEdit");
         if (!isWEEnabled) {

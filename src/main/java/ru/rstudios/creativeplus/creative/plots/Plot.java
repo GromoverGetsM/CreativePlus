@@ -430,6 +430,7 @@ public class Plot implements Listener {
         this.linked.load();
 
         player.teleport(this.linked.getWorld().getSpawnLocation());
+        player.getInventory().setContents(DevPlot.getDevInventory().getContents());
     }
 
     private void registerEvents() {
@@ -499,4 +500,6 @@ public class Plot implements Listener {
             w.setDifficulty(Difficulty.PEACEFUL);
         }
     }
+
+
 }

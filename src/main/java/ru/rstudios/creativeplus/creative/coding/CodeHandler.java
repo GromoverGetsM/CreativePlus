@@ -22,12 +22,13 @@ import ru.rstudios.creativeplus.utils.InventoryUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CodeHandler {
 
     private Plot linked;
-    private List<Starter> starters;
+    private List<Starter> starters = new ArrayList<>();
 
     public CodeHandler (Plot plot) {
         this.linked = plot;
@@ -35,6 +36,9 @@ public class CodeHandler {
 
     public void parseCodeBlocks() {
         Location startBlock = new Location(linked.getLinkedDevPlot().getWorld(), 60, -59, 60);
+        System.out.println("StartersBefore: " + this.starters);
+        if (!this.starters.isEmpty()) this.starters.clear();
+        System.out.println("StartersAfterClear: " + this.starters);
         List<Starter> starters = new ArrayList<>();
 
         for (int dz = 60; dz > -60; dz -= 4) {
@@ -57,7 +61,6 @@ public class CodeHandler {
 
                 Sign aS = (Sign) action.getBlock().getRelative(BlockFace.NORTH).getState();
                 String actionName = aS.getLine(2);
-                List<Entity> selection = starter == null ? new ArrayList<>() : starter.getSelection();
 
                 Location chest = action.getBlock().getRelative(BlockFace.UP).getLocation();
 
@@ -69,7 +72,7 @@ public class CodeHandler {
                 
                 Action act = null;
                 ActionType actionType = ActionType.getByCustomName(actionName);
-                if (actionType != null) act = actionType.create(starter, selection, i);
+                if (actionType != null) act = actionType.create(starter, i);
                 if (act != null) actions.add(act);
             }
 
@@ -79,8 +82,8 @@ public class CodeHandler {
             }
 
         }
-
-        this.starters = starters;
+        this.starters.addAll(starters);
+        System.out.println("StartersAfterParse: " + this.starters);
     }
 
     public void sendStarter (GameEvent event) {
@@ -88,6 +91,7 @@ public class CodeHandler {
 
             for (Starter starter : this.starters) {
                 if (StarterType.getByCustomName(starter.getName()) != null && StarterType.getByCustomName(starter.getName()).getEventClass() == event.getClass()) {
+                    starter.setSelection(Collections.singletonList(event.getDefaultEntity()));
                     starter.executeActions();
                 }
             }

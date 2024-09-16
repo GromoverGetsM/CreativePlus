@@ -3,6 +3,10 @@ package ru.rstudios.creativeplus.creative.plots;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.bukkit.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import ru.rstudios.creativeplus.creative.menus.coding.CreativeHolder;
 import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
@@ -138,6 +142,30 @@ public class DevPlot {
         CuboidRegion region = new CuboidRegion(pos1, pos2);
 
         return region.contains(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+    }
+
+    public static Inventory getDevInventory() {
+        Inventory i = Bukkit.createInventory(new CreativeHolder(), 36, "1");
+
+        ItemStack diamondBlock = new ItemStack(Material.DIAMOND_BLOCK);
+        ItemMeta diamondBlockMeta = diamondBlock.getItemMeta();
+        diamondBlockMeta.setDisplayName("§bСобытие игрока");
+        diamondBlock.setItemMeta(diamondBlockMeta);
+        i.setItem(0, diamondBlock);
+
+        ItemStack cobblestone = new ItemStack(Material.COBBLESTONE);
+        ItemMeta cobblestoneMeta = cobblestone.getItemMeta();
+        cobblestoneMeta.setDisplayName("§7Действие игрока");
+        cobblestone.setItemMeta(cobblestoneMeta);
+        i.setItem(1, cobblestone);
+
+        ItemStack iron = new ItemStack(Material.IRON_INGOT);
+        ItemMeta ironMeta = iron.getItemMeta();
+        ironMeta.setDisplayName("§eПеременные");
+        iron.setItemMeta(ironMeta);
+        i.setItem(8, iron);
+
+        return i;
     }
 
 }

@@ -4,7 +4,9 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerBreakBlockStarter;
 import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerJoinStarter;
+import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerQuitStarter;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
 
 import java.lang.reflect.Constructor;
@@ -14,7 +16,9 @@ import java.util.stream.Collectors;
 
 public enum StarterType {
 
-    PLAYER_JOIN("Игрок зашёл", "Вход", PlayerJoinStarter.class, PlayerJoinStarter.Event.class);
+    PLAYER_JOIN("Игрок зашёл", "Вход", PlayerJoinStarter.class, PlayerJoinStarter.Event.class),
+    PLAYER_QUIT("Игрок вышел", "Выход", PlayerQuitStarter.class, PlayerQuitStarter.Event.class),
+    PLAYER_BLOCK_BREAK("Сломал блок", "Сломал блок", PlayerBreakBlockStarter.class, PlayerBreakBlockStarter.Event.class);
 
     private String displayName;
     private String name;
