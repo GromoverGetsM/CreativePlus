@@ -3,9 +3,11 @@ package ru.rstudios.creativeplus.creative.coding.actions;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerGiveItem;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendMessage;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.GiveItems;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.SendMessage;
 
 import java.lang.reflect.Constructor;
@@ -17,7 +19,8 @@ import java.util.stream.Collectors;
 
 public enum ActionType {
 
-    SEND_MESSAGE("Отправить сообщение", "Отправить сообщение", PlayerSendMessage.class, SendMessage.class, true);
+    SEND_MESSAGE("Отправить сообщение", "Отправить сообщение", PlayerSendMessage.class, SendMessage.class, true),
+    GIVE_ITEMS("Выдать предметы", "Выдать предметы", PlayerGiveItem.class, GiveItems.class, true);
 
     private String displayName;
     private String name;

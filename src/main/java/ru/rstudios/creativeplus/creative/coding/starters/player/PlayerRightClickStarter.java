@@ -5,29 +5,30 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.events.BlockEvent;
 import ru.rstudios.creativeplus.creative.coding.events.GamePlayerEvent;
+import ru.rstudios.creativeplus.creative.coding.events.ItemEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerPlaceBlockStarter extends Starter {
+public class PlayerRightClickStarter extends Starter {
 
     private List<Action> actions = new ArrayList<>();
     private List<Entity> selection = new ArrayList<>();
 
-    public PlayerPlaceBlockStarter() { this("Поставил блок"); }
+    public PlayerRightClickStarter() { this("Правый клик"); }
 
-    public PlayerPlaceBlockStarter(String name) {
+    public PlayerRightClickStarter(String name) {
         this(name, new ArrayList<>());
     }
 
-    public PlayerPlaceBlockStarter (String name, List<Action> actions) {
+    public PlayerRightClickStarter (String name, List<Action> actions) {
         super(name, actions);
     }
 
@@ -48,7 +49,7 @@ public class PlayerPlaceBlockStarter extends Starter {
 
     @Override
     public String getName() {
-        return "Поставил блок";
+        return "Правый клик";
     }
 
     @Override
@@ -68,8 +69,7 @@ public class PlayerPlaceBlockStarter extends Starter {
         }
     }
 
-    public static class Event extends GamePlayerEvent implements BlockEvent, Cancellable {
-
+    public static class Event extends GamePlayerEvent implements BlockEvent, ItemEvent, Cancellable {
 
         public Event(Player player, Plot plot, org.bukkit.event.Event event) {
             super(player, plot, event);
@@ -77,22 +77,32 @@ public class PlayerPlaceBlockStarter extends Starter {
 
         @Override
         public boolean isCancelled() {
-            return ((BlockPlaceEvent) this.getHandleEvent()).isCancelled();
+            return ((PlayerInteractEvent) this.getHandleEvent()).isCancelled();
         }
 
         @Override
         public void setCancelled(boolean b) {
-            ((BlockPlaceEvent) this.getHandleEvent()).setCancelled(b);
+            ((PlayerInteractEvent) this.getHandleEvent()).setCancelled(b);
         }
 
         @Override
         public Block getBlock() {
-            return ((BlockPlaceEvent) this.getHandleEvent()).getBlock();
+            return ((PlayerInteractEvent) this.getHandleEvent()).getClickedBlock();
         }
 
         @Override
         public BlockFace getBlockFace() {
-            return ((BlockPlaceEvent) this.getHandleEvent()).getBlock().getFace(this.getBlock());
+            return ((PlayerInteractEvent) this.getHandleEvent()).getBlockFace();
+        }
+
+        @Override
+        public ItemStack getItem() {
+            return ((PlayerInteractEvent) this.getHandleEvent()).getItem();
+        }
+
+        @Override
+        public void setItem(ItemStack item) {
+            return;
         }
     }
 

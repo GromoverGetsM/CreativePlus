@@ -25,6 +25,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
+import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
+import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerRightClickStarter;
 import ru.rstudios.creativeplus.creative.menus.coding.*;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.GiveItems;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
@@ -41,6 +43,8 @@ import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -48,6 +52,42 @@ import java.util.Objects;
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class Event implements Listener {
+
+    public static boolean skipDoubleClickCall (Player player, PlayerInteractEvent event) {
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
+
+        if (info != null) {
+            LocalDateTime time = info.getLastInteractTime();
+            PlayerInteractEvent lastEvent = info.getLastInteractEvent();
+            LocalDateTime now = LocalDateTime.now();
+
+            if (lastEvent != null && time != null) {
+                if (Objects.equals(event.getHand(), lastEvent.getHand()) && Objects.equals(event.getItem(), lastEvent.getItem())) {
+                    if (ChronoUnit.MILLIS.between(time, now) > 50L) {
+                        info.setLastInteractTime(now);
+                        info.setLastInteractEvent(event);
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    if (ChronoUnit.MILLIS.between(time, now) < 2L) {
+                        return true;
+                    } else {
+                        info.setLastInteractTime(now);
+                        info.setLastInteractEvent(event);
+                        return false;
+                    }
+                }
+            } else {
+                info.setLastInteractTime(now);
+                info.setLastInteractEvent(event);
+                return false;
+            }
+        }
+
+        return false;
+    }
 
     @EventHandler
     public void onPlayerJoin (PlayerJoinEvent event) {
@@ -67,7 +107,6 @@ public class Event implements Listener {
     @EventHandler
     public void onPlayerLeft (PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        PlayerInfo.removePlayer(player);
 
         if (player.getWorld().getName().endsWith("_dev") || player.getWorld().getName().endsWith("_CraftPlot")) {
             if (player.getWorld().getName().endsWith("_dev")) {
@@ -94,27 +133,46 @@ public class Event implements Listener {
                 Block targetBlock = player.getTargetBlockExact(5);
                 if (event.getCurrentItem() != null && targetBlock != null && targetBlock.getType() == Material.OAK_WALL_SIGN) {
                     Sign sign = (Sign) targetBlock.getState();
-                    String itemDisplayName = event.getCurrentItem().getItemMeta().getDisplayName();
-                    sign.setLine(2, ActionType.getByDisplayName(ChatColor.stripColor(itemDisplayName).trim()).getName());
-                    sign.update();
-                    if (ActionType.getByDisplayName(ChatColor.stripColor(itemDisplayName).trim()).getNeedChest()) {
-                        Block chest = targetBlock.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP);
-                        chest.setType(Material.CHEST);
-                        File chestsFolder = new File(Bukkit.getWorldContainer() + File.separator + chest.getWorld().getName() + File.separator + "chests");
-                        File chestFileR = new File(chestsFolder, chest.getLocation() + ".txt");
-                        if (chestFileR.exists()) chestFileR.delete();
-                        try {
-                            FileUtil.createNewFile(chestsFolder, chest.getLocation() + ".txt");
-                        } catch (IOException e) {
-                            plugin.getLogger().severe(e.getLocalizedMessage());
-                        }
+
+                    String itemDisplayName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()).trim();
+
+                    ActionType actionType = ActionType.getByDisplayName(itemDisplayName);
+                    StarterType starterType = null;
+
+                    if (actionType == null) {
+                        starterType = StarterType.getByDisplayName(itemDisplayName);
                     }
-                    player.closeInventory();
-                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+
+                    if (actionType != null || starterType != null) {
+                        String typeName = (actionType != null) ? actionType.getName() : starterType.getName();
+
+                        sign.setLine(2, typeName);
+                        sign.update();
+
+                        if (actionType != null && actionType.getNeedChest()) {
+                            Block chest = targetBlock.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP);
+                            chest.setType(Material.CHEST);
+
+                            File chestsFolder = new File(Bukkit.getWorldContainer() + File.separator + chest.getWorld().getName() + File.separator + "chests");
+                            File chestFileR = new File(chestsFolder, chest.getLocation() + ".txt");
+                            if (chestFileR.exists()) chestFileR.delete();
+
+                            try {
+                                FileUtil.createNewFile(chestsFolder, chest.getLocation() + ".txt");
+                            } catch (IOException e) {
+                                plugin.getLogger().severe(e.getLocalizedMessage());
+                            }
+                        }
+
+                        player.closeInventory();
+                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+                    }
+
                 }
             }
 
             if (event.getClickedInventory().getHolder() instanceof AbstractSelectCategoryMenu) {
+                event.setCancelled(true);
                 if (event.getCurrentItem() != null && !Objects.equals(event.getCurrentItem(), new ItemStack(Material.AIR))) {
                     List<Integer> slotsForCategory = Arrays.asList(10, 12, 14, 16, 37, 39, 41, 43);
 
@@ -124,6 +182,7 @@ public class Event implements Listener {
                         String displayName = meta.hasDisplayName() ? ChatColor.stripColor(meta.getDisplayName()).trim() : "Коммуникация";
 
                         CodingCategoryType categoryType = CodingCategoryType.getByDisplayName(displayName);
+
                         if (categoryType != null) {
                             player.openInventory(categoryType.categoryClass.newInstance().getInventory());
                         }
@@ -205,9 +264,17 @@ public class Event implements Listener {
     public void onPlayerInteract (PlayerInteractEvent event) {
         Player player = event.getPlayer();
         Block target = player.getTargetBlockExact(5);
+        Plot plot = Plot.getByWorld(player.getWorld());
+
+        if (plot != null && player.getWorld() != plot.getLinkedDevPlot().getWorld()) {
+            switch (event.getAction()) {
+                case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
+                    if (!skipDoubleClickCall(player, event)) plot.getHandler().sendStarter(new PlayerRightClickStarter.Event(player, plot, event));
+                }
+            }
+        }
 
         if (event.getItem() != null && !Objects.equals(event.getItem(), new ItemStack(Material.AIR)) && event.getItem().getType() == Material.PAPER) {
-            Plot plot = Plot.getByWorld(player.getWorld());
             PersistentDataContainer pdc = event.getPlayer().getPersistentDataContainer();
             NamespacedKey isInDev = new NamespacedKey(plugin, "CodingActive");
             NamespacedKey handlingPaperKey = new NamespacedKey(plugin, "HandlingPaper");

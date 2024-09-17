@@ -5,10 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.starters.block.BlockDispenseStarter;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerBreakBlockStarter;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerJoinStarter;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerPlaceBlockStarter;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerQuitStarter;
+import ru.rstudios.creativeplus.creative.coding.starters.player.*;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -24,7 +21,8 @@ public enum StarterType {
     PLAYER_QUIT("Игрок вышел", "Выход", PlayerQuitStarter.class, PlayerQuitStarter.Event.class),
     PLAYER_BLOCK_BREAK("Сломал блок", "Сломал блок", PlayerBreakBlockStarter.class, PlayerBreakBlockStarter.Event.class),
     PLAYER_BLOCK_PLACE("Поставил блок", "Поставил блок", PlayerPlaceBlockStarter.class, PlayerPlaceBlockStarter.Event.class),
-    BLOCK_DISPENSE_ITEM("Блок выдал предмет", "Блок выдал предмет", BlockDispenseStarter.class, BlockDispenseStarter.Event.class);
+    BLOCK_DISPENSE_ITEM("Блок выдал предмет", "Блок выдал предмет", BlockDispenseStarter.class, BlockDispenseStarter.Event.class),
+    PLAYER_RIGHT_CLICKED("Правый клик", "Правый клик", PlayerRightClickStarter.class, PlayerRightClickStarter.Event.class);
 
     private String displayName;
     private String name;

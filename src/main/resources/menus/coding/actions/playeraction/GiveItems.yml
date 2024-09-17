@@ -1,10 +1,10 @@
 size: 45
-title: Отправить сообщение
+title: Выдать предметы
 items:
   slot0:
     type: ORANGE_STAINED_GLASS_PANE
     amount: 1
-    name: '§b Предмет(-ы) '
+    name: '§6 Предмет(-ы) '
     lore:
       - '§f Положите сюда предметы для выдачи '
       - §f игроку

@@ -1,6 +1,7 @@
 package ru.rstudios.creativeplus.creative.coding.starters.player;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -87,6 +88,11 @@ public class PlayerBreakBlockStarter extends Starter {
         @Override
         public Block getBlock() {
             return ((BlockBreakEvent) this.getHandleEvent()).getBlock();
+        }
+
+        @Override
+        public BlockFace getBlockFace() {
+            return ((BlockBreakEvent) this.getHandleEvent()).getBlock().getFace(this.getBlock());
         }
     }
 

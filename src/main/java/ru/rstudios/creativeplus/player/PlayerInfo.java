@@ -4,10 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import ru.rstudios.creativeplus.utils.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
@@ -19,6 +21,8 @@ public class PlayerInfo {
     private int plotLimit;
     private File playerData;
     private FileConfiguration playerDataConfiguration;
+    private PlayerInteractEvent lastInteractEvent;
+    private LocalDateTime lastInteractTime;
 
     private static Map<Player, PlayerInfo> playerInfoMap = new HashMap<>();
 
@@ -97,6 +101,14 @@ public class PlayerInfo {
         return this.plotLimit;
     }
 
+    public LocalDateTime getLastInteractTime() {
+        return this.lastInteractTime;
+    }
+
+    public PlayerInteractEvent getLastInteractEvent() {
+        return this.lastInteractEvent;
+    }
+
     public void setName (String name) {
         this.name = name;
         getConfiguration().set("name", name);
@@ -127,5 +139,11 @@ public class PlayerInfo {
         saveConfiguration();
     }
 
+    public void setLastInteractEvent (PlayerInteractEvent event) {
+        this.lastInteractEvent = event;
+    }
 
+    public void setLastInteractTime (LocalDateTime time) {
+        this.lastInteractTime = time;
+    }
 }
