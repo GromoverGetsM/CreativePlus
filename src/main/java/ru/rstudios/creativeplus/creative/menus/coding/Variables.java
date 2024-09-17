@@ -38,8 +38,6 @@ public class Variables extends CreativeSystemMenu implements Listener {
         this.name = name;
         this.rows = rows;
         this.items = items;
-
-        registerEvents();
     }
 
     public void setPlayer (Player player) {
@@ -67,22 +65,5 @@ public class Variables extends CreativeSystemMenu implements Listener {
         }
 
         return i;
-    }
-
-    @Override
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onClick (InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() != null && event.getClickedInventory().getHolder() instanceof Variables) {
-            event.setCancelled(true);
-            if (event.getCurrentItem() != null) {
-                player.getInventory().addItem(event.getCurrentItem());
-            }
-        }
-    }
-
-    @Override
-    public void registerEvents() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 }

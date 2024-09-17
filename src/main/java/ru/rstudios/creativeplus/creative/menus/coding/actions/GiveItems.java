@@ -1,12 +1,18 @@
 package ru.rstudios.creativeplus.creative.menus.coding.actions;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import ru.rstudios.creativeplus.creative.menus.coding.CodingSystemMenu;
+import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
+import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 import ru.rstudios.creativeplus.utils.InventoryUtil;
 
 import java.io.File;
@@ -14,26 +20,26 @@ import java.util.HashMap;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
-public class SendMessage extends CodingSystemMenu  {
+public class GiveItems extends CreativeSystemMenu implements Listener {
 
     private final String name;
     private final int rows;
     private final HashMap<Integer, ItemStack> items;
     private Player player;
 
-    public SendMessage() {
-        this("Отправить сообщение");
+    public GiveItems() {
+        this("Выдать предметы");
     }
 
-    public SendMessage (String name) {
+    public GiveItems (String name) {
         this(name, 1);
     }
 
-    public SendMessage (String name, int rows) {
+    public GiveItems (String name, int rows) {
         this(name, rows, null);
     }
 
-    public SendMessage (String name, int rows, HashMap<Integer, ItemStack> items) {
+    public GiveItems (String name, int rows, HashMap<Integer, ItemStack> items) {
         super(name, rows, items);
         this.name = name;
         this.rows = rows;
@@ -65,6 +71,18 @@ public class SendMessage extends CodingSystemMenu  {
         }
 
         return i;
+    }
+
+    @EventHandler
+    public void onInventoryClose (InventoryCloseEvent event) {
+        if (event.getInventory().getHolder() != null && event.getInventory().getHolder() instanceof SendMessage) {
+            Player player = (Player) event.getPlayer();
+            Block chest = player.getTargetBlockExact(5);
+
+            if (chest != null && chest.getType() == Material.CHEST) {
+                CodingHandleUtils.saveInventoryToChest(player.getWorld(), chest.getLocation(), event.getInventory());
+            }
+        }
     }
 
 }

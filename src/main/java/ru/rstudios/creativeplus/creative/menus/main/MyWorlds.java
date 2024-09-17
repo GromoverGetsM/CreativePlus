@@ -43,8 +43,6 @@ public class MyWorlds extends CreativeSystemMenu implements Listener {
         this.name = name;
         this.rows = rows;
         this.items = items;
-
-        registerEvents();
     }
 
     public void setPlayer (Player player) {
@@ -87,34 +85,6 @@ public class MyWorlds extends CreativeSystemMenu implements Listener {
         }
 
         return i;
-    }
-
-    @Override
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onClick (InventoryClickEvent event) {
-        if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() != null && event.getClickedInventory().getHolder() instanceof MyWorlds) {
-            if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.WHITE_STAINED_GLASS) {
-                if (event.isCancelled()) return;
-                event.setCancelled(true);
-                event.getWhoClicked().closeInventory();
-                new Plot(Plot.getNextPlotName(), event.getWhoClicked().getName(), PlotInitializeReason.PLAYER_PLOT_CREATED);
-            } else if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.WHITE_STAINED_GLASS) {
-                List<String> lore = event.getCurrentItem().getItemMeta().getLore();
-                int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
-                Plot plot = Plot.getById(id);
-                if (plot != null) {
-                    event.getWhoClicked().closeInventory();
-                    if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
-                    Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
-                }
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @Override
-    public void registerEvents() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
 }

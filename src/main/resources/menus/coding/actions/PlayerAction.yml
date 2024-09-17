@@ -2,10 +2,17 @@
   title: Действие игрока
   items:
     slot10:
+      type: CHEST
+      amount: 1
+      name: '§e Управление инвентарём '
+      lore:
+        - '§f Взаимодействие с инвентарём '
+        - '§f игрока из события '
+    slot11:
       type: WRITABLE_BOOK
       amount: 1
       name: '§e Коммуникация '
       lore:
         - '§f Коммуникация с игроком в любом '
         - §f виде
-      slot: 10
+      slot: 11

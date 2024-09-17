@@ -12,28 +12,41 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.reflections.Reflections;
+import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
+import ru.rstudios.creativeplus.creative.menus.coding.AbstractCategoryMenu;
+import ru.rstudios.creativeplus.creative.menus.coding.AbstractSelectCategoryMenu;
+import ru.rstudios.creativeplus.creative.menus.coding.CodingCategoryType;
 import ru.rstudios.creativeplus.creative.menus.coding.Variables;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.GiveItems;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.SendMessage;
 import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
+import ru.rstudios.creativeplus.creative.menus.main.MyWorlds;
 import ru.rstudios.creativeplus.creative.menus.main.WorldsMenu;
 import ru.rstudios.creativeplus.creative.plots.DevPlot;
 import ru.rstudios.creativeplus.creative.plots.Plot;
+import ru.rstudios.creativeplus.creative.plots.PlotInitializeReason;
 import ru.rstudios.creativeplus.player.PlayerInfo;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
+import ru.rstudios.creativeplus.utils.FileUtil;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
@@ -71,6 +84,122 @@ public class Event implements Listener {
             if (plot != null) plot.getHandler().parseCodeBlocks();
             if (plot == null || plot.getPlotOnline() == 0) {
                 plot.unload(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onClick (InventoryClickEvent event) throws InstantiationException, IllegalAccessException {
+        Player player = (Player) event.getWhoClicked();
+        if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() != null) {
+            if (event.getClickedInventory().getHolder() instanceof AbstractCategoryMenu) {
+                event.setCancelled(true);
+                Block targetBlock = player.getTargetBlockExact(5);
+                if (event.getCurrentItem() != null && targetBlock != null && targetBlock.getType() == Material.OAK_WALL_SIGN) {
+                    Sign sign = (Sign) targetBlock.getState();
+                    String itemDisplayName = event.getCurrentItem().getItemMeta().getDisplayName();
+                    sign.setLine(2, ActionType.getByDisplayName(ChatColor.stripColor(itemDisplayName).trim()).getName());
+                    sign.update();
+                    if (ActionType.getByDisplayName(ChatColor.stripColor(itemDisplayName).trim()).getNeedChest()) {
+                        Block chest = targetBlock.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP);
+                        chest.setType(Material.CHEST);
+                        File chestsFolder = new File(Bukkit.getWorldContainer() + File.separator + chest.getWorld().getName() + File.separator + "chests");
+                        File chestFileR = new File(chestsFolder, chest.getLocation() + ".txt");
+                        if (chestFileR.exists()) chestFileR.delete();
+                        try {
+                            FileUtil.createNewFile(chestsFolder, chest.getLocation() + ".txt");
+                        } catch (IOException e) {
+                            plugin.getLogger().severe(e.getLocalizedMessage());
+                        }
+                    }
+                    player.closeInventory();
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+                }
+            }
+
+            if (event.getClickedInventory().getHolder() instanceof AbstractSelectCategoryMenu) {
+                if (event.getCurrentItem() != null && !Objects.equals(event.getCurrentItem(), new ItemStack(Material.AIR))) {
+                    List<Integer> slotsForCategory = Arrays.asList(10, 12, 14, 16, 37, 39, 41, 43);
+
+                    if (slotsForCategory.contains(event.getSlot())) {
+                        ItemStack item = event.getCurrentItem();
+                        ItemMeta meta = item.getItemMeta();
+                        String displayName = meta.hasDisplayName() ? ChatColor.stripColor(meta.getDisplayName()).trim() : "Коммуникация";
+
+                        CodingCategoryType categoryType = CodingCategoryType.getByDisplayName(displayName);
+                        if (categoryType != null) {
+                            player.openInventory(categoryType.categoryClass.newInstance().getInventory());
+                        }
+                    }
+                }
+            }
+
+            if (event.getClickedInventory().getHolder() instanceof Variables) {
+                event.setCancelled(true);
+                if (event.getCurrentItem() != null) {
+                    player.getInventory().addItem(event.getCurrentItem());
+                }
+            }
+
+            if (event.getClickedInventory().getHolder() instanceof WorldsMenu) {
+                event.setCancelled(true);
+                if (event.getSlot() == 49) {
+                    MyWorlds mw = new MyWorlds("Мои миры");
+                    mw.setPlayer((Player) event.getWhoClicked());
+                    event.getWhoClicked().openInventory(mw.getInventory());
+                } else if (Arrays.asList(20, 21, 22, 23, 24, 29, 30, 31, 32, 33).contains(event.getSlot())) {
+                    if (event.getCurrentItem() != null) {
+                        List<String> lore = event.getCurrentItem().getItemMeta().getLore();
+                        int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
+                        Plot plot = Plot.getById(id);
+                        if (plot != null) {
+                            event.getWhoClicked().closeInventory();
+                            if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
+                            Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
+                        }
+                    }
+                }
+            }
+
+            if (event.getClickedInventory().getHolder() instanceof MyWorlds) {
+                if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() != null && event.getClickedInventory().getHolder() instanceof MyWorlds) {
+                    if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.WHITE_STAINED_GLASS) {
+                        if (event.isCancelled()) return;
+                        event.setCancelled(true);
+                        event.getWhoClicked().closeInventory();
+                        new Plot(Plot.getNextPlotName(), event.getWhoClicked().getName(), PlotInitializeReason.PLAYER_PLOT_CREATED);
+                    } else if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.WHITE_STAINED_GLASS) {
+                        List<String> lore = event.getCurrentItem().getItemMeta().getLore();
+                        int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
+                        Plot plot = Plot.getById(id);
+                        if (plot != null) {
+                            event.getWhoClicked().closeInventory();
+                            if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
+                            Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
+                        }
+                        event.setCancelled(true);
+                    }
+                }
+            }
+
+            if (event.getClickedInventory().getHolder() instanceof SendMessage || event.getClickedInventory().getHolder() instanceof GiveItems) {
+                if (Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8).contains(event.getSlot()) || Arrays.asList(44, 43, 42, 41, 40, 39, 38, 37, 36).contains(event.getSlot())) {
+                    event.setCancelled(true);
+                }
+            }
+
+
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClose (InventoryCloseEvent event) {
+        if (event.getInventory().getHolder() != null && event.getInventory().getHolder() instanceof CodingHandleUtils) {
+            Player player = (Player) event.getPlayer();
+            Block chest = player.getTargetBlockExact(5);
+
+            if (chest != null && chest.getType() == Material.CHEST) {
+                CodingHandleUtils.saveInventoryToChest(player.getWorld(), chest.getLocation(), event.getInventory());
             }
         }
     }

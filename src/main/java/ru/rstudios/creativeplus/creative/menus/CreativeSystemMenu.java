@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
-public abstract class CreativeSystemMenu implements InventoryHolder, Listener {
+public abstract class CreativeSystemMenu implements InventoryHolder {
 
     private String name;
     private int rows;
@@ -33,8 +33,6 @@ public abstract class CreativeSystemMenu implements InventoryHolder, Listener {
         this.name = name;
         this.rows = Math.min(rows, 6);
         this.items = items;
-
-        registerEvents();
     }
 
     public String getName() {
@@ -81,8 +79,4 @@ public abstract class CreativeSystemMenu implements InventoryHolder, Listener {
 
         return i;
     }
-
-    public abstract void onClick(InventoryClickEvent event);
-    public abstract void registerEvents();
-
 }

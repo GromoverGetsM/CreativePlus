@@ -1,7 +1,6 @@
 package ru.rstudios.creativeplus.creative.coding.starters;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;

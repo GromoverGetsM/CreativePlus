@@ -19,7 +19,7 @@ import java.util.*;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
-public class WorldsMenu extends CreativeSystemMenu implements Listener {
+public class WorldsMenu extends CreativeSystemMenu {
 
     private final String name;
     private final int rows;
@@ -38,8 +38,6 @@ public class WorldsMenu extends CreativeSystemMenu implements Listener {
         this.name = name;
         this.rows = rows;
         this.items = items;
-
-        registerEvents();
     }
 
 
@@ -74,34 +72,5 @@ public class WorldsMenu extends CreativeSystemMenu implements Listener {
         }
 
         return i;
-    }
-
-    @Override
-    @EventHandler
-    public void onClick(InventoryClickEvent event) {
-        if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() != null && event.getClickedInventory().getHolder() instanceof WorldsMenu) {
-            event.setCancelled(true);
-            if (event.getSlot() == 49) {
-                MyWorlds mw = new MyWorlds("Мои миры");
-                mw.setPlayer((Player) event.getWhoClicked());
-                event.getWhoClicked().openInventory(mw.getInventory());
-            } else if (Arrays.asList(20, 21, 22, 23, 24, 29, 30, 31, 32, 33).contains(event.getSlot())) {
-                if (event.getCurrentItem() != null) {
-                    List<String> lore = event.getCurrentItem().getItemMeta().getLore();
-                    int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
-                    Plot plot = Plot.getById(id);
-                    if (plot != null) {
-                        event.getWhoClicked().closeInventory();
-                        if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
-                        Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void registerEvents() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 }

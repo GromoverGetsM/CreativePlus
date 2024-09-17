@@ -1,10 +1,7 @@
 package ru.rstudios.creativeplus.creative.coding.starters.player;
 
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.events.GamePlayerEvent;
@@ -13,8 +10,6 @@ import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class PlayerQuitStarter extends Starter {
 

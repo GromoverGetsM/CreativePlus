@@ -9,10 +9,12 @@ import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerBreakBlock
 import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerJoinStarter;
 import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerPlaceBlockStarter;
 import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerQuitStarter;
-import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
