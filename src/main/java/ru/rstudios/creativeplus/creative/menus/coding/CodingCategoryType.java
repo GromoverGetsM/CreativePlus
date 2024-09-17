@@ -3,6 +3,7 @@ package ru.rstudios.creativeplus.creative.menus.coding;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
+import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -12,7 +13,9 @@ import java.util.stream.Collectors;
 
 public enum CodingCategoryType {
 
-    PLAYER_ACTION_COMMUNICATION_CATEGORY("Коммуникация", PlayerAction.CommunicationCategory.class, PlayerAction.class);
+    PLAYER_EVENT_WORLD_INTERACT_CATEGORY("Событие игрока", PlayerEvent.WorldInteractCategory.class, PlayerEvent.class),
+    PLAYER_ACTION_COMMUNICATION_CATEGORY("Коммуникация", PlayerAction.CommunicationCategory.class, PlayerAction.class),
+    PLAYER_ACTION_INVENTORY_CATEGORY("Управление инвентарём", PlayerAction.InventoryCategory.class, PlayerAction.class);
 
 
     public String categoryDisplayName;

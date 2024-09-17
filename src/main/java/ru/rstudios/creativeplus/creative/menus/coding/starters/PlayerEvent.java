@@ -71,6 +71,9 @@ public class PlayerEvent extends AbstractSelectCategoryMenu {
         private final HashMap<Integer, ItemStack> items;
         private Player player;
 
+        public WorldInteractCategory() {
+            this("Событие игрока");
+        }
         public WorldInteractCategory (String name) {
             this(name, 1);
         }

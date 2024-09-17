@@ -25,10 +25,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
-import ru.rstudios.creativeplus.creative.menus.coding.AbstractCategoryMenu;
-import ru.rstudios.creativeplus.creative.menus.coding.AbstractSelectCategoryMenu;
-import ru.rstudios.creativeplus.creative.menus.coding.CodingCategoryType;
-import ru.rstudios.creativeplus.creative.menus.coding.Variables;
+import ru.rstudios.creativeplus.creative.menus.coding.*;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.GiveItems;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.SendMessage;
@@ -194,7 +191,7 @@ public class Event implements Listener {
 
     @EventHandler
     public void onInventoryClose (InventoryCloseEvent event) {
-        if (event.getInventory().getHolder() != null && event.getInventory().getHolder() instanceof CodingHandleUtils) {
+        if (event.getInventory().getHolder() != null && event.getInventory().getHolder() instanceof CodingSystemMenu) {
             Player player = (Player) event.getPlayer();
             Block chest = player.getTargetBlockExact(5);
 

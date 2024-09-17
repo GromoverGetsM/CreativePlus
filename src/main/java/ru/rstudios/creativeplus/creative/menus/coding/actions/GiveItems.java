@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
+import ru.rstudios.creativeplus.creative.menus.coding.CodingSystemMenu;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 import ru.rstudios.creativeplus.utils.InventoryUtil;
 
@@ -20,7 +21,7 @@ import java.util.HashMap;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
-public class GiveItems extends CreativeSystemMenu implements Listener {
+public class GiveItems extends CodingSystemMenu {
 
     private final String name;
     private final int rows;
@@ -71,18 +72,6 @@ public class GiveItems extends CreativeSystemMenu implements Listener {
         }
 
         return i;
-    }
-
-    @EventHandler
-    public void onInventoryClose (InventoryCloseEvent event) {
-        if (event.getInventory().getHolder() != null && event.getInventory().getHolder() instanceof SendMessage) {
-            Player player = (Player) event.getPlayer();
-            Block chest = player.getTargetBlockExact(5);
-
-            if (chest != null && chest.getType() == Material.CHEST) {
-                CodingHandleUtils.saveInventoryToChest(player.getWorld(), chest.getLocation(), event.getInventory());
-            }
-        }
     }
 
 }
