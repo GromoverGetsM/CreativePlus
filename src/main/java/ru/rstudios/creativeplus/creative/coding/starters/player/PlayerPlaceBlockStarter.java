@@ -9,6 +9,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.events.BlockEvent;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.events.GamePlayerEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.plots.Plot;
@@ -62,8 +63,9 @@ public class PlayerPlaceBlockStarter extends Starter {
     }
 
     @Override
-    public void executeActions() {
+    public void executeActions (GameEvent event) {
         for (Action action : actions) {
+            action.setEvent(event);
             action.execute();
         }
     }

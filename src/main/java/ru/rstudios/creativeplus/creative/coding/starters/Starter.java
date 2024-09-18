@@ -1,14 +1,14 @@
 package ru.rstudios.creativeplus.creative.coding.starters;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Starter implements Listener {
+public abstract class Starter {
 
     private List<Action> linkedActions;
     private final String name;
@@ -23,13 +23,12 @@ public abstract class Starter implements Listener {
         this.linkedActions = actions;
     }
 
-
     public abstract List<Entity> getSelection();
     public abstract void setSelection(List<Entity> selection);
     public abstract ItemStack getIcon();
     public abstract List<Action> getActions();
     public abstract String getName();
     public abstract void setActions(List<Action> actions);
-    public abstract void executeActions();
+    public abstract void executeActions(GameEvent event);
 
 }

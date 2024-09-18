@@ -6,6 +6,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 
 import java.util.List;
@@ -14,11 +15,18 @@ public class PlayerGiveItem extends Action {
 
     private final Inventory inventory;
     private Starter starter;
+    private GameEvent event;
 
-    public PlayerGiveItem (Starter starter, String name, Inventory inventory) {
-        super(starter, name, inventory);
+    public PlayerGiveItem (Starter starter, GameEvent event, String name, Inventory inventory) {
+        super(starter, event, name, inventory);
+        this.event = event;
         this.inventory = inventory;
         this.starter = starter;
+    }
+
+    @Override
+    public void setEvent (GameEvent event) {
+        this.event = event;
     }
 
     @Override

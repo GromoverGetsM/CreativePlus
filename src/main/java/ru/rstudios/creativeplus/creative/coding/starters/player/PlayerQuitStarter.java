@@ -4,6 +4,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.events.GamePlayerEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.plots.Plot;
@@ -57,8 +58,9 @@ public class PlayerQuitStarter extends Starter {
     }
 
     @Override
-    public void executeActions() {
+    public void executeActions (GameEvent event) {
         for (Action action : actions) {
+            action.setEvent(event);
             action.execute();
         }
     }

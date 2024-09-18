@@ -21,7 +21,10 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.entity.Entity;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
+import ru.rstudios.creativeplus.creative.coding.eventvalues.ValueType;
 
 import java.io.*;
 import java.util.concurrent.Executor;
@@ -256,6 +259,34 @@ public class CodingHandleUtils {
                 return defaultNum;
             }
         }
+    }
+
+    public static Object parseGameValue (ItemStack item, GameEvent event, Entity entity) {
+        parseGameValue(item, null, event, entity);
+    }
+    public static Object parseGameValue (ItemStack item, Object defaultValue, GameEvent event, Entity entity) {
+        return parseGameValue(item, defaultValue, true, event, entity);
+    }
+    public static Object parseGameValue (ItemStack item, Object defaultValue, boolean checkTypeMatches, GameEvent event, Entity entity) {
+        if (item == null) {
+            return defaultValue;
+        }
+
+        if (checkTypeMatches && item.getType() != Material.APPLE) {
+            return defaultValue;
+        } else {
+            if (item.getItemMeta().hasDisplayName()) {
+                String message = ChatColor.stripColor(item.getItemMeta().getDisplayName()).trim();
+                try {
+                    return ValueType.getByMessage(message) == null ? defaultValue : ValueType.getByMessage(message).getClazz().newInstance().get(event, entity);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    plugin.getLogger().severe(e.getLocalizedMessage());
+                }
+            } else {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
 }

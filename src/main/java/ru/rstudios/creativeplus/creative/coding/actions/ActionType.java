@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerGiveItem;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendMessage;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendTitle;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.GiveItems;
@@ -78,12 +79,12 @@ public enum ActionType {
     }
 
 
-    public Action create (Starter starter, Inventory inventory) {
+    public Action create (Starter starter, GameEvent event, Inventory inventory) {
         Action a = null;
 
         try {
-            Constructor<? extends Action> constructor = this.aClass.getConstructor(Starter.class, String.class, Inventory.class);
-            a = constructor.newInstance(starter, this.name, inventory);
+            Constructor<? extends Action> constructor = this.aClass.getConstructor(Starter.class, GameEvent.class,  String.class, Inventory.class);
+            a = constructor.newInstance(starter, event, this.name, inventory);
         } catch (Exception e) {
             e.printStackTrace();
         }

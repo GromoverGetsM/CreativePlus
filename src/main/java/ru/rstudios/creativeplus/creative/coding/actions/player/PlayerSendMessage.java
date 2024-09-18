@@ -4,6 +4,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
@@ -13,11 +14,18 @@ public class PlayerSendMessage extends Action {
 
     private final Inventory inventory;
     private Starter starter;
+    private GameEvent event;
 
-    public PlayerSendMessage(Starter starter, String name, Inventory inventory) {
-        super(starter, name, inventory);
+    public PlayerSendMessage(Starter starter, GameEvent event, String name, Inventory inventory) {
+        super(starter, event, name, inventory);
         this.inventory = inventory;
         this.starter = starter;
+        this.event = event;
+    }
+
+    @Override
+    public void setEvent(GameEvent event) {
+        this.event = event;
     }
 
     @Override
@@ -51,7 +59,10 @@ public class PlayerSendMessage extends Action {
         for (int i = 9; i < 35; i++) {
 
             if (inventory.getItem(i) != null) {
-                builder.append(CodingHandleUtils.parseText(inventory.getItem(i), ""));
+                switch (inventory.getItem(i).getType()) {
+                    case BOOK -> builder.append(CodingHandleUtils.parseText(inventory.getItem(i), ""));
+                    case APPLE -> builder.append(CodingHandleUtils.parseGameValue(inventory.getItem(i), starter.));
+                }
             }
         }
 

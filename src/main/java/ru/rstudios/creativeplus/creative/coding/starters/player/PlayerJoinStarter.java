@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.events.GamePlayerEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.plots.Plot;
@@ -12,7 +13,7 @@ import ru.rstudios.creativeplus.creative.plots.Plot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerJoinStarter extends Starter implements Listener {
+public class PlayerJoinStarter extends Starter {
 
     private List<Action> actions = new ArrayList<>();
     private List<Entity> selection = new ArrayList<>();
@@ -58,8 +59,9 @@ public class PlayerJoinStarter extends Starter implements Listener {
     }
 
     @Override
-    public void executeActions() {
+    public void executeActions (GameEvent event) {
         for (Action action : actions) {
+            action.setEvent(event);
             action.execute();
         }
     }

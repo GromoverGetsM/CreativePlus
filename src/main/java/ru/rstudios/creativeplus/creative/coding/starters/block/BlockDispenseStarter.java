@@ -5,10 +5,12 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.events.BlockEvent;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.events.GamePlayerEvent;
 import ru.rstudios.creativeplus.creative.coding.events.ItemEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
@@ -63,8 +65,9 @@ public class BlockDispenseStarter extends Starter {
     }
 
     @Override
-    public void executeActions() {
+    public void executeActions(GameEvent event) {
         for (Action action : actions) {
+            action.setEvent(event);
             action.execute();
         }
     }

@@ -63,7 +63,7 @@ public class CodeHandler {
                 
                 Action act = null;
                 ActionType actionType = ActionType.getByCustomName(actionName);
-                if (actionType != null) act = actionType.create(starter, i);
+                if (actionType != null) act = actionType.create(starter, null, i);
                 if (act != null) actions.add(act);
             }
 
@@ -82,7 +82,7 @@ public class CodeHandler {
             for (Starter starter : this.starters) {
                 if (StarterType.getByCustomName(starter.getName()) != null && StarterType.getByCustomName(starter.getName()).getEventClass() == event.getClass()) {
                     starter.setSelection(Collections.singletonList(event.getDefaultEntity()));
-                    starter.executeActions();
+                    starter.executeActions(event);
                 }
             }
 

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
@@ -14,11 +15,18 @@ public class PlayerSendTitle extends Action {
 
     private final Inventory inventory;
     private Starter starter;
+    private GameEvent event;
 
-    public PlayerSendTitle (Starter starter, String name, Inventory inventory) {
-        super(starter, name, inventory);
+    public PlayerSendTitle (Starter starter, GameEvent event, String name, Inventory inventory) {
+        super(starter, event, name, inventory);
         this.inventory = inventory;
         this.starter = starter;
+        this.event = event;
+    }
+
+    @Override
+    public void setEvent(GameEvent event) {
+        this.event = event;
     }
 
     @Override
