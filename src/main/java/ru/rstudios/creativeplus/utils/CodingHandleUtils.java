@@ -262,7 +262,7 @@ public class CodingHandleUtils {
     }
 
     public static Object parseGameValue (ItemStack item, GameEvent event, Entity entity) {
-        parseGameValue(item, null, event, entity);
+        return parseGameValue(item, null, event, entity);
     }
     public static Object parseGameValue (ItemStack item, Object defaultValue, GameEvent event, Entity entity) {
         return parseGameValue(item, defaultValue, true, event, entity);

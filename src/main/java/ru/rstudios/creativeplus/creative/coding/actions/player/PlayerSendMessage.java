@@ -45,15 +45,15 @@ public class PlayerSendMessage extends Action {
 
     @Override
     public void execute() {
-        String message = parseMessage(this.inventory);
         List<Entity> selection = starter.getSelection();
 
         for (Entity entity : selection) {
+            String message = parseMessage(this.inventory, entity);
             entity.sendMessage(message);
         }
     }
 
-    private String parseMessage (Inventory inventory) {
+    private String parseMessage (Inventory inventory, Entity entity) {
         StringBuilder builder = new StringBuilder();
 
         for (int i = 9; i < 35; i++) {
@@ -61,7 +61,7 @@ public class PlayerSendMessage extends Action {
             if (inventory.getItem(i) != null) {
                 switch (inventory.getItem(i).getType()) {
                     case BOOK -> builder.append(CodingHandleUtils.parseText(inventory.getItem(i), ""));
-                    case APPLE -> builder.append(CodingHandleUtils.parseGameValue(inventory.getItem(i), starter.));
+                    case APPLE -> builder.append(CodingHandleUtils.parseGameValue(inventory.getItem(i), event, entity));
                 }
             }
         }
