@@ -11,6 +11,9 @@ import ru.rstudios.creativeplus.utils.InventoryUtil;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
@@ -67,4 +70,11 @@ public class SendMessage extends CodingSystemMenu  {
         return i;
     }
 
+    @Override
+    public List<Integer> getDisallowedSlots() {
+        List<Integer> disallowedSlots = new LinkedList<>();
+        IntStream.rangeClosed(0, 8).forEach(disallowedSlots::add);
+        IntStream.rangeClosed(36, 44).forEach(disallowedSlots::add);
+        return disallowedSlots;
+    }
 }

@@ -2,7 +2,6 @@ package ru.rstudios.creativeplus.creative.menus.coding.actions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +9,7 @@ import ru.rstudios.creativeplus.creative.menus.coding.CodingSystemMenu;
 import ru.rstudios.creativeplus.utils.InventoryUtil;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,34 +17,29 @@ import java.util.stream.IntStream;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
-public class GiveItems extends CodingSystemMenu {
+public class SendTitle extends CodingSystemMenu {
 
     private final String name;
     private final int rows;
     private final HashMap<Integer, ItemStack> items;
-    private Player player;
 
-    public GiveItems() {
-        this("Выдать предметы");
+    public SendTitle() {
+        this("Отправить титл");
     }
 
-    public GiveItems (String name) {
+    public SendTitle (String name) {
         this(name, 1);
     }
 
-    public GiveItems (String name, int rows) {
+    public SendTitle (String name, int rows) {
         this(name, rows, null);
     }
 
-    public GiveItems (String name, int rows, HashMap<Integer, ItemStack> items) {
+    public SendTitle (String name, int rows, HashMap<Integer, ItemStack> items) {
         super(name, rows, items);
         this.name = name;
         this.rows = rows;
         this.items = items;
-    }
-
-    public void setPlayer (Player player) {
-        this.player = player;
     }
 
 
@@ -74,7 +69,8 @@ public class GiveItems extends CodingSystemMenu {
     public List<Integer> getDisallowedSlots() {
         List<Integer> disallowedSlots = new LinkedList<>();
         IntStream.rangeClosed(0, 8).forEach(disallowedSlots::add);
-        IntStream.rangeClosed(36, 44).forEach(disallowedSlots::add);
+        IntStream.rangeClosed(18, 26).forEach(disallowedSlots::add);
+        disallowedSlots.addAll(Arrays.asList(10, 12, 14, 16));
         return disallowedSlots;
     }
 

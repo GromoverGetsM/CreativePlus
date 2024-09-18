@@ -125,128 +125,133 @@ public class Event implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onClick (InventoryClickEvent event) throws InstantiationException, IllegalAccessException {
+    public void onClick(InventoryClickEvent event) throws InstantiationException, IllegalAccessException {
         Player player = (Player) event.getWhoClicked();
-        if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() != null) {
-            if (event.getClickedInventory().getHolder() instanceof AbstractCategoryMenu) {
-                event.setCancelled(true);
-                Block targetBlock = player.getTargetBlockExact(5);
-                if (event.getCurrentItem() != null && targetBlock != null && targetBlock.getType() == Material.OAK_WALL_SIGN) {
-                    Sign sign = (Sign) targetBlock.getState();
+        if (event.getClickedInventory() == null || event.getClickedInventory().getHolder() == null) return;
 
-                    String itemDisplayName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()).trim();
+        Object holder = event.getClickedInventory().getHolder();
+        ItemStack currentItem = event.getCurrentItem();
 
-                    ActionType actionType = ActionType.getByDisplayName(itemDisplayName);
-                    StarterType starterType = null;
+        if (holder instanceof AbstractCategoryMenu) {
+            event.setCancelled(true);
+            handleCategoryMenuClick(player, currentItem);
+        }
 
-                    if (actionType == null) {
-                        starterType = StarterType.getByDisplayName(itemDisplayName);
-                    }
+        else if (holder instanceof AbstractSelectCategoryMenu) {
+            event.setCancelled(true);
+            handleSelectCategoryMenuClick(event, player, currentItem);
+        }
 
-                    if (actionType != null || starterType != null) {
-                        String typeName = (actionType != null) ? actionType.getName() : starterType.getName();
+        else if (holder instanceof Variables) {
+            event.setCancelled(true);
+            if (currentItem != null) player.getInventory().addItem(currentItem);
+        }
 
-                        sign.setLine(2, typeName);
-                        sign.update();
+        else if (holder instanceof WorldsMenu) {
+            event.setCancelled(true);
+            handleWorldsMenuClick(event, player, currentItem);
+        }
 
-                        if (actionType != null && actionType.getNeedChest()) {
-                            Block chest = targetBlock.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP);
-                            chest.setType(Material.CHEST);
+        else if (holder instanceof MyWorlds) {
+            handleMyWorldsClick(event, currentItem);
+        }
 
-                            File chestsFolder = new File(Bukkit.getWorldContainer() + File.separator + chest.getWorld().getName() + File.separator + "chests");
-                            File chestFileR = new File(chestsFolder, chest.getLocation() + ".txt");
-                            if (chestFileR.exists()) chestFileR.delete();
-
-                            try {
-                                FileUtil.createNewFile(chestsFolder, chest.getLocation() + ".txt");
-                            } catch (IOException e) {
-                                plugin.getLogger().severe(e.getLocalizedMessage());
-                            }
-                        }
-
-                        player.closeInventory();
-                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-                    }
-
-                }
-            }
-
-            if (event.getClickedInventory().getHolder() instanceof AbstractSelectCategoryMenu) {
-                event.setCancelled(true);
-                if (event.getCurrentItem() != null && !Objects.equals(event.getCurrentItem(), new ItemStack(Material.AIR))) {
-                    List<Integer> slotsForCategory = Arrays.asList(10, 12, 14, 16, 37, 39, 41, 43);
-
-                    if (slotsForCategory.contains(event.getSlot())) {
-                        ItemStack item = event.getCurrentItem();
-                        ItemMeta meta = item.getItemMeta();
-                        String displayName = meta.hasDisplayName() ? ChatColor.stripColor(meta.getDisplayName()).trim() : "Коммуникация";
-
-                        CodingCategoryType categoryType = CodingCategoryType.getByDisplayName(displayName);
-
-                        if (categoryType != null) {
-                            player.openInventory(categoryType.categoryClass.newInstance().getInventory());
-                        }
-                    }
-                }
-            }
-
-            if (event.getClickedInventory().getHolder() instanceof Variables) {
-                event.setCancelled(true);
-                if (event.getCurrentItem() != null) {
-                    player.getInventory().addItem(event.getCurrentItem());
-                }
-            }
-
-            if (event.getClickedInventory().getHolder() instanceof WorldsMenu) {
-                event.setCancelled(true);
-                if (event.getSlot() == 49) {
-                    MyWorlds mw = new MyWorlds("Мои миры");
-                    mw.setPlayer((Player) event.getWhoClicked());
-                    event.getWhoClicked().openInventory(mw.getInventory());
-                } else if (Arrays.asList(20, 21, 22, 23, 24, 29, 30, 31, 32, 33).contains(event.getSlot())) {
-                    if (event.getCurrentItem() != null) {
-                        List<String> lore = event.getCurrentItem().getItemMeta().getLore();
-                        int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
-                        Plot plot = Plot.getById(id);
-                        if (plot != null) {
-                            event.getWhoClicked().closeInventory();
-                            if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
-                            Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
-                        }
-                    }
-                }
-            }
-
-            if (event.getClickedInventory().getHolder() instanceof MyWorlds) {
-                if (event.getClickedInventory() != null && event.getClickedInventory().getHolder() != null && event.getClickedInventory().getHolder() instanceof MyWorlds) {
-                    if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.WHITE_STAINED_GLASS) {
-                        if (event.isCancelled()) return;
-                        event.setCancelled(true);
-                        event.getWhoClicked().closeInventory();
-                        new Plot(Plot.getNextPlotName(), event.getWhoClicked().getName(), PlotInitializeReason.PLAYER_PLOT_CREATED);
-                    } else if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.WHITE_STAINED_GLASS) {
-                        List<String> lore = event.getCurrentItem().getItemMeta().getLore();
-                        int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
-                        Plot plot = Plot.getById(id);
-                        if (plot != null) {
-                            event.getWhoClicked().closeInventory();
-                            if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
-                            Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
-                        }
-                        event.setCancelled(true);
-                    }
-                }
-            }
-
-            if (event.getClickedInventory().getHolder() instanceof SendMessage || event.getClickedInventory().getHolder() instanceof GiveItems) {
-                if (Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8).contains(event.getSlot()) || Arrays.asList(44, 43, 42, 41, 40, 39, 38, 37, 36).contains(event.getSlot())) {
-                    event.setCancelled(true);
-                }
-            }
-
-
+        else if (holder instanceof CodingSystemMenu) {
+            event.setCancelled(((CodingSystemMenu) holder).getDisallowedSlots().contains(event.getSlot()));
         }
     }
+
+    private void handleCategoryMenuClick(Player player, ItemStack currentItem) {
+        if (currentItem == null) return;
+
+        Block targetBlock = player.getTargetBlockExact(5);
+        if (targetBlock != null && targetBlock.getType() == Material.OAK_WALL_SIGN) {
+            Sign sign = (Sign) targetBlock.getState();
+            String itemDisplayName = ChatColor.stripColor(currentItem.getItemMeta().getDisplayName()).trim();
+            ActionType actionType = ActionType.getByDisplayName(itemDisplayName);
+            StarterType starterType = actionType == null ? StarterType.getByDisplayName(itemDisplayName) : null;
+
+            if (actionType != null || starterType != null) {
+                sign.setLine(2, actionType != null ? actionType.getName() : starterType.getName());
+                sign.update();
+
+                if (actionType != null && actionType.getNeedChest()) {
+                    createChest(targetBlock);
+                }
+
+                player.closeInventory();
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+            }
+        }
+    }
+
+    private void handleSelectCategoryMenuClick(InventoryClickEvent event, Player player, ItemStack currentItem) throws InstantiationException, IllegalAccessException {
+        if (currentItem == null || currentItem.getType() == Material.AIR) return;
+
+        List<Integer> slotsForCategory = Arrays.asList(10, 12, 14, 16, 37, 39, 41, 43);
+        if (!slotsForCategory.contains(event.getSlot())) return;
+
+        String displayName = ChatColor.stripColor(currentItem.getItemMeta().getDisplayName()).trim();
+        CodingCategoryType categoryType = CodingCategoryType.getByDisplayName(displayName);
+        if (categoryType != null) {
+            player.openInventory(categoryType.categoryClass.newInstance().getInventory());
+        }
+    }
+
+    private void handleWorldsMenuClick(InventoryClickEvent event, Player player, ItemStack currentItem) {
+        if (event.getSlot() == 49) {
+            MyWorlds mw = new MyWorlds("Мои миры");
+            mw.setPlayer(player);
+            player.openInventory(mw.getInventory());
+        } else if (Arrays.asList(20, 21, 22, 23, 24, 29, 30, 31, 32, 33).contains(event.getSlot())) {
+            if (currentItem != null) {
+                List<String> lore = currentItem.getItemMeta().getLore();
+                int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
+                Plot plot = Plot.getById(id);
+                if (plot != null) {
+                    player.closeInventory();
+                    if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
+                    Plot.teleportToPlot(plot, player);
+                }
+            }
+        }
+    }
+
+    private void handleMyWorldsClick(InventoryClickEvent event, ItemStack currentItem) {
+        if (currentItem == null) return;
+
+        if (currentItem.getType() == Material.WHITE_STAINED_GLASS) {
+            event.setCancelled(true);
+            event.getWhoClicked().closeInventory();
+            new Plot(Plot.getNextPlotName(), event.getWhoClicked().getName(), PlotInitializeReason.PLAYER_PLOT_CREATED);
+        } else {
+            List<String> lore = currentItem.getItemMeta().getLore();
+            int id = Integer.parseInt(lore.get(lore.size() - 2).split(":")[1].trim().substring(2));
+            Plot plot = Plot.getById(id);
+            if (plot != null) {
+                event.getWhoClicked().closeInventory();
+                if (!plot.getPlotLoaded()) plot.load(plot.getPlotName());
+                Plot.teleportToPlot(plot, (Player) event.getWhoClicked());
+            }
+            event.setCancelled(true);
+        }
+    }
+
+    private void createChest(Block targetBlock) {
+        Block chest = targetBlock.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP);
+        chest.setType(Material.CHEST);
+
+        File chestsFolder = new File(Bukkit.getWorldContainer() + File.separator + chest.getWorld().getName() + File.separator + "chests");
+        File chestFile = new File(chestsFolder, chest.getLocation() + ".txt");
+        if (chestFile.exists()) chestFile.delete();
+
+        try {
+            FileUtil.createNewFile(chestsFolder, chest.getLocation() + ".txt");
+        } catch (IOException e) {
+            Bukkit.getLogger().severe(e.getLocalizedMessage());
+        }
+    }
+
 
     @EventHandler
     public void onInventoryClose (InventoryCloseEvent event) {

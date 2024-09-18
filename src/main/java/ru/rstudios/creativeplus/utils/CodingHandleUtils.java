@@ -150,7 +150,9 @@ public class CodingHandleUtils {
     }
 
     public static Object parseItem (ItemStack item) {
-        Preconditions.checkNotNull(item);
+        if (item == null) {
+            return null;
+        }
 
         switch (item.getType()) {
             case BOOK -> {
@@ -175,7 +177,9 @@ public class CodingHandleUtils {
     }
 
     public static String parseText (ItemStack item, String defaultText, boolean checkTypeMatches) {
-        Preconditions.checkNotNull(item);
+        if (item == null) {
+            return defaultText;
+        }
         if (checkTypeMatches && item.getType() != Material.BOOK) {
             return defaultText;
         } else {
@@ -238,7 +242,10 @@ public class CodingHandleUtils {
     }
 
     public static double parseNumber (ItemStack item, double defaultNum, boolean checkTypeMatches) {
-        Preconditions.checkNotNull(item);
+        if (item == null) {
+            return defaultNum;
+        }
+
         if (checkTypeMatches && item.getType() != Material.SLIME_BALL) {
             return defaultNum;
         } else {
