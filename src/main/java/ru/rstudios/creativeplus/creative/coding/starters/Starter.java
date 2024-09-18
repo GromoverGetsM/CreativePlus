@@ -8,7 +8,7 @@ import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Starter implements Listener {
+public abstract class Starter {
 
     private List<Action> linkedActions;
     private final String name;
