@@ -1,6 +1,5 @@
 package ru.rstudios.creativeplus;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.rstudios.creativeplus.commands.CreateInventory;
 import ru.rstudios.creativeplus.commands.WorldCommand;

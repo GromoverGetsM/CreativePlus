@@ -14,18 +14,11 @@ public class PlayerSendMessage extends Action {
 
     private final Inventory inventory;
     private Starter starter;
-    private GameEvent event;
 
-    public PlayerSendMessage(Starter starter, GameEvent event, String name, Inventory inventory) {
-        super(starter, event, name, inventory);
+    public PlayerSendMessage(Starter starter, String name, Inventory inventory) {
+        super(starter, name, inventory);
         this.inventory = inventory;
         this.starter = starter;
-        this.event = event;
-    }
-
-    @Override
-    public void setEvent(GameEvent event) {
-        this.event = event;
     }
 
     @Override
@@ -44,16 +37,16 @@ public class PlayerSendMessage extends Action {
     }
 
     @Override
-    public void execute() {
+    public void execute (GameEvent event) {
         List<Entity> selection = starter.getSelection();
 
         for (Entity entity : selection) {
-            String message = parseMessage(this.inventory, entity);
+            String message = parseMessage(this.inventory, entity, event);
             entity.sendMessage(message);
         }
     }
 
-    private String parseMessage (Inventory inventory, Entity entity) {
+    private String parseMessage (Inventory inventory, Entity entity, GameEvent gameEvent) {
         StringBuilder builder = new StringBuilder();
 
         for (int i = 9; i < 35; i++) {
@@ -61,7 +54,7 @@ public class PlayerSendMessage extends Action {
             if (inventory.getItem(i) != null) {
                 switch (inventory.getItem(i).getType()) {
                     case BOOK -> builder.append(CodingHandleUtils.parseText(inventory.getItem(i), ""));
-                    case APPLE -> builder.append(CodingHandleUtils.parseGameValue(inventory.getItem(i), event, entity));
+                    case APPLE -> builder.append(CodingHandleUtils.parseGameValue(inventory.getItem(i), gameEvent, entity));
                 }
             }
         }

@@ -65,8 +65,7 @@ public class PlayerBreakBlockStarter extends Starter {
     @Override
     public void executeActions (GameEvent event) {
         for (Action action : actions) {
-            action.setEvent(event);
-            action.execute();
+            action.execute(event);
         }
     }
 

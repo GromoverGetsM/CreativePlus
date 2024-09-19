@@ -15,19 +15,13 @@ public class PlayerGiveItem extends Action {
 
     private final Inventory inventory;
     private Starter starter;
-    private GameEvent event;
 
-    public PlayerGiveItem (Starter starter, GameEvent event, String name, Inventory inventory) {
-        super(starter, event, name, inventory);
-        this.event = event;
+    public PlayerGiveItem (Starter starter, String name, Inventory inventory) {
+        super(starter, name, inventory);
         this.inventory = inventory;
         this.starter = starter;
     }
 
-    @Override
-    public void setEvent (GameEvent event) {
-        this.event = event;
-    }
 
     @Override
     public ItemStack getIcon() {
@@ -45,7 +39,7 @@ public class PlayerGiveItem extends Action {
     }
 
     @Override
-    public void execute() {
+    public void execute (GameEvent event) {
         List<Entity> selection = starter.getSelection();
 
         for (Entity entity : selection) {

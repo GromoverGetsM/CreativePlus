@@ -13,21 +13,18 @@ public abstract class Action {
     private final String name;
     private final Inventory inventory;
     private final Starter starter;
-    private GameEvent event;
     protected List<Entity> selection;
 
-    public Action (Starter starter, GameEvent event, String name, Inventory inventory) {
-        this.event = event;
+    public Action (Starter starter, String name, Inventory inventory) {
         this.name = name;
         this.inventory = inventory;
         this.starter = starter;
     }
 
-    public abstract void setEvent(GameEvent event);
     public abstract ItemStack getIcon();
     public abstract String getName();
     public abstract Inventory getInventory();
 
-    public abstract void execute();
+    public abstract void execute (GameEvent event);
 
 }

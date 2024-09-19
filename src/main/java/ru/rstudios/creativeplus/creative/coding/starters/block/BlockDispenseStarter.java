@@ -5,7 +5,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
@@ -67,8 +66,7 @@ public class BlockDispenseStarter extends Starter {
     @Override
     public void executeActions(GameEvent event) {
         for (Action action : actions) {
-            action.setEvent(event);
-            action.execute();
+            action.execute(event);
         }
     }
 

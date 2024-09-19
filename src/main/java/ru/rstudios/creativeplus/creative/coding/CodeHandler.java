@@ -63,7 +63,7 @@ public class CodeHandler {
                 
                 Action act = null;
                 ActionType actionType = ActionType.getByCustomName(actionName);
-                if (actionType != null) act = actionType.create(starter, null, i);
+                if (actionType != null) act = actionType.create(starter, i);
                 if (act != null) actions.add(act);
             }
 

@@ -15,18 +15,11 @@ public class PlayerSendTitle extends Action {
 
     private final Inventory inventory;
     private Starter starter;
-    private GameEvent event;
 
-    public PlayerSendTitle (Starter starter, GameEvent event, String name, Inventory inventory) {
-        super(starter, event, name, inventory);
+    public PlayerSendTitle (Starter starter, String name, Inventory inventory) {
+        super(starter, name, inventory);
         this.inventory = inventory;
         this.starter = starter;
-        this.event = event;
-    }
-
-    @Override
-    public void setEvent(GameEvent event) {
-        this.event = event;
     }
 
     @Override
@@ -45,7 +38,7 @@ public class PlayerSendTitle extends Action {
     }
 
     @Override
-    public void execute() {
+    public void execute (GameEvent event) {
         List<Entity> selection = starter.getSelection();
 
         String title = CodingHandleUtils.parseText(this.inventory.getItem(9));

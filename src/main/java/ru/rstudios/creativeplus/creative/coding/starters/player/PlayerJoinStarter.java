@@ -2,7 +2,6 @@ package ru.rstudios.creativeplus.creative.coding.starters.player;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
@@ -61,8 +60,7 @@ public class PlayerJoinStarter extends Starter {
     @Override
     public void executeActions (GameEvent event) {
         for (Action action : actions) {
-            action.setEvent(event);
-            action.execute();
+            action.execute(event);
         }
     }
 
