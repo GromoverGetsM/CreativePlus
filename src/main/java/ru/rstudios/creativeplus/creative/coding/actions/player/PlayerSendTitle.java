@@ -41,14 +41,14 @@ public class PlayerSendTitle extends Action {
     public void execute (GameEvent event) {
         List<Entity> selection = starter.getSelection();
 
-        String title = CodingHandleUtils.parseText(this.inventory.getItem(9));
-        String subtitle = CodingHandleUtils.parseText(this.inventory.getItem(11));
-        int fadein = (int) CodingHandleUtils.parseNumber(this.inventory.getItem(13));
-        int duration = (int) CodingHandleUtils.parseNumber(this.inventory.getItem(15));
-        int fadeout = (int) CodingHandleUtils.parseNumber(this.inventory.getItem(17));
-
         for (Entity entity : selection) {
             if (entity instanceof Player player) {
+                String title = (String) CodingHandleUtils.parseItem(this.inventory.getItem(9), event, entity);
+                String subtitle = (String) CodingHandleUtils.parseItem(this.inventory.getItem(11), event, entity);
+                int fadein = CodingHandleUtils.parseItem(this.inventory.getItem(13), event, entity) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(13), event, entity) : 0;
+                int duration = CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity) : 0;
+                int fadeout = CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity) : 0;
+
                 player.sendTitle(title, subtitle, fadein, duration, fadeout);
             }
         }

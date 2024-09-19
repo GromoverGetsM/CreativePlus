@@ -52,10 +52,7 @@ public class PlayerSendMessage extends Action {
         for (int i = 9; i < 35; i++) {
 
             if (inventory.getItem(i) != null) {
-                switch (inventory.getItem(i).getType()) {
-                    case BOOK -> builder.append(CodingHandleUtils.parseText(inventory.getItem(i), ""));
-                    case APPLE -> builder.append(CodingHandleUtils.parseGameValue(inventory.getItem(i), gameEvent, entity));
-                }
+                builder.append(CodingHandleUtils.parseItem(inventory.getItem(i), gameEvent, entity));
             }
         }
 

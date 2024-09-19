@@ -22,7 +22,8 @@ public enum StarterType {
     PLAYER_BLOCK_BREAK("Сломал блок", "Сломал блок", PlayerBreakBlockStarter.class, PlayerBreakBlockStarter.Event.class),
     PLAYER_BLOCK_PLACE("Поставил блок", "Поставил блок", PlayerPlaceBlockStarter.class, PlayerPlaceBlockStarter.Event.class),
     BLOCK_DISPENSE_ITEM("Блок выдал предмет", "Блок выдал предмет", BlockDispenseStarter.class, BlockDispenseStarter.Event.class),
-    PLAYER_RIGHT_CLICKED("Правый клик", "Правый клик", PlayerRightClickStarter.class, PlayerRightClickStarter.Event.class);
+    PLAYER_RIGHT_CLICKED("Правый клик", "Правый клик", PlayerRightClickStarter.class, PlayerRightClickStarter.Event.class),
+    PLAYER_CHATTED("Событие чата", "Событие чата", PlayerChattedStarter.class, PlayerChattedStarter.Event.class);
 
     private String displayName;
     private String name;

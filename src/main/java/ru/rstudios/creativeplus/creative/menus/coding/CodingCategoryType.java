@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public enum CodingCategoryType {
 
     PLAYER_EVENT_WORLD_INTERACT_CATEGORY("Взаимодействие с миром", PlayerEvent.WorldInteractCategory.class, PlayerEvent.class),
+    PLAYER_EVENT_OTHER_CATEGORY("Другое", PlayerEvent.OtherCategory.class, PlayerEvent.class),
     PLAYER_ACTION_COMMUNICATION_CATEGORY("Коммуникация", PlayerAction.CommunicationCategory.class, PlayerAction.class),
     PLAYER_ACTION_INVENTORY_CATEGORY("Управление инвентарём", PlayerAction.InventoryCategory.class, PlayerAction.class);
 

@@ -9,7 +9,7 @@
         - '§f Взаимодействие с инвентарём '
         - '§f игрока из события '
       slot: 10
-    slot11:
+    slot12:
       type: WRITABLE_BOOK
       amount: 1
       name: '§e Коммуникация '

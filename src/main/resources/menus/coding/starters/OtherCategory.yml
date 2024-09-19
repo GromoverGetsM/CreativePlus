@@ -1,0 +1,11 @@
+size: 54
+title: Событие игрока
+items:
+  slot0:
+    type: WRITABLE_BOOK
+    amount: 1
+    name: '§e Событие чата '
+    lore:
+      - '§f Срабатывает, когда игрок пишет '
+      - §f в чат
+    slot: 0

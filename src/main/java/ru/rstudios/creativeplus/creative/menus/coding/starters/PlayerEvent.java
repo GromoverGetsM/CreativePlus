@@ -117,4 +117,57 @@ public class PlayerEvent extends AbstractSelectCategoryMenu {
         }
     }
 
+    public static class OtherCategory extends AbstractCategoryMenu {
+
+        private final String name;
+        private final int rows;
+        private final HashMap<Integer, ItemStack> items;
+        private Player player;
+
+        public OtherCategory() {
+            this("Событие игрока");
+        }
+        public OtherCategory (String name) {
+            this(name, 1);
+        }
+
+        public OtherCategory (String name, int rows) {
+            this(name, rows, null);
+        }
+
+        public OtherCategory (String name, int rows, HashMap<Integer, ItemStack> items) {
+            super(name, rows, items);
+            this.name = name;
+            this.rows = rows;
+            this.items = items;
+        }
+
+        public void setPlayer (Player player) {
+            this.player = player;
+        }
+
+
+        @Override
+        public @NotNull Inventory getInventory() {
+            File inventory = new File(plugin.getDataFolder() + File.separator + "menus" + File.separator + "coding" + File.separator + "starters" + File.separator + this.getClass().getSimpleName() + ".yml");
+            Inventory i;
+
+            if (!inventory.exists() || !inventory.isFile() || inventory.length() == 0) {
+                i = Bukkit.createInventory(this, this.rows * 9, this.name);
+
+                for (Integer key : this.items.keySet()) {
+                    if (key <= this.rows * 9) i.setItem(key, this.items.get(key));
+                    else {
+                        plugin.getLogger().warning("Установка предмета невозможна. Слот " + key + " в инвентаре " + this.name + " превышает допустимое значение.");
+                        break;
+                    }
+                }
+            } else {
+                i = InventoryUtil.getInventory(YamlConfiguration.loadConfiguration(inventory), this);
+            }
+
+            return i;
+        }
+    }
+
 }

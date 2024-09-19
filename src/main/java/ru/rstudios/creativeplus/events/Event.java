@@ -157,6 +157,25 @@ public class Event implements Listener {
         else if (holder instanceof CodingSystemMenu) {
             event.setCancelled(((CodingSystemMenu) holder).getDisallowedSlots().contains(event.getSlot()));
         }
+
+        else if (holder instanceof GameValues) {
+            event.setCancelled(true);
+            handleGameValueClick(player, currentItem);
+        }
+    }
+
+    private void handleGameValueClick (Player player, ItemStack currentItem) {
+        if (currentItem == null) return;
+
+        ItemStack item = player.getInventory().getItemInMainHand();
+
+        if (item.getType() == Material.APPLE && currentItem.getItemMeta().hasDisplayName()) {
+            String name = ChatColor.stripColor(currentItem.getItemMeta().getDisplayName()).trim();
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName(name);
+            item.setItemMeta(meta);
+            player.closeInventory();
+        }
     }
 
     private void handleCategoryMenuClick(Player player, ItemStack currentItem) {
@@ -314,6 +333,8 @@ public class Event implements Listener {
 
                 item.setItemMeta(meta);
             }
+        } else if (event.getItem() != null && !Objects.equals(event.getItem(), new ItemStack(Material.AIR)) && event.getItem().getType() == Material.APPLE) {
+            player.openInventory(new GameValues("Игровое значение").getInventory());
         }
 
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -525,7 +546,9 @@ public class Event implements Listener {
         if (message.length() > 256) message = message.substring(0, 256);
         if (message.contains("&")) message = message.replace("&", "§");
 
-        if (player.getWorld().getName().endsWith("_dev")) {
+        Plot plot = Plot.getByWorld(player.getWorld());
+
+        if (plot != null && plot.getLinkedDevPlot().getWorld() == player.getWorld()) {
             ItemStack activeItem = player.getInventory().getItemInMainHand();
             ItemMeta meta = activeItem.getItemMeta();
 

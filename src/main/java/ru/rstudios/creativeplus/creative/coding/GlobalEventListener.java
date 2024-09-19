@@ -1,5 +1,6 @@
 package ru.rstudios.creativeplus.creative.coding;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,10 +10,7 @@ import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.block.BlockDispenseStarter;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerBreakBlockStarter;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerJoinStarter;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerPlaceBlockStarter;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerQuitStarter;
+import ru.rstudios.creativeplus.creative.coding.starters.player.*;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.util.Random;
@@ -64,6 +62,16 @@ public class GlobalEventListener implements Listener {
 
         if (plot != null && plot.getLinkedDevPlot().getWorld() != event.getBlock().getWorld()) {
             plot.getHandler().sendStarter(new BlockDispenseStarter.Event(plot.getPlotOnlineList().get(new Random().nextInt(0, plot.getPlotOnlineList().size())), plot, event));
+        }
+    }
+
+    @EventHandler
+    public void onChatEvent (AsyncChatEvent event) {
+        Player player = event.getPlayer();
+        Plot plot = Plot.getByWorld(player.getWorld());
+
+        if (plot != null && player.getWorld() != plot.getLinkedDevPlot().getWorld()) {
+            plot.getHandler().sendStarter(new PlayerChattedStarter.Event(player, plot, event));
         }
     }
 }

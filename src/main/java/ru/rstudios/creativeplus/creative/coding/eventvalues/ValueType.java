@@ -17,6 +17,7 @@ public enum ValueType {
     private Class<? extends Value> clazz;
 
     ValueType (String message, Class<? extends Value> clazz) {
+        this.message = message;
         this.clazz = clazz;
     }
 

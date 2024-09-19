@@ -22,6 +22,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.eventvalues.ValueType;
@@ -152,7 +153,7 @@ public class CodingHandleUtils {
         return inv;
     }
 
-    public static Object parseItem (ItemStack item) {
+    public static Object parseItem (ItemStack item, @Nullable GameEvent event, @Nullable Entity entity) {
         if (item == null) {
             return null;
         }
@@ -166,6 +167,9 @@ public class CodingHandleUtils {
             }
             case PAPER -> {
                 return parseLocation(item, null);
+            }
+            case APPLE -> {
+                return parseGameValue(item, event, entity);
             }
         }
         return null;
