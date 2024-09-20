@@ -28,6 +28,7 @@ import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
 import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerRightClickStarter;
 import ru.rstudios.creativeplus.creative.menus.coding.*;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.GameAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifPlayer;
 import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
@@ -362,6 +363,7 @@ public class Event implements Listener {
                 case DIAMOND_BLOCK -> player.openInventory(new PlayerEvent("Событие игрока").getInventory());
                 case COBBLESTONE -> player.openInventory(new PlayerAction("Действие игрока").getInventory());
                 case OAK_PLANKS -> player.openInventory(new ifPlayer("Если игрок").getInventory());
+                case NETHER_BRICKS -> player.openInventory(new GameAction("Игровое действие").getInventory());
             }
         } else if (event.getAction().isRightClick() && target != null && target.getType() == Material.CHEST && player.getWorld().getName().endsWith("_dev")) {
             event.setCancelled(true);
