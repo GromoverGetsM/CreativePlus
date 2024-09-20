@@ -164,10 +164,10 @@ public class Plot implements Listener {
         PlayerInfo.getPlayerInfo(Bukkit.getPlayer(owner)).addPlot(id);
         plots.putIfAbsent(plotName, this);
         if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline() && this.reason != PlotInitializeReason.SERVER_STARTED) teleportToPlot(this, Bukkit.getPlayer(owner));
+        linked.load();
+        if (this.handler == null) this.handler = new CodeHandler(this);
+        this.handler.parseCodeBlocks();
         if (this.reason == PlotInitializeReason.SERVER_STARTED) {
-            linked.load();
-            this.handler = new CodeHandler(this);
-            this.handler.parseCodeBlocks();
             unload(false);
         }
     }
@@ -191,10 +191,11 @@ public class Plot implements Listener {
 
         plots.putIfAbsent(plotName, this);
         if (Bukkit.getPlayer(owner) != null && Bukkit.getPlayer(owner).isOnline() && this.reason != PlotInitializeReason.SERVER_STARTED) teleportToPlot(this, Bukkit.getPlayer(owner));
+        linked.load();
+        if (this.handler == null) this.handler = new CodeHandler(this);
+        this.handler.parseCodeBlocks();
         if (this.reason == PlotInitializeReason.SERVER_STARTED) {
             linked.load();
-            this.handler = new CodeHandler(this);
-            this.handler.parseCodeBlocks();
             unload(false);
         }
     }

@@ -2,8 +2,6 @@ package ru.rstudios.creativeplus.events;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
@@ -49,7 +47,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Vector;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
@@ -443,7 +440,7 @@ public class Event implements Listener {
 
                 Block finalB = b;
                 switch (type) {
-                    case COBBLESTONE -> {
+                    case COBBLESTONE, NETHER_BRICKS -> {
                         b.getRelative(BlockFace.NORTH).setType(Material.AIR);
                         b.setType(Material.AIR);
                         b.getRelative(BlockFace.UP).setType(Material.AIR);
@@ -466,7 +463,10 @@ public class Event implements Listener {
                                 }
                             }
 
-                            CodingHandleUtils.setBlocks(b.getRelative(BlockFace.NORTH).getLocation(), endBlock.getLocation());
+                            Location relative = b.getRelative(BlockFace.NORTH).getLocation();
+
+                            CodingHandleUtils.setBlocks(BukkitAdapter.adapt(relative.getWorld()), BlockVector3.at(relative.getBlockX(), relative.getBlockY(), relative.getBlockZ()), BlockVector3.at(endBlock.getX(), endBlock.getY(), endBlock.getZ()));
+                            CodingHandleUtils.moveBlocks(endBlock.getLocation().add(-1, 1, -1), getLastStringBlock(endBlock.getLocation()), BlockFace.EAST, (int) b.getLocation().distance(endBlock.getLocation()) + 1);
                         }
                     }
                     default -> {
@@ -518,10 +518,16 @@ public class Event implements Listener {
 
     private boolean place (Location mainBlock, Material additional, String actionName) {
         if (additional != null && additional != Material.AIR) {
+            Block relative = mainBlock.getBlock().getRelative(BlockFace.WEST);
             if (additional != Material.PISTON) {
-                mainBlock.getBlock().getRelative(BlockFace.WEST).setType(additional);
+                if (relative.getType() != Material.AIR) {
+                    Location pos1 = relative.getLocation();
+                    Location pos2 = getLastStringBlock(pos1).add(0, 1, -1);
+
+                    CodingHandleUtils.moveBlocks(pos1, pos2, BlockFace.WEST, 2);
+                }
+                relative.setType(additional);
             } else {
-                Block relative = mainBlock.getBlock().getRelative(BlockFace.WEST);
                 relative.setType(additional);
                 Directional facing = (Directional) relative.getBlockData();
                 facing.setFacing(BlockFace.WEST);
@@ -564,7 +570,7 @@ public class Event implements Listener {
             }
         }
 
-        return b.getLocation();
+        return b.getLocation().add(-1, 0, 0);
     }
 
     @EventHandler
@@ -580,7 +586,7 @@ public class Event implements Listener {
             ItemStack activeItem = player.getInventory().getItemInMainHand();
             ItemMeta meta = activeItem.getItemMeta();
 
-            if (activeItem != null && activeItem.getType() != Material.AIR) {
+            if (activeItem.getType() != Material.AIR) {
 
                 switch (activeItem.getType()) {
                     case BOOK -> {
@@ -608,11 +614,6 @@ public class Event implements Listener {
                         } catch (NumberFormatException e) {
                             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
                             player.sendTitle("§cНекорректное значение", "§6" + message, 10, 70, 20);
-
-                            meta = activeItem.getItemMeta();
-                            if (meta != null) {
-                                meta.setDisplayName(message);
-                            }
                         }
                     }
                 }

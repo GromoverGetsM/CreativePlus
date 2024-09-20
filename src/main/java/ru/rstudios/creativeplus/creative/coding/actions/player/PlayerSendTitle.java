@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
@@ -35,6 +36,11 @@ public class PlayerSendTitle extends Action {
     @Override
     public Inventory getInventory() {
         return this.inventory;
+    }
+
+    @Override
+    public ActionType getType() {
+        return ActionType.SEND_TITLE;
     }
 
     @Override

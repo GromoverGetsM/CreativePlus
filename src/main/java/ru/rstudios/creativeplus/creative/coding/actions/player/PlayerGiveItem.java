@@ -6,6 +6,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
+import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 
@@ -36,6 +37,11 @@ public class PlayerGiveItem extends Action {
     @Override
     public Inventory getInventory() {
         return this.inventory;
+    }
+
+    @Override
+    public ActionType getType() {
+        return ActionType.GIVE_ITEMS;
     }
 
     @Override

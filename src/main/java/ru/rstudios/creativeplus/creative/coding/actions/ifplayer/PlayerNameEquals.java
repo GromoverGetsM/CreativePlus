@@ -5,6 +5,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionIf;
+import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
@@ -38,6 +39,11 @@ public class PlayerNameEquals extends ActionIf {
     @Override
     public Inventory getInventory() {
         return this.inventory;
+    }
+
+    @Override
+    public ActionType getType() {
+        return ActionType.IF_PLAYER_NAME_EQUALS;
     }
 
     @Override

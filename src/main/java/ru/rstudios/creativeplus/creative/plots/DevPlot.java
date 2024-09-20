@@ -166,6 +166,12 @@ public class DevPlot {
         cobblestone.setItemMeta(cobblestoneMeta);
         i.setItem(2, cobblestone);
 
+        ItemStack netherbricks = new ItemStack(Material.NETHER_BRICKS);
+        ItemMeta netherbricksMeta = netherbricks.getItemMeta();
+        netherbricksMeta.setDisplayName("§cИгровое действие");
+        netherbricks.setItemMeta(netherbricksMeta);
+        i.setItem(3, netherbricks);
+
         ItemStack iron = new ItemStack(Material.IRON_INGOT);
         ItemMeta ironMeta = iron.getItemMeta();
         ironMeta.setDisplayName("§eПеременные");

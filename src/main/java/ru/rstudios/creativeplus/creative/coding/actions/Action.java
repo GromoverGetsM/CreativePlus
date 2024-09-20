@@ -24,6 +24,7 @@ public abstract class Action {
     public abstract ItemStack getIcon();
     public abstract String getName();
     public abstract Inventory getInventory();
+    public abstract ActionType getType();
 
     public abstract void execute (GameEvent event);
 
