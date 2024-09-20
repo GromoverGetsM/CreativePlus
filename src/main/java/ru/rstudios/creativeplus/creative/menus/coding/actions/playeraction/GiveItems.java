@@ -1,4 +1,4 @@
-package ru.rstudios.creativeplus.creative.menus.coding.actions;
+package ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

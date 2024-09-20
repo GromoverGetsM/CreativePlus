@@ -1,6 +1,7 @@
 package ru.rstudios.creativeplus.creative.coding.eventvalues;
 
 import org.jetbrains.annotations.Nullable;
+import ru.rstudios.creativeplus.creative.coding.eventvalues.values.EventBlockValue;
 import ru.rstudios.creativeplus.creative.coding.eventvalues.values.EventMessage;
 
 import java.util.Arrays;
@@ -11,7 +12,8 @@ import java.util.stream.Collectors;
 
 public enum ValueType {
 
-    PLAYER_MESSAGE("Сообщение игрока", EventMessage.class);
+    PLAYER_MESSAGE("Сообщение игрока", EventMessage.class),
+    EVENT_BLOCK("Блок", EventBlockValue.class);
 
     private String message;
     private Class<? extends Value> clazz;

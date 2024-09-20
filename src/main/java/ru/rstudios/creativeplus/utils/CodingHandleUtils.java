@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.eventvalues.ValueType;
+import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.io.*;
 import java.util.concurrent.Executor;
@@ -75,6 +76,31 @@ public class CodingHandleUtils {
         } catch (MaxChangedBlocksException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Block getLastPiston (Block startPiston) {
+        Plot plot = Plot.getByWorld(startPiston.getWorld());
+
+        if (plot != null) {
+            int openPistons = 1;
+            Block block = startPiston;
+
+            while (plot.getLinkedDevPlot().inTerritory(block.getLocation())) {
+                block = block.getRelative(BlockFace.WEST, 2);
+
+                if (block.getType() == Material.PISTON) {
+                    if (block.getFace(block) == BlockFace.WEST) {
+                        openPistons++;
+                    } else if (block.getFace(block) == BlockFace.EAST) {
+                        openPistons--;
+                    }
+
+                    if (openPistons == 0) return block;
+                }
+            }
+        }
+
+        return null;
     }
 
     public static void saveInventoryToChest (org.bukkit.World world, Location chest, Inventory inventory) {

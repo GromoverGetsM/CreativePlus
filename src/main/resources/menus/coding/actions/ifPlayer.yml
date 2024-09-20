@@ -1,0 +1,10 @@
+size: 54
+title: Если игрок
+items:
+  slot10:
+    type: CHEST
+    amount: 1
+    name: '§e Текстовые условия '
+    lore:
+      - '§f Сравнивает тексты '
+    slot: 10

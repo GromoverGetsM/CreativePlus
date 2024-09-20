@@ -479,6 +479,10 @@ public class Event implements Listener {
                         relativeBlock = Material.STONE;
                         blockName = "Действие игрока";
                     }
+                    case OAK_PLANKS -> {
+                        relativeBlock = Material.PISTON;
+                        blockName = "Если игрок";
+                    }
                     default -> {
                         relativeBlock = Material.AIR;
                         blockName = "UnknownAction";

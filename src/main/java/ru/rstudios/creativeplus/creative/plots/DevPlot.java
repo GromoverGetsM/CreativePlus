@@ -100,6 +100,7 @@ public class DevPlot {
     public static List<Material> getActionBlocks() {
         List<Material> list = new ArrayList<>();
         list.add(Material.COBBLESTONE);
+        list.add(Material.OAK_PLANKS);
         return list;
     }
 
