@@ -2,6 +2,8 @@ package ru.rstudios.creativeplus.events;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
@@ -29,6 +31,7 @@ import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
 import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerRightClickStarter;
 import ru.rstudios.creativeplus.creative.menus.coding.*;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.ifPlayer;
 import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
 import ru.rstudios.creativeplus.creative.menus.main.MyWorlds;
 import ru.rstudios.creativeplus.creative.menus.main.WorldsMenu;
@@ -46,6 +49,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Vector;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
@@ -360,6 +364,7 @@ public class Event implements Listener {
             switch (target.getRelative(BlockFace.SOUTH).getType()) {
                 case DIAMOND_BLOCK -> player.openInventory(new PlayerEvent("Событие игрока").getInventory());
                 case COBBLESTONE -> player.openInventory(new PlayerAction("Действие игрока").getInventory());
+                case OAK_PLANKS -> player.openInventory(new ifPlayer("Если игрок").getInventory());
             }
         } else if (event.getAction().isRightClick() && target != null && target.getType() == Material.CHEST && player.getWorld().getName().endsWith("_dev")) {
             event.setCancelled(true);
@@ -449,6 +454,21 @@ public class Event implements Listener {
                             CodingHandleUtils.moveBlocks(finalB.getLocation().add(-2, 0, 0), lastStringBlock.add(-1, 1, -1), BlockFace.EAST, 2);
                         }, 5L);
                     }
+                    case OAK_PLANKS -> {
+                        Block endBlock = CodingHandleUtils.getLastPiston(b.getRelative(BlockFace.WEST));
+                        b.getRelative(BlockFace.WEST).setType(Material.AIR);
+                        b.getRelative(BlockFace.UP).setType(Material.AIR);
+                        b.getRelative(BlockFace.NORTH).setType(Material.AIR);
+                        if (endBlock != null) {
+                            for(Block chestBlock = b.getRelative(BlockFace.UP); !chestBlock.getRelative(BlockFace.DOWN).getLocation().equals(endBlock.getLocation()); chestBlock = chestBlock.getRelative(BlockFace.WEST)) {
+                                if (chestBlock.getType() == Material.CHEST) {
+                                    chestBlock.setType(Material.AIR, true);
+                                }
+                            }
+
+                            CodingHandleUtils.setBlocks(b.getRelative(BlockFace.NORTH).getLocation(), endBlock.getLocation());
+                        }
+                    }
                     default -> {
                         return;
                     }
@@ -518,6 +538,10 @@ public class Event implements Listener {
                         CodingHandleUtils.moveBlocks(pos1, pos2, BlockFace.WEST, 2);
                     }
                 }
+                piston.setType(Material.PISTON);
+                Directional facing1 = (Directional) piston.getBlockData();
+                facing1.setFacing(BlockFace.EAST);
+                piston.setBlockData(facing1);
             }
         }
 

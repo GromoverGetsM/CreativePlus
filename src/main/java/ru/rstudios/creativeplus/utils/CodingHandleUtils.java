@@ -19,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Directional;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Entity;
@@ -78,7 +79,7 @@ public class CodingHandleUtils {
         }
     }
 
-    public static Block getLastPiston (Block startPiston) {
+    public static Block getLastPiston(Block startPiston) {
         Plot plot = Plot.getByWorld(startPiston.getWorld());
 
         if (plot != null) {
@@ -89,19 +90,25 @@ public class CodingHandleUtils {
                 block = block.getRelative(BlockFace.WEST, 2);
 
                 if (block.getType() == Material.PISTON) {
-                    if (block.getFace(block) == BlockFace.WEST) {
+                    Directional pistonData = (Directional) block.getBlockData();
+                    BlockFace pistonFacing = pistonData.getFacing();
+
+                    if (pistonFacing == BlockFace.WEST) {
                         openPistons++;
-                    } else if (block.getFace(block) == BlockFace.EAST) {
+                    } else if (pistonFacing == BlockFace.EAST) {
                         openPistons--;
                     }
 
-                    if (openPistons == 0) return block;
+                    if (openPistons == 0) {
+                        return block;
+                    }
                 }
             }
         }
 
         return null;
     }
+
 
     public static void saveInventoryToChest (org.bukkit.World world, Location chest, Inventory inventory) {
         File chestsFolder = new File(Bukkit.getWorldContainer(), world.getName() + File.separator + "chests");

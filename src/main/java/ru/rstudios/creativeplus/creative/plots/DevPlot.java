@@ -154,11 +154,17 @@ public class DevPlot {
         diamondBlock.setItemMeta(diamondBlockMeta);
         i.setItem(0, diamondBlock);
 
+        ItemStack oakplanks = new ItemStack(Material.OAK_PLANKS);
+        ItemMeta oakplanksmeta = oakplanks.getItemMeta();
+        oakplanksmeta.setDisplayName("§eЕсли игрок");
+        oakplanks.setItemMeta(oakplanksmeta);
+        i.setItem(1, oakplanks);
+
         ItemStack cobblestone = new ItemStack(Material.COBBLESTONE);
         ItemMeta cobblestoneMeta = cobblestone.getItemMeta();
         cobblestoneMeta.setDisplayName("§7Действие игрока");
         cobblestone.setItemMeta(cobblestoneMeta);
-        i.setItem(1, cobblestone);
+        i.setItem(2, cobblestone);
 
         ItemStack iron = new ItemStack(Material.IRON_INGOT);
         ItemMeta ironMeta = iron.getItemMeta();
