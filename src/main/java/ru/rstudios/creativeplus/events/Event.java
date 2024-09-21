@@ -53,42 +53,6 @@ import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class Event implements Listener {
 
-    public static boolean skipDoubleClickCall (Player player, PlayerInteractEvent event) {
-        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
-
-        if (info != null) {
-            LocalDateTime time = info.getLastInteractTime();
-            PlayerInteractEvent lastEvent = info.getLastInteractEvent();
-            LocalDateTime now = LocalDateTime.now();
-
-            if (lastEvent != null && time != null) {
-                if (Objects.equals(event.getHand(), lastEvent.getHand()) && Objects.equals(event.getItem(), lastEvent.getItem())) {
-                    if (ChronoUnit.MILLIS.between(time, now) > 50L) {
-                        info.setLastInteractTime(now);
-                        info.setLastInteractEvent(event);
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } else {
-                    if (ChronoUnit.MILLIS.between(time, now) < 2L) {
-                        return true;
-                    } else {
-                        info.setLastInteractTime(now);
-                        info.setLastInteractEvent(event);
-                        return false;
-                    }
-                }
-            } else {
-                info.setLastInteractTime(now);
-                info.setLastInteractEvent(event);
-                return false;
-            }
-        }
-
-        return false;
-    }
-
     @EventHandler
     public void onPlayerJoin (PlayerJoinEvent event) {
         Player player = event.getPlayer();
@@ -258,6 +222,7 @@ public class Event implements Listener {
 
     private void createChest(Block targetBlock) {
         Block chest = targetBlock.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP);
+        if (chest.getType() != Material.AIR) chest.setType(Material.AIR);
         chest.setType(Material.CHEST);
 
         File chestsFolder = new File(Bukkit.getWorldContainer() + File.separator + chest.getWorld().getName() + File.separator + "chests");
@@ -290,11 +255,16 @@ public class Event implements Listener {
         Block target = player.getTargetBlockExact(5);
         Plot plot = Plot.getByWorld(player.getWorld());
 
-        if (plot != null && player.getWorld() != plot.getLinkedDevPlot().getWorld()) {
-            switch (event.getAction()) {
-                case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
-                    if (!skipDoubleClickCall(player, event)) plot.getHandler().sendStarter(new PlayerRightClickStarter.Event(player, plot, event));
-                }
+        if (event.getAction().isRightClick() && target != null && target.getType() == Material.CHEST && player.getWorld().getName().endsWith("_dev")) {
+            event.setCancelled(true);
+            Chest chest = (Chest) target.getState();
+
+            if (!Objects.equals(chest.getBlockInventory().getItem(0), new ItemStack(Material.BARRIER))) {
+                String actionDisplayName = ((Sign) target.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState()).getLine(2);
+                player.openInventory(CodingHandleUtils.loadChestInventory(player.getWorld(), target.getLocation(), actionDisplayName));
+                chest.getBlockInventory().setItem(0, new ItemStack(Material.BARRIER));
+            } else {
+                player.sendMessage("§bCreative+ §8» §fКакой-то игрок §6уже взаимодействует §fс этим сундуком.");
             }
         }
 
@@ -364,17 +334,6 @@ public class Event implements Listener {
                 case COBBLESTONE -> player.openInventory(new PlayerAction("Действие игрока").getInventory());
                 case OAK_PLANKS -> player.openInventory(new ifPlayer("Если игрок").getInventory());
                 case NETHER_BRICKS -> player.openInventory(new GameAction("Игровое действие").getInventory());
-            }
-        } else if (event.getAction().isRightClick() && target != null && target.getType() == Material.CHEST && player.getWorld().getName().endsWith("_dev")) {
-            event.setCancelled(true);
-            Chest chest = (Chest) target.getState();
-
-            if (!Objects.equals(chest.getBlockInventory().getItem(0), new ItemStack(Material.BARRIER))) {
-                String actionDisplayName = ((Sign) target.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState()).getLine(2);
-                player.openInventory(CodingHandleUtils.loadChestInventory(player.getWorld(), target.getLocation(), actionDisplayName));
-                chest.getBlockInventory().setItem(0, new ItemStack(Material.BARRIER));
-            } else {
-                player.sendMessage("§bCreative+ §8» §fКакой-то игрок §6уже взаимодействует §fс этим сундуком.");
             }
         }
     }
@@ -504,6 +463,10 @@ public class Event implements Listener {
                     case OAK_PLANKS -> {
                         relativeBlock = Material.PISTON;
                         blockName = "Если игрок";
+                    }
+                    case NETHER_BRICKS -> {
+                        relativeBlock = Material.NETHERRACK;
+                        blockName = "Игровое действие";
                     }
                     default -> {
                         relativeBlock = Material.AIR;

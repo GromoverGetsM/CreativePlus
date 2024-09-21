@@ -193,13 +193,13 @@ public class CodingHandleUtils {
 
         switch (item.getType()) {
             case BOOK -> {
-                return parseText(item);
+                return parseText(item, event, entity);
             }
             case SLIME_BALL -> {
                 return parseNumber(item);
             }
             case PAPER -> {
-                return parseLocation(item, null);
+                return parseLocation(item, null, event);
             }
             case APPLE -> {
                 return parseGameValue(item, event, entity);
@@ -208,15 +208,15 @@ public class CodingHandleUtils {
         return null;
     }
 
-    public static String parseText (ItemStack item) {
-        return parseText(item, "");
+    public static String parseText (ItemStack item, GameEvent event, Entity entity) {
+        return parseText(item, "", event, entity);
     }
 
-    public static String parseText (ItemStack item, String defaultText) {
-        return parseText(item, defaultText, true);
+    public static String parseText (ItemStack item, String defaultText, GameEvent event, Entity entity) {
+        return parseText(item, defaultText, true, event, entity);
     }
 
-    public static String parseText (ItemStack item, String defaultText, boolean checkTypeMatches) {
+    public static String parseText (ItemStack item, String defaultText, boolean checkTypeMatches, GameEvent event, Entity entity) {
         if (item == null) {
             return defaultText;
         }
@@ -234,11 +234,12 @@ public class CodingHandleUtils {
             }
         }
     }
-    public static Location parseLocation (ItemStack item, Location def) {
-        return parseLocation(item, def, true);
+
+    public static Location parseLocation (ItemStack item, Location def, GameEvent event) {
+        return parseLocation(item, def, true, event);
     }
 
-    public static Location parseLocation (ItemStack item, Location def, boolean checkTypeMatches) {
+    public static Location parseLocation (ItemStack item, Location def, boolean checkTypeMatches, GameEvent event) {
         Preconditions.checkNotNull(item);
 
         if (checkTypeMatches && item.getType() != Material.PAPER) {
@@ -259,6 +260,7 @@ public class CodingHandleUtils {
                 if (world == null) {
                     return null;
                 }
+                if (event.getPlot().getPlotWorld() != world) world = event.getPlot().getPlotWorld();
 
                 double x = Double.parseDouble(matcher.group(2));
                 double y = Double.parseDouble(matcher.group(3));

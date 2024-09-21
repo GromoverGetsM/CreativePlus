@@ -2,6 +2,7 @@ package ru.rstudios.creativeplus.creative.menus.coding;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.GameAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifPlayer;
 import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
@@ -18,7 +19,8 @@ public enum CodingCategoryType {
     PLAYER_EVENT_OTHER_CATEGORY("Другое", PlayerEvent.OtherCategory.class, PlayerEvent.class),
     PLAYER_ACTION_COMMUNICATION_CATEGORY("Коммуникация", PlayerAction.CommunicationCategory.class, PlayerAction.class),
     PLAYER_ACTION_INVENTORY_CATEGORY("Управление инвентарём", PlayerAction.InventoryCategory.class, PlayerAction.class),
-    IF_PLAYER_TEXT_CONDS_CATEGORY("Текстовые условия", ifPlayer.TextConditionsCategory.class, ifPlayer.class);
+    IF_PLAYER_TEXT_CONDS_CATEGORY("Текстовые условия", ifPlayer.TextConditionsCategory.class, ifPlayer.class),
+    GAME_ACTION_CODE_UTIL_CATEGORY("Утилиты кода", GameAction.CodeUtilCategory.class, GameAction.class);
 
 
     public String categoryDisplayName;

@@ -16,3 +16,6 @@ commands:
   play:
     aliases:
       - здфн
+  placeholders:
+    aliases:
+      - здфсурщдвукы

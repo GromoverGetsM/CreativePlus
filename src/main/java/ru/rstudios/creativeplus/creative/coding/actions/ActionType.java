@@ -3,12 +3,15 @@ package ru.rstudios.creativeplus.creative.coding.actions;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.rstudios.creativeplus.creative.coding.actions.gameaction.CancelEventAction;
+import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerMessageEquals;
 import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerNameEquals;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerGiveItem;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendMessage;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendTitle;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageEquals;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.NameEquals;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.GiveItems;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.SendMessage;
@@ -27,7 +30,9 @@ public enum ActionType {
     SEND_MESSAGE("Отправить сообщение", "Отправить сообщение", PlayerSendMessage.class, SendMessage.class, true),
     GIVE_ITEMS("Выдать предметы", "Выдать предметы", PlayerGiveItem.class, GiveItems.class, true),
     SEND_TITLE("Отправить титл", "Отправить титл", PlayerSendTitle.class, SendTitle.class, true),
-    IF_PLAYER_NAME_EQUALS("Имя равно", "Имя равно", PlayerNameEquals.class, NameEquals.class, true);
+    IF_PLAYER_NAME_EQUALS("Имя равно", "Имя равно", PlayerNameEquals.class, NameEquals.class, true),
+    IF_PLAYER_MESSAGE_EQUALS("Сообщение равно", "Сообщение равно", PlayerMessageEquals.class, MessageEquals.class, true),
+    CANCEL_EVENT("Отменить событие", "Отменить событие", CancelEventAction.class, null, false);
 
     private String displayName;
     private String name;

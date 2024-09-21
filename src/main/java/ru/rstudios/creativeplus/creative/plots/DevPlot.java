@@ -101,6 +101,7 @@ public class DevPlot {
         List<Material> list = new ArrayList<>();
         list.add(Material.COBBLESTONE);
         list.add(Material.OAK_PLANKS);
+        list.add(Material.NETHER_BRICKS);
         return list;
     }
 

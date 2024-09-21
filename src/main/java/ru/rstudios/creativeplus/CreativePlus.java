@@ -5,6 +5,7 @@ import ru.rstudios.creativeplus.commands.CreateInventory;
 import ru.rstudios.creativeplus.commands.WorldCommand;
 import ru.rstudios.creativeplus.commands.creative.Games;
 import ru.rstudios.creativeplus.commands.creative.devCommand;
+import ru.rstudios.creativeplus.commands.creative.placeholdersInfoCommand;
 import ru.rstudios.creativeplus.commands.creative.playCommand;
 import ru.rstudios.creativeplus.creative.coding.GlobalEventListener;
 import ru.rstudios.creativeplus.creative.plots.Plot;
@@ -50,6 +51,7 @@ public final class CreativePlus extends JavaPlugin {
         Objects.requireNonNull(getCommand("games")).setExecutor(new Games());
         Objects.requireNonNull(getCommand("dev")).setExecutor(new devCommand());
         Objects.requireNonNull(getCommand("play")).setExecutor(new playCommand());
+        Objects.requireNonNull(getCommand("placeholders")).setExecutor(new placeholdersInfoCommand());
 
         Plot.loadPlots();
     }

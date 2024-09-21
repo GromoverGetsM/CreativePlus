@@ -62,6 +62,6 @@ public class PlayerSendMessage extends Action {
             }
         }
 
-        return builder.toString();
+        return this.replacePlaceholders(builder.toString(), gameEvent);
     }
 }

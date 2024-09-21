@@ -55,7 +55,7 @@ public class PlayerSendTitle extends Action {
                 int duration = CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity) : 0;
                 int fadeout = CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity) : 0;
 
-                player.sendTitle(title, subtitle, fadein, duration, fadeout);
+                player.sendTitle(this.replacePlaceholders(title, event), this.replacePlaceholders(subtitle, event), fadein, duration, fadeout);
             }
         }
     }

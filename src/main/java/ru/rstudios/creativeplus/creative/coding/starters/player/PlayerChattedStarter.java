@@ -4,6 +4,7 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.events.ChatEvent;
@@ -67,7 +68,7 @@ public class PlayerChattedStarter extends Starter {
         }
     }
 
-    public static class Event extends GamePlayerEvent implements ChatEvent {
+    public static class Event extends GamePlayerEvent implements ChatEvent, Cancellable {
 
         public Event(Player player, Plot plot, org.bukkit.event.Event event) {
             super(player, plot, event);
@@ -76,6 +77,16 @@ public class PlayerChattedStarter extends Starter {
         @Override
         public String getMessage() {
             return LegacyComponentSerializer.legacySection().serialize(((AsyncChatEvent) this.getHandleEvent()).message());
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return ((AsyncChatEvent) this.getHandleEvent()).isCancelled();
+        }
+
+        @Override
+        public void setCancelled(boolean b) {
+            ((AsyncChatEvent) this.getHandleEvent()).setCancelled(true);
         }
     }
 

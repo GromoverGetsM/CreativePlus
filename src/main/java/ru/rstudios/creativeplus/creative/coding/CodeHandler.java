@@ -103,10 +103,6 @@ public class CodeHandler {
                         if (condType != null) condition = condType.createCondition(starter, i, conditionalActions);
                         if (condition != null) actions.add(condition);
 
-                        System.out.println(condition);
-                        System.out.println(conditionalActions);
-
-
                         dx = closingPiston.getX();
                         continue;
                     }

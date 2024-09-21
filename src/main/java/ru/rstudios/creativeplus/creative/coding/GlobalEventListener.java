@@ -9,13 +9,54 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.block.BlockDispenseStarter;
 import ru.rstudios.creativeplus.creative.coding.starters.player.*;
 import ru.rstudios.creativeplus.creative.plots.Plot;
+import ru.rstudios.creativeplus.player.PlayerInfo;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Random;
 
 public class GlobalEventListener implements Listener {
+
+    public static boolean skipDoubleClickCall (Player player, PlayerInteractEvent event) {
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
+
+        if (info != null) {
+            LocalDateTime time = info.getLastInteractTime();
+            PlayerInteractEvent lastEvent = info.getLastInteractEvent();
+            LocalDateTime now = LocalDateTime.now();
+
+            if (lastEvent != null && time != null) {
+                if (Objects.equals(event.getHand(), lastEvent.getHand()) && Objects.equals(event.getItem(), lastEvent.getItem())) {
+                    if (ChronoUnit.MILLIS.between(time, now) > 50L) {
+                        info.setLastInteractTime(now);
+                        info.setLastInteractEvent(event);
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    if (ChronoUnit.MILLIS.between(time, now) < 2L) {
+                        return true;
+                    } else {
+                        info.setLastInteractTime(now);
+                        info.setLastInteractEvent(event);
+                        return false;
+                    }
+                }
+            } else {
+                info.setLastInteractTime(now);
+                info.setLastInteractEvent(event);
+                return false;
+            }
+        }
+
+        return false;
+    }
 
     @EventHandler
     public void onPlayerChangedWorld (PlayerChangedWorldEvent event) {
@@ -72,6 +113,20 @@ public class GlobalEventListener implements Listener {
 
         if (plot != null && player.getWorld() != plot.getLinkedDevPlot().getWorld()) {
             plot.getHandler().sendStarter(new PlayerChattedStarter.Event(player, plot, event));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract (PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        Plot plot = Plot.getByWorld(player.getWorld());
+
+        if (plot != null && player.getWorld() != plot.getLinkedDevPlot().getWorld()) {
+            switch (event.getAction()) {
+                case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
+                    if (!skipDoubleClickCall(player, event)) plot.getHandler().sendStarter(new PlayerRightClickStarter.Event(player, plot, event));
+                }
+            }
         }
     }
 }

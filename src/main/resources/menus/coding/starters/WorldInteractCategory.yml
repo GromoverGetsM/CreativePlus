@@ -18,7 +18,7 @@
         - §f из мира
       slot: 11
     slot12:
-      type: STONE_PICKAXE
+      type: COBBLESTONE
       amount: 1
       hideAll: true
       name: '§e Сломал блок '
@@ -27,7 +27,7 @@
         - '§f блок в мире'
       slot: 12
     slot13:
-      type: GRASS_BLOCK
+      type: STONE
       amount: 1
       name: '§e Поставил блок '
       lore:
@@ -43,7 +43,7 @@
         - '§f выбрасыватель выдают предмет '
       slot: 14
     slot15:
-      type: AMETHYST_SHARD
+      type: DIAMOND_PICKAXE
       amount: 1
       name: '§e Правый клик '
       lore:
