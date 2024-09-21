@@ -126,6 +126,12 @@ public class GlobalEventListener implements Listener {
                 case RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK -> {
                     if (!skipDoubleClickCall(player, event)) plot.getHandler().sendStarter(new PlayerRightClickStarter.Event(player, plot, event));
                 }
+                case LEFT_CLICK_AIR, LEFT_CLICK_BLOCK -> {
+                    if (!skipDoubleClickCall(player, event)) plot.getHandler().sendStarter(new PlayerLeftClickStarter.Event(player, plot, event));
+                }
+                case PHYSICAL -> {
+                    if (!skipDoubleClickCall(player, event)) plot.getHandler().sendStarter(new PlayerPhysicalInteractStarter.Event(player, plot, event));
+                }
             }
         }
     }

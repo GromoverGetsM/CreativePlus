@@ -35,18 +35,37 @@
         - '§f блок в мире'
       slot: 13
     slot14:
-      type: DISPENSER
-      amount: 1
-      name: '§e Блок выдал предмет '
-      lore:
-        - '§f Срабатывает, когда раздатчик или '
-        - '§f выбрасыватель выдают предмет '
-      slot: 14
-    slot15:
       type: DIAMOND_PICKAXE
       amount: 1
       name: '§e Правый клик '
       lore:
         - '§f Срабатывает, когда игрок нажимает '
         - '§f правую кнопку мыши '
+      slot: 14
+      hideAll: true
+    slot15:
+      type: IRON_PICKAXE
+      amount: 1
+      name: '§e Левый клик '
+      lore:
+        - '§f Срабатывает, когда игрок нажимает '
+        - '§f левую кнопку мыши '
       slot: 15
+      hideAll: true
+    slot16:
+      type: STONE_PRESSURE_PLATE
+      amount: 1
+      name: '§e Физическое взаимодействие '
+      lore:
+        - '§f Срабатывает, когда игрок нажимает на '
+        - '§f дверь, плиту, кнопку, рычаг, блок редстоуна '
+        - '§f и т.д. '
+      slot: 16
+    slot19:
+      type: DISPENSER
+      amount: 1
+      name: '§e Блок выдал предмет '
+      lore:
+        - '§f Срабатывает, когда раздатчик или '
+        - '§f выбрасыватель выдают предмет '
+      slot: 19

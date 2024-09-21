@@ -155,14 +155,14 @@ public class CodingHandleUtils {
                 if (!inventory.isEmpty()) {
                     inv = ItemStackSerializer.inventoryFromBase64(inventory);
                 } else {
-                    inv = ActionType.getByDisplayName(actionDisplayName).getmClass().newInstance().getInventory();
+                    inv = ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory();
                 }
             } catch (IOException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                inv = ActionType.getByDisplayName(actionDisplayName).getmClass().newInstance().getInventory();
+                inv = ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory();
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -173,7 +173,7 @@ public class CodingHandleUtils {
             String name = sign.getLine(2);
             Inventory newInv = null;
             try {
-                newInv = Bukkit.createInventory(ActionType.getByDisplayName(actionDisplayName).getmClass().newInstance().getInventory().getHolder(), inv.getSize(), name);
+                newInv = Bukkit.createInventory(ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory().getHolder(), inv.getSize(), name);
             } catch (InstantiationException | IllegalAccessException e) {
                 plugin.getLogger().severe(e.getLocalizedMessage());
             }
