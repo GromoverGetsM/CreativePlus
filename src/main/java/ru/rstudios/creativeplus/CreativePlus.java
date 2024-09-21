@@ -60,7 +60,10 @@ public final class CreativePlus extends JavaPlugin {
     public void onDisable() {
 
         for (Plot plot : Plot.plots.values()) {
-            if (plot.getPlotLoaded()) plot.unload(true);
+            if (plot.getPlotLoaded()) {
+                plot.getHandler().saveDynamicVariables();
+                plot.unload(true);
+            }
         }
 
     }

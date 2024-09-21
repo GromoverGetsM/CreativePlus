@@ -168,6 +168,7 @@ public class Plot implements Listener {
         if (this.handler == null) this.handler = new CodeHandler(this);
         this.handler.parseCodeBlocks();
         if (this.reason == PlotInitializeReason.SERVER_STARTED) {
+            this.getHandler().saveDynamicVariables();
             unload(false);
         }
     }
@@ -196,6 +197,7 @@ public class Plot implements Listener {
         this.handler.parseCodeBlocks();
         if (this.reason == PlotInitializeReason.SERVER_STARTED) {
             linked.load();
+            this.getHandler().saveDynamicVariables();
             unload(false);
         }
     }

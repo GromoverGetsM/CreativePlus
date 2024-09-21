@@ -83,7 +83,10 @@ public class Event implements Listener {
             Plot plot = Plot.getByPlayer(event.getPlayer());
             if (plot != null) plot.getHandler().parseCodeBlocks();
             if (plot == null || plot.getPlotOnline() == 0) {
-                plot.unload(true);
+                if (plot != null) {
+                    plot.getHandler().saveDynamicVariables();
+                    plot.unload(true);
+                }
             }
         }
     }
@@ -569,18 +572,28 @@ public class Event implements Listener {
 
                         try {
                             double d = Double.parseDouble(message);
+
+                            String displayValue;
+                            if (d == (long) d) {
+                                displayValue = String.valueOf((long) d);
+                            } else {
+                                displayValue = String.valueOf(d);
+                            }
+
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
-                            player.sendTitle("§aЗначение установлено", String.valueOf(d), 10, 70, 20);
+                            player.sendTitle("§aЗначение установлено", displayValue, 10, 70, 20);
 
                             meta = activeItem.getItemMeta();
                             if (meta != null) {
-                                meta.setDisplayName(String.valueOf(d));
+                                meta.setDisplayName(displayValue);
+                                activeItem.setItemMeta(meta);
                             }
                         } catch (NumberFormatException e) {
                             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
                             player.sendTitle("§cНекорректное значение", "§6" + message, 10, 70, 20);
                         }
                     }
+
                 }
 
                 activeItem.setItemMeta(meta);

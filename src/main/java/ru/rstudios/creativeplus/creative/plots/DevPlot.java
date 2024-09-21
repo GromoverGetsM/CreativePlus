@@ -22,7 +22,7 @@ public class DevPlot {
 
     public final Plot linked;
     public File chestsFolder;
-    public File jsonCode;
+    public File dynamicVars;
     public String devPlotName;
     public World world;
     public boolean isLoaded;
@@ -40,12 +40,10 @@ public class DevPlot {
         File template = new File(plugin.getDataFolder() + File.separator + "templates" + File.separator + "dev" + File.separator);
         File dev = new File(Bukkit.getWorldContainer() + File.separator + this.devPlotName);
         FileUtil.copyFilesTo(template, dev);
-        if (new File(dev + File.separator + "chests").mkdirs()) this.chestsFolder = new File(dev + File.separator + "chests");
-        File jsonCode = new File(dev + File.separator + "code.json");
         try {
-            if (jsonCode.createNewFile()) this.jsonCode = jsonCode;
+            new File(Bukkit.getWorldContainer() + File.separator + this.devPlotName + File.separator + "DynamicVariables.yml").createNewFile();
         } catch (IOException e) {
-            plugin.getLogger().severe("Error in DevPlot :43 - " + e.getLocalizedMessage());
+            plugin.getLogger().severe(e.getLocalizedMessage());
         }
     }
 

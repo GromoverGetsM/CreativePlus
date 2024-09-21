@@ -1,15 +1,22 @@
 package ru.rstudios.creativeplus.creative.coding;
 
+import com.jeff_media.jefflib.ItemStackSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionIf;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
+import ru.rstudios.creativeplus.creative.coding.dynamicvariables.DynamicVariable;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
@@ -17,14 +24,17 @@ import ru.rstudios.creativeplus.creative.plots.DevPlot;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
 public class CodeHandler {
 
     private Plot linked;
     private List<Starter> starters = new ArrayList<>();
+    private HashMap<String, DynamicVariable> dynamicvariables = new LinkedHashMap<>();
 
     public CodeHandler (Plot plot) {
         this.linked = plot;
@@ -121,6 +131,95 @@ public class CodeHandler {
             }
         }
         this.starters.addAll(starters);
+        loadDynamicVariables();
+    }
+
+    private void loadDynamicVariables() {
+        File varsFile = new File(Bukkit.getWorldContainer() + File.separator + linked.getLinkedDevPlot().getWorld().getName() + File.separator + "DynamicVariables.yml");
+
+        if (varsFile.exists() && varsFile.isFile() && varsFile.length() != 0) {
+            FileConfiguration vars = YamlConfiguration.loadConfiguration(varsFile);
+
+            for (String key : vars.getKeys(false)) {
+                ConfigurationSection section = vars.getConfigurationSection(key);
+
+                if (section != null) {
+                    String name = section.getString("name");
+                    Object value = section.get("value");
+                    String typeMarker = section.getString("type");
+                    boolean isSaved = section.getBoolean("saved");
+
+                    if (typeMarker.equalsIgnoreCase("itemstack") && value instanceof String) {
+                        String valueCache = value.toString();
+                        value = ItemStackSerializer.fromBase64(valueCache);
+                    }
+
+                    this.dynamicvariables.put(name, new DynamicVariable(name, value, isSaved));
+                }
+            }
+        }
+    }
+
+    public void saveDynamicVariables() {
+        File varsFile = new File(Bukkit.getWorldContainer() + File.separator + linked.getLinkedDevPlot().getWorld().getName() + File.separator + "DynamicVariables.yml");
+
+        if (varsFile.exists() && varsFile.isFile() && varsFile.length() != 0) {
+            varsFile.delete();
+            try {
+                varsFile.createNewFile();
+            } catch (IOException e) {
+                plugin.getLogger().severe(e.getLocalizedMessage());
+            }
+        }
+
+        FileConfiguration vars = YamlConfiguration.loadConfiguration(varsFile);
+
+        for (String key : this.dynamicvariables.keySet()) {
+            ConfigurationSection section = vars.createSection(key);
+
+            DynamicVariable variable = this.dynamicvariables.get(key);
+
+            String name = variable.getName();
+            Object value = variable.getValue(linked);
+            boolean isSaved = variable.isSaved();
+
+            if (isSaved) {
+                section.set("name", name);
+                section.set("value", value);
+                section.set("saved", isSaved);
+
+                if (value instanceof String) {
+                    section.set("type", "text");
+                }
+
+                if (value instanceof Number) {
+                    section.set("type", "num");
+                }
+
+                if (value instanceof Location) {
+                    section.set("type", "loc");
+                }
+
+                if (value instanceof ItemStack) {
+                    section.set("type", "itemstack");
+                    try {
+                        section.set("value", ItemStackSerializer.toBase64((ItemStack) value));
+                    } catch (IOException e) {
+                        plugin.getLogger().severe(e.getLocalizedMessage());
+                    }
+                }
+            }
+        }
+
+        try {
+            vars.save(varsFile);
+        } catch (IOException e) {
+            plugin.getLogger().severe(e.getLocalizedMessage());
+        }
+    }
+
+    public HashMap<String, DynamicVariable> getDynamicVariables() {
+        return this.dynamicvariables;
     }
 
 

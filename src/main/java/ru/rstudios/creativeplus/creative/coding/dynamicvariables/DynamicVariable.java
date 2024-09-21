@@ -2,6 +2,9 @@ package ru.rstudios.creativeplus.creative.coding.dynamicvariables;
 
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class DynamicVariable {
 
     private String name;
@@ -17,6 +20,11 @@ public class DynamicVariable {
     }
 
     public DynamicVariable (String name, Object value, boolean isSaved) {
+        if (value instanceof String) {
+            value = cutManySymbols(value.toString());
+        }
+
+        name = cutManySymbols(name);
         this.name = name;
         this.value = value;
         this.isSaved = isSaved;
@@ -26,8 +34,9 @@ public class DynamicVariable {
         return this.name;
     }
 
-    public Object getValue() {
-        return this.value;
+    public Object getValue(Plot plot) {
+        DynamicVariable var = plot.getHandler().getDynamicVariables().get(this.getName());
+        return var != null ? var.value : null;
     }
 
     public boolean isSaved() {
@@ -45,6 +54,34 @@ public class DynamicVariable {
 
         this.value = value;
         this.isSaved = isSaved;
+        plot.getHandler().getDynamicVariables().put(this.getName(), new DynamicVariable(this.getName(), value, isSaved));
+    }
+
+    public void setSaved (boolean isSaved) {
+        this.isSaved = isSaved;
+    }
+
+    public String toString() {
+        return "DynamicVariable{name='" + this.name + "', value=" + this.value + ", isSaved=" + this.isSaved + "}";
+    }
+
+    public static DynamicVariable valueOf (String s) {
+        Pattern pattern = Pattern.compile("name='(.*?)', value=(.*?), isSaved=(.*?)}");
+        Matcher matcher = pattern.matcher(s);
+
+        String name = null;
+        Object value = null;
+        boolean isSaved = false;
+
+        if (matcher.find()) {
+            name = matcher.group(1);
+            value = matcher.group(2);
+            String isSavedStr = matcher.group(3);
+
+            isSaved = Boolean.parseBoolean(isSavedStr);
+        }
+
+        return new DynamicVariable(name, value, isSaved);
     }
 
     public static String cutManySymbols (String s) {
