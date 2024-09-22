@@ -11,6 +11,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,8 +26,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
-import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
+import ru.rstudios.creativeplus.creative.coding.dynamicvariables.DynamicVariable;
+import ru.rstudios.creativeplus.creative.coding.events.*;
 import ru.rstudios.creativeplus.creative.coding.eventvalues.ValueType;
+import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.io.*;
@@ -34,6 +37,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
@@ -186,7 +190,7 @@ public class CodingHandleUtils {
         return inv;
     }
 
-    public static Object parseItem (ItemStack item, @Nullable GameEvent event, @Nullable Entity entity) {
+    public static Object parseItem (ItemStack item, @Nullable GameEvent event, @Nullable Entity entity, @Nullable Starter starter) {
         if (item == null) {
             return null;
         }
@@ -203,6 +207,9 @@ public class CodingHandleUtils {
             }
             case APPLE -> {
                 return parseGameValue(item, event, entity);
+            }
+            case MAGMA_CREAM -> {
+                return parseDynamicVariable(item, "", true, event, starter);
             }
         }
         return null;
@@ -326,6 +333,40 @@ public class CodingHandleUtils {
             }
         }
         return defaultValue;
+    }
+
+    public static Object parseDynamicVariable (ItemStack item, Object defaultValue, boolean checkTypeMatches, GameEvent event, Starter starter) {
+        if (item == null) {
+            return defaultValue;
+        }
+
+        if (checkTypeMatches && item.getType() != Material.MAGMA_CREAM) {
+            return defaultValue;
+        } else {
+            if (item.getItemMeta().hasDisplayName()) {
+                String displayName = replacePlaceholders(item.getItemMeta().getDisplayName(), event, starter);
+                DynamicVariable variable = event.getPlot().getHandler().getDynamicVariables().get(displayName);
+                return variable == null ? "" : variable.getValue(event.getPlot());
+            } else {
+                return defaultValue;
+            }
+        }
+    }
+
+    private static String replacePlaceholders (String s, GameEvent event, Starter starter) {
+        if (s == null || s.isEmpty()) {
+            return null;
+        } else {
+            s = StringUtils.replace(s, "%selected%", starter.getSelection().stream().map(Entity::getName).collect(Collectors.joining("")));
+            s = StringUtils.replace(s, "%default%", event.getDefaultEntity().getName());
+            s = StringUtils.replace(s, "%player%", event instanceof GamePlayerEvent ? ((GamePlayerEvent) event).getPlayer().getName() : "");
+            s = StringUtils.replace(s, "%victim%", event instanceof DamageEvent ? ((DamageEvent) event).getVictim().getName() : event instanceof KillEvent ? ((KillEvent) event).getVictim().getName() : "");
+            s = StringUtils.replace(s, "%damager%", event instanceof DamageEvent ? ((DamageEvent) event).getDamager().getName() : "");
+            s = StringUtils.replace(s, "%killer%", event instanceof KillEvent ? ((KillEvent) event).getKiller().getName() : "");
+            s = StringUtils.replace(s, "%shooter%", event instanceof DamageEvent ? ((DamageEvent) event).getShooter().getName() : "");
+            s = StringUtils.replace(s, "%entity%", event instanceof EntityEvent ? ((EntityEvent) event).getEntity().getName() : "");
+            return s;
+        }
     }
 
 }

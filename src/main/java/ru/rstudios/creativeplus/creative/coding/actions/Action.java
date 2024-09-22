@@ -39,6 +39,10 @@ public abstract class Action {
         }
     }
 
+    public void sortItems() {
+        ItemStack items = this.inventory.getContents()
+    }
+
     public abstract ItemStack getIcon();
     public abstract String getName();
     public abstract Inventory getInventory();

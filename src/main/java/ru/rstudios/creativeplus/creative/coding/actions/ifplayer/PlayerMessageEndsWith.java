@@ -78,7 +78,7 @@ public class PlayerMessageEndsWith extends ActionIf {
             ItemStack item = this.inventory.getItem(i);
 
             if (item != null) {
-                String name = CodingHandleUtils.parseItem(item, event, selection.get(new Random().nextInt(0, selection.size()))) == null ? "" : CodingHandleUtils.parseItem(item, event, selection.get(new Random().nextInt(0, selection.size()))).toString();
+                String name = CodingHandleUtils.parseItem(item, event, selection.get(new Random().nextInt(0, selection.size())), this.starter) == null ? "" : CodingHandleUtils.parseItem(item, event, selection.get(new Random().nextInt(0, selection.size())), this.starter).toString();
                 name = this.replacePlaceholders(name, event);
 
                 if (((ChatEvent) event).getMessage().endsWith(name)) return true;

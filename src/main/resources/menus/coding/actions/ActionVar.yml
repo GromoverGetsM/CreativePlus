@@ -1,0 +1,11 @@
+size: 54
+title: Работа с переменными
+items:
+  slot10:
+    type: IRON_BLOCK
+    amount: 1
+    name: "§e Присвоение "
+    lore:
+      - '§f Присвоение переменной различных '
+      - '§f значений '
+    slot: 10

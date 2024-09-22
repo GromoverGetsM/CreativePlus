@@ -100,6 +100,7 @@ public class DevPlot {
         list.add(Material.COBBLESTONE);
         list.add(Material.OAK_PLANKS);
         list.add(Material.NETHER_BRICKS);
+        // list.add(Material.IRON_BLOCK);
         return list;
     }
 
@@ -170,6 +171,12 @@ public class DevPlot {
         netherbricksMeta.setDisplayName("§cИгровое действие");
         netherbricks.setItemMeta(netherbricksMeta);
         i.setItem(3, netherbricks);
+
+        ItemStack ironblock = new ItemStack(Material.IRON_BLOCK);
+        ItemMeta ironblockMeta = ironblock.getItemMeta();
+        ironblockMeta.setDisplayName("§eРабота с переменными");
+        ironblock.setItemMeta(ironblockMeta);
+        i.setItem(4, ironblock);
 
         ItemStack iron = new ItemStack(Material.IRON_INGOT);
         ItemMeta ironMeta = iron.getItemMeta();

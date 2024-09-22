@@ -58,7 +58,7 @@ public class PlayerSendMessage extends Action {
         for (int i = 9; i < 35; i++) {
 
             if (inventory.getItem(i) != null) {
-                builder.append(CodingHandleUtils.parseItem(inventory.getItem(i), gameEvent, entity));
+                builder.append(CodingHandleUtils.parseItem(inventory.getItem(i), gameEvent, entity, this.starter));
             }
         }
 

@@ -65,7 +65,7 @@ public class PlayerNameEquals extends ActionIf {
         for (Entity entity : selection) {
             for (int i = 9; i < 44; i++) {
                 ItemStack item = this.inventory.getItem(i);
-                String name = CodingHandleUtils.parseItem(item, event, entity) == null ? "" : this.replacePlaceholders(CodingHandleUtils.parseItem(item, event, entity).toString(), event);
+                String name = CodingHandleUtils.parseItem(item, event, entity, this.starter) == null ? "" : this.replacePlaceholders(CodingHandleUtils.parseItem(item, event, entity, this.starter).toString(), event);
                 if (entity.getName().equalsIgnoreCase(name)) return true;
             }
         }

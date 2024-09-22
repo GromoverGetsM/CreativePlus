@@ -49,11 +49,11 @@ public class PlayerSendTitle extends Action {
 
         for (Entity entity : selection) {
             if (entity instanceof Player player) {
-                String title = (String) CodingHandleUtils.parseItem(this.inventory.getItem(9), event, entity);
-                String subtitle = (String) CodingHandleUtils.parseItem(this.inventory.getItem(11), event, entity);
-                int fadein = CodingHandleUtils.parseItem(this.inventory.getItem(13), event, entity) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(13), event, entity) : 0;
-                int duration = CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity) : 0;
-                int fadeout = CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity) : 0;
+                String title = (String) CodingHandleUtils.parseItem(this.inventory.getItem(9), event, entity, this.starter);
+                String subtitle = (String) CodingHandleUtils.parseItem(this.inventory.getItem(11), event, entity, this.starter);
+                int fadein = CodingHandleUtils.parseItem(this.inventory.getItem(13), event, entity, this.starter) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(13), event, entity, this.starter) : 0;
+                int duration = CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity, this.starter) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity, this.starter) : 0;
+                int fadeout = CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity, this.starter) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity, this.starter) : 0;
 
                 player.sendTitle(this.replacePlaceholders(title, event), this.replacePlaceholders(subtitle, event), fadein, duration, fadeout);
             }
