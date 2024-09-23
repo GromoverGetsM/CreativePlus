@@ -50,9 +50,15 @@ public class PlayerGiveItem extends Action {
 
         for (Entity entity : selection) {
 
-            for (int i = 9; i < 35; i++) {
-                if (entity instanceof InventoryHolder) {
-                    ((InventoryHolder) entity).getInventory().addItem(inventory.getItem(i) == null ? new ItemStack(Material.AIR) : inventory.getItem(i));
+            initInventorySort();
+
+            if (entity instanceof InventoryHolder) {
+                ItemStack[] items = this.getOtherItems();
+
+                for (ItemStack item : items) {
+                    if (!isNullOrAir(item)) {
+                        ((InventoryHolder) entity).getInventory().addItem(item);
+                    }
                 }
             }
 

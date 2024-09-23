@@ -23,6 +23,7 @@ import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
 import ru.rstudios.creativeplus.creative.plots.DevPlot;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
+import ru.rstudios.creativeplus.utils.LoadInventoryReason;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,7 +75,7 @@ public class CodeHandler {
                 if (chest.getBlock().getType() == Material.CHEST) {
                     i = CodingHandleUtils.loadChestInventory(chest.getWorld(), chest,
                             ((Sign) chest.getBlock().getRelative(BlockFace.DOWN)
-                                    .getRelative(BlockFace.NORTH).getState()).getLine(2));
+                                    .getRelative(BlockFace.NORTH).getState()).getLine(2), LoadInventoryReason.CODE_PARSE);
                 }
 
                 Block westBlock = actionBlock.getRelative(BlockFace.WEST);
@@ -98,7 +99,7 @@ public class CodeHandler {
                                 if (insideChest.getBlock().getType() == Material.CHEST) {
                                     insideInventory = CodingHandleUtils.loadChestInventory(insideChest.getWorld(), insideChest,
                                             ((Sign) insideChest.getBlock().getRelative(BlockFace.DOWN)
-                                                    .getRelative(BlockFace.NORTH).getState()).getLine(2));
+                                                    .getRelative(BlockFace.NORTH).getState()).getLine(2), LoadInventoryReason.CODE_PARSE);
                                 }
 
                                 Action insideAct = null;

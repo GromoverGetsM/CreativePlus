@@ -1,12 +1,20 @@
 package ru.rstudios.creativeplus.creative.coding.actions;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.events.*;
+import ru.rstudios.creativeplus.creative.coding.eventvalues.ItemStackValue;
+import ru.rstudios.creativeplus.creative.coding.eventvalues.LocationValue;
+import ru.rstudios.creativeplus.creative.coding.eventvalues.NumericValue;
+import ru.rstudios.creativeplus.creative.coding.eventvalues.StringValue;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
+import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +23,16 @@ public abstract class Action {
     private final String name;
     private final Inventory inventory;
     private final Starter starter;
+
+    private ItemStack[] originalContents;
+    private ItemStack[] nonNullItems;
+    private ItemStack[] texts;
+    private ItemStack[] numbers;
+    private ItemStack[] locations;
+    private ItemStack[] dynamicVariables;
+    private ItemStack[] itemStackGameValues;
+    private ItemStack[] otherItems;
+
     protected List<Entity> selection;
 
     public Action (Starter starter, String name, Inventory inventory) {
@@ -39,9 +57,100 @@ public abstract class Action {
         }
     }
 
-    public void sortItems() {
-        ItemStack items = this.inventory.getContents()
+    public static boolean isNullOrAir(ItemStack item) {
+        return item == null || item.getType() == Material.AIR;
     }
+
+    public void initInventorySort() {
+        this.originalContents = this.inventory.getContents();
+        this.nonNullItems = Arrays.stream(this.inventory.getContents())
+                .filter(item -> item != null && item.getType() != Material.AIR)
+                .toArray(ItemStack[]::new);
+        this.texts = new ItemStack[0];
+        this.numbers = new ItemStack[0];
+        this.locations = new ItemStack[0];
+        this.dynamicVariables = new ItemStack[0];
+        this.otherItems = new ItemStack[0];
+        this.itemStackGameValues = new ItemStack[0];
+        sort();
+    }
+
+    private void sort() {
+        for (int i = 0; i < this.nonNullItems.length - 1; i++) {
+            ItemStack item = this.nonNullItems[i];
+
+            if (!isNullOrAir(item)) {
+                switch (item.getType()) {
+                    case BOOK -> {
+                        this.texts = ArrayUtils.add(this.texts, item);
+                        this.otherItems = ArrayUtils.add(this.otherItems, item);
+                    }
+                    case SLIME_BALL -> {
+                        this.numbers = ArrayUtils.add(this.numbers, item);
+                        this.otherItems = ArrayUtils.add(this.otherItems, item);
+                    }
+                    case PAPER -> {
+                        this.locations = ArrayUtils.add(this.locations, item);
+                        this.otherItems = ArrayUtils.add(this.otherItems, item);
+                    }
+                    case APPLE -> {
+                        Object o = CodingHandleUtils.parseGameValue(item);
+                        if (o instanceof StringValue) {
+                            this.texts = ArrayUtils.add(this.texts, item);
+                        }
+                        if (o instanceof NumericValue) {
+                            this.numbers = ArrayUtils.add(this.numbers, item);
+                        }
+                        if (o instanceof LocationValue) {
+                            this.locations = ArrayUtils.add(this.locations, item);
+                        }
+                        if (o instanceof ItemStackValue) {
+                            this.itemStackGameValues = ArrayUtils.add(this.itemStackGameValues, item);
+                        }
+                        this.otherItems = ArrayUtils.add(this.otherItems, item);
+                    }
+                    case MAGMA_CREAM -> {
+                        this.dynamicVariables = ArrayUtils.add(this.dynamicVariables, item);
+                        this.otherItems = ArrayUtils.add(this.otherItems, item);
+                    }
+                    default -> this.otherItems = ArrayUtils.add(this.otherItems, item);
+                }
+            }
+        }
+    }
+
+    public ItemStack[] getOriginalContents() {
+        return this.originalContents;
+    }
+
+    public ItemStack[] getNonNullItems() {
+        return this.nonNullItems;
+    }
+
+    public ItemStack[] getTexts() {
+        return this.texts;
+    }
+
+    public ItemStack[] getNumbers() {
+        return this.numbers;
+    }
+
+    public ItemStack[] getLocations() {
+        return this.locations;
+    }
+
+    public ItemStack[] getItemStackGameValues() {
+        return this.itemStackGameValues;
+    }
+
+    public ItemStack[] getOtherItems() {
+        return this.otherItems;
+    }
+
+    public ItemStack[] getDynamicVariables() {
+        return this.dynamicVariables;
+    }
+
 
     public abstract ItemStack getIcon();
     public abstract String getName();

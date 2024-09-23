@@ -40,6 +40,7 @@ import ru.rstudios.creativeplus.creative.plots.PlotInitializeReason;
 import ru.rstudios.creativeplus.player.PlayerInfo;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 import ru.rstudios.creativeplus.utils.FileUtil;
+import ru.rstudios.creativeplus.utils.LoadInventoryReason;
 
 import java.io.File;
 import java.io.IOException;
@@ -264,7 +265,7 @@ public class Event implements Listener {
 
             if (!Objects.equals(chest.getBlockInventory().getItem(0), new ItemStack(Material.BARRIER))) {
                 String actionDisplayName = ((Sign) target.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState()).getLine(2);
-                player.openInventory(CodingHandleUtils.loadChestInventory(player.getWorld(), target.getLocation(), actionDisplayName));
+                player.openInventory(CodingHandleUtils.loadChestInventory(player.getWorld(), target.getLocation(), actionDisplayName, LoadInventoryReason.PLAYER_CHEST_OPEN));
                 chest.getBlockInventory().setItem(0, new ItemStack(Material.BARRIER));
             } else {
                 player.sendMessage("§bCreative+ §8» §fКакой-то игрок §6уже взаимодействует §fс этим сундуком.");

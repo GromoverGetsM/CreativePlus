@@ -30,9 +30,12 @@ import ru.rstudios.creativeplus.creative.coding.dynamicvariables.DynamicVariable
 import ru.rstudios.creativeplus.creative.coding.events.*;
 import ru.rstudios.creativeplus.creative.coding.eventvalues.ValueType;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
+import ru.rstudios.creativeplus.creative.menus.coding.CodingSystemMenu;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -123,26 +126,34 @@ public class CodingHandleUtils {
 
         File chestFile = new File(chestsFolder, chest.toString() + ".txt");
 
-        String chestInventoryString = ItemStackSerializer.toBase64(inventory);
+        if (inventory.getHolder() instanceof CodingSystemMenu) {
+            List<Integer> forRemoval = ((CodingSystemMenu) inventory.getHolder()).getDisallowedSlots();
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(chestFile))) {
-            writer.write(chestInventoryString);
-        } catch (IOException e) {
-            plugin.getLogger().severe(e.getLocalizedMessage());
-        }
+            for (int i : forRemoval) {
+                inventory.setItem(i, new ItemStack(Material.AIR));
+            }
 
-        Block block = chest.getBlock();
-        if (block.getType() == Material.CHEST) {
-            Chest ch = (Chest) block.getState();
-            Inventory chestInventory = ch.getBlockInventory();
+            String chestInventoryString = ItemStackSerializer.toBase64(inventory);
 
-            if (chestInventory.getItem(0) != null && chestInventory.getItem(0).getType() == Material.BARRIER) {
-                chestInventory.clear();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(chestFile))) {
+                writer.write(chestInventoryString);
+            } catch (IOException e) {
+                plugin.getLogger().severe(e.getLocalizedMessage());
+            }
+
+            Block block = chest.getBlock();
+            if (block.getType() == Material.CHEST) {
+                Chest ch = (Chest) block.getState();
+                Inventory chestInventory = ch.getBlockInventory();
+
+                if (chestInventory.getItem(0) != null && chestInventory.getItem(0).getType() == Material.BARRIER) {
+                    chestInventory.clear();
+                }
             }
         }
     }
 
-    public static Inventory loadChestInventory (org.bukkit.World world, Location chest, String actionDisplayName) {
+    public static Inventory loadChestInventory (org.bukkit.World world, Location chest, String actionDisplayName, LoadInventoryReason reason) {
         File chestsFolder = new File(Bukkit.getWorldContainer(), world.getName() + File.separator + "chests");
         File chestFile = new File(chestsFolder, chest.toString() + ".txt");
 
@@ -158,7 +169,16 @@ public class CodingHandleUtils {
                 String inventory = inventoryBuilder.toString();
                 if (!inventory.isEmpty()) {
                     inv = ItemStackSerializer.inventoryFromBase64(inventory);
-                } else {
+                }
+                if (inv != null && reason == LoadInventoryReason.PLAYER_CHEST_OPEN) {
+                    Inventory cacheInv = ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory();
+                    for (int i = 0; i < cacheInv.getSize(); i++) {
+                        ItemStack item = cacheInv.getItem(i);
+                        if (item != null && item.getType() != Material.AIR) {
+                            inv.setItem(i, item);
+                        }
+                    }
+                } else if (inv == null && reason == LoadInventoryReason.PLAYER_CHEST_OPEN) {
                     inv = ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory();
                 }
             } catch (IOException | IllegalAccessException | InstantiationException e) {
@@ -206,7 +226,7 @@ public class CodingHandleUtils {
                 return parseLocation(item, null, event);
             }
             case APPLE -> {
-                return parseGameValue(item, event, entity);
+                return parseGameValue(item, event);
             }
             case MAGMA_CREAM -> {
                 return parseDynamicVariable(item, "", true, event, starter);
@@ -307,13 +327,13 @@ public class CodingHandleUtils {
         }
     }
 
-    public static Object parseGameValue (ItemStack item, GameEvent event, Entity entity) {
-        return parseGameValue(item, null, event, entity);
+    public static Object parseGameValue (ItemStack item) {
+        return parseGameValue(item, null);
     }
-    public static Object parseGameValue (ItemStack item, Object defaultValue, GameEvent event, Entity entity) {
-        return parseGameValue(item, defaultValue, true, event, entity);
+    public static Object parseGameValue (ItemStack item, Object defaultValue) {
+        return parseGameValue(item, defaultValue, true);
     }
-    public static Object parseGameValue (ItemStack item, Object defaultValue, boolean checkTypeMatches, GameEvent event, Entity entity) {
+    public static Object parseGameValue (ItemStack item, Object defaultValue, boolean checkTypeMatches) {
         if (item == null) {
             return defaultValue;
         }
@@ -324,7 +344,7 @@ public class CodingHandleUtils {
             if (item.getItemMeta().hasDisplayName()) {
                 String message = ChatColor.stripColor(item.getItemMeta().getDisplayName()).trim();
                 try {
-                    return ValueType.getByMessage(message) == null ? defaultValue : ValueType.getByMessage(message).getClazz().newInstance().get(event, entity);
+                    return ValueType.getByMessage(message) == null ? defaultValue : ValueType.getByMessage(message).getClazz().newInstance();
                 } catch (InstantiationException | IllegalAccessException e) {
                     plugin.getLogger().severe(e.getLocalizedMessage());
                 }
