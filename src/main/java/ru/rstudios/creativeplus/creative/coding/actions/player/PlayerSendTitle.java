@@ -44,20 +44,26 @@ public class PlayerSendTitle extends Action {
     }
 
     @Override
-    public void execute (GameEvent event) {
+    public void execute(GameEvent event) {
         List<Entity> selection = starter.getSelection();
+        this.initInventorySort();
 
         for (Entity entity : selection) {
             if (entity instanceof Player player) {
-                String title = (String) CodingHandleUtils.parseItem(this.inventory.getItem(9), event, entity, this.starter);
-                String subtitle = (String) CodingHandleUtils.parseItem(this.inventory.getItem(11), event, entity, this.starter);
-                int fadein = CodingHandleUtils.parseItem(this.inventory.getItem(13), event, entity, this.starter) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(13), event, entity, this.starter) : 0;
-                int duration = CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity, this.starter) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(15), event, entity, this.starter) : 0;
-                int fadeout = CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity, this.starter) instanceof Number ? (int) CodingHandleUtils.parseItem(this.inventory.getItem(17), event, entity, this.starter) : 0;
+                String title = this.getTexts().length > 0 ? CodingHandleUtils.parseText(this.getTexts()[0]) : null;
+                String subtitle = this.getTexts().length > 1 ? CodingHandleUtils.parseText(this.getTexts()[1]) : null;
+                int fadein = this.getNumbers().length > 0 ? (int) CodingHandleUtils.parseNumber(this.getNumbers()[0]) : 0;
+                int duration = this.getNumbers().length > 1 ? (int) CodingHandleUtils.parseNumber(this.getNumbers()[1]) : 0;
+                int fadeout = this.getNumbers().length > 2 ? (int) CodingHandleUtils.parseNumber(this.getNumbers()[2]) : 0;
 
-                player.sendTitle(this.replacePlaceholders(title, event), this.replacePlaceholders(subtitle, event), fadein, duration, fadeout);
+                player.sendTitle(
+                        this.replacePlaceholders(title, event, entity),
+                        this.replacePlaceholders(subtitle, event, entity),
+                        fadein, duration, fadeout
+                );
             }
         }
     }
+
 
 }

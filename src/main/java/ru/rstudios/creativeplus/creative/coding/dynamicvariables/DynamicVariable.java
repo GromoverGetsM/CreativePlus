@@ -36,6 +36,7 @@ public class DynamicVariable {
 
     public Object getValue(Plot plot) {
         DynamicVariable var = plot.getHandler().getDynamicVariables().get(this.getName());
+        System.out.println("SentName: " + this.getName());
         return var != null ? var.value : null;
     }
 
@@ -47,6 +48,9 @@ public class DynamicVariable {
         this.name = cutManySymbols(name);
     }
 
+    public void setValue (Plot plot, Object value) {
+        this.setValue(plot, value, this.isSaved);
+    }
     public void setValue (Plot plot, Object value, boolean isSaved) {
         if (value instanceof String) {
             value = cutManySymbols(value.toString());

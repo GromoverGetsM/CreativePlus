@@ -53,7 +53,7 @@ public class PlayerGiveItem extends Action {
             initInventorySort();
 
             if (entity instanceof InventoryHolder) {
-                ItemStack[] items = this.getOtherItems();
+                ItemStack[] items = this.getNonNullItems();
 
                 for (ItemStack item : items) {
                     if (!isNullOrAir(item)) {

@@ -3,6 +3,7 @@ package ru.rstudios.creativeplus.creative.coding.actions;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.rstudios.creativeplus.creative.coding.actions.actionvar.ActionSetVar;
 import ru.rstudios.creativeplus.creative.coding.actions.gameaction.CancelEventAction;
 import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerMessageEndsWith;
 import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerMessageEquals;
@@ -13,6 +14,7 @@ import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendMessage
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendTitle;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.actionvar.VarSet;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageEndsWith;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageEquals;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageStartsWith;
@@ -38,7 +40,8 @@ public enum ActionType {
     IF_PLAYER_MESSAGE_EQUALS("Сообщение равно", "Сообщение равно", PlayerMessageEquals.class, MessageEquals.class, true),
     IF_PLAYER_MESSAGE_STARTS_WITH("Сообщение начинается с", "Начинается с", PlayerMessageStartsWith.class, MessageStartsWith.class, true),
     IF_PLAYER_MESSAGE_ENDS_WITH("Сообщение заканчивается на", "Заканчивается на", PlayerMessageEndsWith.class, MessageEndsWith.class, true),
-    CANCEL_EVENT("Отменить событие", "Отменить событие", CancelEventAction.class, null, false);
+    CANCEL_EVENT("Отменить событие", "Отменить событие", CancelEventAction.class, null, false),
+    ACTION_VAR_SET("Установить (=)", "Установить (=)", ActionSetVar.class, VarSet.class, true);
 
     private String displayName;
     private String name;

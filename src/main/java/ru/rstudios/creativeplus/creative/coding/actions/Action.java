@@ -2,10 +2,12 @@ package ru.rstudios.creativeplus.creative.coding.actions;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import ru.rstudios.creativeplus.creative.coding.dynamicvariables.DynamicVariable;
 import ru.rstudios.creativeplus.creative.coding.events.*;
 import ru.rstudios.creativeplus.creative.coding.eventvalues.ItemStackValue;
 import ru.rstudios.creativeplus.creative.coding.eventvalues.LocationValue;
@@ -15,6 +17,7 @@ import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +34,6 @@ public abstract class Action {
     private ItemStack[] locations;
     private ItemStack[] dynamicVariables;
     private ItemStack[] itemStackGameValues;
-    private ItemStack[] otherItems;
 
     protected List<Entity> selection;
 
@@ -41,11 +43,11 @@ public abstract class Action {
         this.starter = starter;
     }
 
-    public String replacePlaceholders (String s, GameEvent event) {
+    public String replacePlaceholders (String s, GameEvent event, Entity entity) {
         if (s == null || s.isEmpty()) {
             return null;
         } else {
-            s = StringUtils.replace(s, "%selected%", this.starter.getSelection().stream().map(Entity::getName).collect(Collectors.joining("")));
+            s = StringUtils.replace(s, "%selected%", entity.getName());
             s = StringUtils.replace(s, "%default%", event.getDefaultEntity().getName());
             s = StringUtils.replace(s, "%player%", event instanceof GamePlayerEvent ? ((GamePlayerEvent) event).getPlayer().getName() : "");
             s = StringUtils.replace(s, "%victim%", event instanceof DamageEvent ? ((DamageEvent) event).getVictim().getName() : event instanceof KillEvent ? ((KillEvent) event).getVictim().getName() : "");
@@ -70,7 +72,6 @@ public abstract class Action {
         this.numbers = new ItemStack[0];
         this.locations = new ItemStack[0];
         this.dynamicVariables = new ItemStack[0];
-        this.otherItems = new ItemStack[0];
         this.itemStackGameValues = new ItemStack[0];
         sort();
     }
@@ -81,18 +82,9 @@ public abstract class Action {
 
             if (!isNullOrAir(item)) {
                 switch (item.getType()) {
-                    case BOOK -> {
-                        this.texts = ArrayUtils.add(this.texts, item);
-                        this.otherItems = ArrayUtils.add(this.otherItems, item);
-                    }
-                    case SLIME_BALL -> {
-                        this.numbers = ArrayUtils.add(this.numbers, item);
-                        this.otherItems = ArrayUtils.add(this.otherItems, item);
-                    }
-                    case PAPER -> {
-                        this.locations = ArrayUtils.add(this.locations, item);
-                        this.otherItems = ArrayUtils.add(this.otherItems, item);
-                    }
+                    case BOOK -> this.texts = ArrayUtils.add(this.texts, item);
+                    case SLIME_BALL -> this.numbers = ArrayUtils.add(this.numbers, item);
+                    case PAPER -> this.locations = ArrayUtils.add(this.locations, item);
                     case APPLE -> {
                         Object o = CodingHandleUtils.parseGameValue(item);
                         if (o instanceof StringValue) {
@@ -107,13 +99,13 @@ public abstract class Action {
                         if (o instanceof ItemStackValue) {
                             this.itemStackGameValues = ArrayUtils.add(this.itemStackGameValues, item);
                         }
-                        this.otherItems = ArrayUtils.add(this.otherItems, item);
                     }
                     case MAGMA_CREAM -> {
                         this.dynamicVariables = ArrayUtils.add(this.dynamicVariables, item);
-                        this.otherItems = ArrayUtils.add(this.otherItems, item);
+                        this.texts = ArrayUtils.add(this.texts, item);
+                        this.numbers = ArrayUtils.add(this.numbers, item);
+                        this.locations = ArrayUtils.add(this.locations, item);
                     }
-                    default -> this.otherItems = ArrayUtils.add(this.otherItems, item);
                 }
             }
         }
@@ -143,12 +135,43 @@ public abstract class Action {
         return this.itemStackGameValues;
     }
 
-    public ItemStack[] getOtherItems() {
-        return this.otherItems;
-    }
-
     public ItemStack[] getDynamicVariables() {
         return this.dynamicVariables;
+    }
+
+    public List<String> getAsTexts(GameEvent event, Entity entity) {
+        List<String> texts = new LinkedList<>();
+
+        for (ItemStack item : this.texts) {
+            System.out.println("++");
+            switch (item.getType()) {
+                case BOOK -> {
+                    if (item.getItemMeta().hasDisplayName()) {
+                        texts.add(item.getItemMeta().getDisplayName());
+                    } else {
+                        texts.add(item.getI18NDisplayName());
+                    }
+                }
+                case APPLE -> {
+                    Object o = CodingHandleUtils.parseGameValue(item);
+                    if (o instanceof StringValue) {
+                        texts.add(((StringValue) o).get(event, entity));
+                    }
+                }
+                case MAGMA_CREAM -> {
+                    System.out.println("true");
+                    if (item.getItemMeta().hasDisplayName()) {
+                        String displayName = item.getItemMeta().getDisplayName();
+                        displayName = this.replacePlaceholders(displayName, event, entity);
+
+                        System.out.println(ChatColor.stripColor(displayName) + "//" + event.getPlot().getHandler().getDynamicVariables());
+                        texts.add(new DynamicVariable(ChatColor.stripColor(displayName)).getValue(event.getPlot()) == null ? "" : new DynamicVariable(ChatColor.stripColor(displayName)).getValue(event.getPlot()).toString());
+                    }
+                }
+            }
+        }
+
+        return texts;
     }
 
 

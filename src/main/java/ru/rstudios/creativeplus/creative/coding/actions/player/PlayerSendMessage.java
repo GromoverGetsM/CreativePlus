@@ -7,7 +7,6 @@ import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
-import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
 import java.util.List;
 
@@ -47,21 +46,21 @@ public class PlayerSendMessage extends Action {
         List<Entity> selection = starter.getSelection();
 
         for (Entity entity : selection) {
-            String message = parseMessage(this.inventory, entity, event);
+            String message = parseMessage(entity, event);
             entity.sendMessage(message);
         }
+
+        System.out.println("DVars SendMessage: " + event.getPlot().getHandler().getDynamicVariables());
     }
 
-    private String parseMessage (Inventory inventory, Entity entity, GameEvent gameEvent) {
+    private String parseMessage (Entity entity, GameEvent gameEvent) {
         StringBuilder builder = new StringBuilder();
 
-        for (int i = 9; i < 35; i++) {
+        this.initInventorySort();
 
-            if (inventory.getItem(i) != null) {
-                builder.append(CodingHandleUtils.parseItem(inventory.getItem(i), gameEvent, entity, this.starter));
-            }
-        }
+        List<String> messages = this.getAsTexts(gameEvent, entity);
+        messages.forEach(builder::append);
 
-        return this.replacePlaceholders(builder.toString(), gameEvent);
+        return this.replacePlaceholders(builder.toString(), gameEvent, entity);
     }
 }

@@ -26,8 +26,8 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
-import ru.rstudios.creativeplus.creative.coding.starters.player.PlayerRightClickStarter;
 import ru.rstudios.creativeplus.creative.menus.coding.*;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.ActionVar;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.GameAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifPlayer;
@@ -44,8 +44,6 @@ import ru.rstudios.creativeplus.utils.LoadInventoryReason;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -350,6 +348,7 @@ public class Event implements Listener {
                 case COBBLESTONE -> player.openInventory(new PlayerAction("Действие игрока").getInventory());
                 case OAK_PLANKS -> player.openInventory(new ifPlayer("Если игрок").getInventory());
                 case NETHER_BRICKS -> player.openInventory(new GameAction("Игровое действие").getInventory());
+                case IRON_BLOCK -> player.openInventory(new ActionVar("Работа с переменными").getInventory());
             }
         }
     }
@@ -417,7 +416,7 @@ public class Event implements Listener {
 
                 Block finalB = b;
                 switch (type) {
-                    case COBBLESTONE, NETHER_BRICKS -> {
+                    case COBBLESTONE, NETHER_BRICKS, IRON_BLOCK -> {
                         b.getRelative(BlockFace.NORTH).setType(Material.AIR);
                         b.setType(Material.AIR);
                         b.getRelative(BlockFace.UP).setType(Material.AIR);

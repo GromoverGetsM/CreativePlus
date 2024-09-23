@@ -21,9 +21,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.Directional;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.dynamicvariables.DynamicVariable;
@@ -34,7 +34,6 @@ import ru.rstudios.creativeplus.creative.menus.coding.CodingSystemMenu;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -217,7 +216,7 @@ public class CodingHandleUtils {
 
         switch (item.getType()) {
             case BOOK -> {
-                return parseText(item, event, entity);
+                return parseText(item);
             }
             case SLIME_BALL -> {
                 return parseNumber(item);
@@ -235,15 +234,15 @@ public class CodingHandleUtils {
         return null;
     }
 
-    public static String parseText (ItemStack item, GameEvent event, Entity entity) {
-        return parseText(item, "", event, entity);
+    public static String parseText (ItemStack item) {
+        return parseText(item, "");
     }
 
-    public static String parseText (ItemStack item, String defaultText, GameEvent event, Entity entity) {
-        return parseText(item, defaultText, true, event, entity);
+    public static String parseText (ItemStack item, String defaultText) {
+        return parseText(item, defaultText, true);
     }
 
-    public static String parseText (ItemStack item, String defaultText, boolean checkTypeMatches, GameEvent event, Entity entity) {
+    public static String parseText (ItemStack item, String defaultText, boolean checkTypeMatches) {
         if (item == null) {
             return defaultText;
         }
@@ -365,7 +364,7 @@ public class CodingHandleUtils {
         } else {
             if (item.getItemMeta().hasDisplayName()) {
                 String displayName = replacePlaceholders(item.getItemMeta().getDisplayName(), event, starter);
-                DynamicVariable variable = event.getPlot().getHandler().getDynamicVariables().get(displayName);
+                DynamicVariable variable = event.getPlot().getHandler().getDynamicVariables().get(ChatColor.stripColor(displayName));
                 return variable == null ? "" : variable.getValue(event.getPlot());
             } else {
                 return defaultValue;

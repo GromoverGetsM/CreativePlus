@@ -100,7 +100,7 @@ public class DevPlot {
         list.add(Material.COBBLESTONE);
         list.add(Material.OAK_PLANKS);
         list.add(Material.NETHER_BRICKS);
-        // list.add(Material.IRON_BLOCK);
+        list.add(Material.IRON_BLOCK);
         return list;
     }
 

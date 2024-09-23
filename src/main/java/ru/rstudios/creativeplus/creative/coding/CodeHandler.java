@@ -145,17 +145,17 @@ public class CodeHandler {
                 ConfigurationSection section = vars.getConfigurationSection(key);
 
                 if (section != null) {
-                    String name = section.getString("name");
-                    Object value = section.get("value");
-                    String typeMarker = section.getString("type");
-                    boolean isSaved = section.getBoolean("saved");
+                    String name = section.getString("name", "");
+                    Object value = section.get("value", "");
+                    String typeMarker = section.getString("type", "null");
+                    boolean isSaved = section.getBoolean("saved", false);
 
                     if (typeMarker.equalsIgnoreCase("itemstack") && value instanceof String) {
                         String valueCache = value.toString();
                         value = ItemStackSerializer.fromBase64(valueCache);
                     }
 
-                    this.dynamicvariables.put(name, new DynamicVariable(name, value, isSaved));
+                    if (!name.isEmpty()) this.dynamicvariables.put(name, new DynamicVariable(name, value, isSaved));
                 }
             }
         }
@@ -175,11 +175,16 @@ public class CodeHandler {
 
         FileConfiguration vars = YamlConfiguration.loadConfiguration(varsFile);
 
+        System.out.println(this.dynamicvariables.keySet());
         for (String key : this.dynamicvariables.keySet()) {
+            if (key == null || key.trim().isEmpty()) {
+                plugin.getLogger().severe("Skipping dynamic variable with an empty or null key.");
+                continue; // Пропустить пустой или null ключ
+            }
+
             ConfigurationSection section = vars.createSection(key);
 
             DynamicVariable variable = this.dynamicvariables.get(key);
-
             String name = variable.getName();
             Object value = variable.getValue(linked);
             boolean isSaved = variable.isSaved();
@@ -187,21 +192,15 @@ public class CodeHandler {
             if (isSaved) {
                 section.set("name", name);
                 section.set("value", value);
-                section.set("saved", isSaved);
+                section.set("saved", true);
 
                 if (value instanceof String) {
                     section.set("type", "text");
-                }
-
-                if (value instanceof Number) {
+                } else if (value instanceof Number) {
                     section.set("type", "num");
-                }
-
-                if (value instanceof Location) {
+                } else if (value instanceof Location) {
                     section.set("type", "loc");
-                }
-
-                if (value instanceof ItemStack) {
+                } else if (value instanceof ItemStack) {
                     section.set("type", "itemstack");
                     try {
                         section.set("value", ItemStackSerializer.toBase64((ItemStack) value));
@@ -211,6 +210,7 @@ public class CodeHandler {
                 }
             }
         }
+
 
         try {
             vars.save(varsFile);
