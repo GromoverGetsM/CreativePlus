@@ -57,9 +57,9 @@ public class ActionSetVar extends Action {
                 DynamicVariable variable = new DynamicVariable(this.replacePlaceholders(ChatColor.stripColor(dynamic.getItemMeta().getDisplayName()), event, entity));
 
                 if (nonnull.length == 1) {
-                    variable.setValue(event.getPlot(), CodingHandleUtils.parseItem(nonnull[0], event, entity, this.starter));
+                    variable.setValue(event.getPlot(), CodingHandleUtils.parseItem(nonnull[0], event, entity, this.starter), dynamic.getItemMeta().getLore().get(0).contains("СОХРАНЕНО"));
                 } else if (nonnull.length == 0) {
-                    variable.setValue(event.getPlot(), "");
+                    variable.setValue(event.getPlot(), "", dynamic.getItemMeta().getLore().get(0).contains("СОХРАНЕНО"));
                 } else {
                     StringBuilder builder = new StringBuilder();
 
@@ -70,7 +70,7 @@ public class ActionSetVar extends Action {
                     String result = builder.toString();
                     if (result.length() > 1024) result = result.substring(0, 1024);
 
-                    variable.setValue(event.getPlot(), result);
+                    variable.setValue(event.getPlot(), result, dynamic.getItemMeta().getLore().get(0).contains("СОХРАНЕНО"));
                 }
             }
         }

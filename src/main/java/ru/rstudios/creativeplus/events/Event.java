@@ -257,6 +257,8 @@ public class Event implements Listener {
         Block target = player.getTargetBlockExact(5);
         Plot plot = Plot.getByWorld(player.getWorld());
 
+        if (player.getWorld() == plot.getLinkedDevPlot().getWorld() && target != null && target.getType() == Material.OAK_WALL_SIGN) event.setCancelled(true);
+
         if (event.getAction().isRightClick() && target != null && target.getType() == Material.CHEST && player.getWorld().getName().endsWith("_dev")) {
             event.setCancelled(true);
             Chest chest = (Chest) target.getState();
