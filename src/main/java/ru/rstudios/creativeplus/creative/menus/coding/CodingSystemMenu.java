@@ -21,4 +21,5 @@ public abstract class CodingSystemMenu extends CreativeSystemMenu {
     }
 
     public abstract List<Integer> getDisallowedSlots();
+    public abstract List<Integer> getSwitches();
 }

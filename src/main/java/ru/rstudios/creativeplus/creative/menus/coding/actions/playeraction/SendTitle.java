@@ -74,4 +74,8 @@ public class SendTitle extends CodingSystemMenu {
         return disallowedSlots;
     }
 
+    @Override
+    public List<Integer> getSwitches() {
+        return new LinkedList<>();
+    }
 }

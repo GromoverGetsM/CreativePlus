@@ -78,4 +78,9 @@ public class NameEquals extends CodingSystemMenu {
         return disallowedSlots;
     }
 
+    @Override
+    public List<Integer> getSwitches() {
+        return new LinkedList<>();
+    }
+
 }

@@ -10,9 +10,7 @@ import ru.rstudios.creativeplus.creative.menus.coding.CodingSystemMenu;
 import ru.rstudios.creativeplus.utils.InventoryUtil;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
@@ -75,6 +73,12 @@ public class SendMessage extends CodingSystemMenu  {
         List<Integer> disallowedSlots = new LinkedList<>();
         IntStream.rangeClosed(0, 8).forEach(disallowedSlots::add);
         IntStream.rangeClosed(36, 44).forEach(disallowedSlots::add);
+        disallowedSlots.remove(13);
         return disallowedSlots;
+    }
+
+    @Override
+    public List<Integer> getSwitches() {
+        return Collections.singletonList(40);
     }
 }

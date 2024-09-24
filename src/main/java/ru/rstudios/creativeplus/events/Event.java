@@ -20,12 +20,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.starters.StarterType;
+import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
 import ru.rstudios.creativeplus.creative.menus.coding.*;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ActionVar;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.GameAction;
@@ -97,6 +99,30 @@ public class Event implements Listener {
 
         Object holder = event.getClickedInventory().getHolder();
         ItemStack currentItem = event.getCurrentItem();
+
+        if (holder instanceof CodingSystemMenu && !ru.rstudios.creativeplus.creative.coding.actions.Action.isNullOrAir(currentItem)) {
+            ItemMeta meta = currentItem.getItemMeta();
+            if (meta != null && meta.getPersistentDataContainer().has(new NamespacedKey(plugin, "switch_item"), PersistentDataType.INTEGER)) {
+                event.setCancelled(true);
+
+                int currentState = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "switch_item"), PersistentDataType.INTEGER);
+                SwitchItem item = SwitchItem.getByConfigName(holder.getClass().getSimpleName() + "#" + event.getSlot());
+
+                if (item != null) {
+                    item.setCurrentState(currentState);
+
+                    if (event.isLeftClick()) {
+                        item.nextState();
+                    } else if (event.isRightClick()) {
+                        item.previousState();
+                    }
+
+                    player.setItemOnCursor(new ItemStack(Material.AIR));
+                    event.getInventory().setItem(event.getSlot(), item.getCurrentIcon());
+                    event.setCancelled(true);
+                }
+            }
+        }
 
         if (holder instanceof AbstractCategoryMenu) {
             event.setCancelled(true);
@@ -265,7 +291,25 @@ public class Event implements Listener {
 
             if (!Objects.equals(chest.getBlockInventory().getItem(0), new ItemStack(Material.BARRIER))) {
                 String actionDisplayName = ((Sign) target.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState()).getLine(2);
-                player.openInventory(CodingHandleUtils.loadChestInventory(player.getWorld(), target.getLocation(), actionDisplayName, LoadInventoryReason.PLAYER_CHEST_OPEN));
+                Inventory inventory = CodingHandleUtils.loadChestInventory(player.getWorld(), target.getLocation(), actionDisplayName, LoadInventoryReason.PLAYER_CHEST_OPEN);
+
+                if (inventory.getHolder() instanceof CodingSystemMenu) {
+                    List<Integer> switches = ((CodingSystemMenu) inventory.getHolder()).getSwitches();
+
+                    for (int i : switches) {
+                        ItemStack item = inventory.getItem(i);
+                        SwitchItem switchItem = SwitchItem.getByConfigName(inventory.getHolder().getClass().getSimpleName() + "#" + i);
+
+                        if (switchItem != null) {
+                            if (!ru.rstudios.creativeplus.creative.coding.actions.Action.isNullOrAir(item)) {
+                                switchItem.setCurrentState(switchItem.getCurrentState(item));
+                            }
+                            inventory.setItem(i, switchItem.getCurrentIcon());
+                        }
+                    }
+                }
+
+                player.openInventory(inventory);
                 chest.getBlockInventory().setItem(0, new ItemStack(Material.BARRIER));
             } else {
                 player.sendMessage("§bCreative+ §8» §fКакой-то игрок §6уже взаимодействует §fс этим сундуком.");
