@@ -77,7 +77,7 @@ public abstract class Action {
     }
 
     private void sort() {
-        for (int i = 0; i < this.nonNullItems.length - 1; i++) {
+        for (int i = 0; i < this.nonNullItems.length; i++) {
             ItemStack item = this.nonNullItems[i];
 
             if (!isNullOrAir(item)) {
@@ -140,38 +140,35 @@ public abstract class Action {
     }
 
     public List<String> getAsTexts(GameEvent event, Entity entity) {
-        List<String> texts = new LinkedList<>();
+        List<String> list = new LinkedList<>();
 
         for (ItemStack item : this.texts) {
-            System.out.println("++");
             switch (item.getType()) {
                 case BOOK -> {
                     if (item.getItemMeta().hasDisplayName()) {
-                        texts.add(item.getItemMeta().getDisplayName());
+                        list.add(item.getItemMeta().getDisplayName());
                     } else {
-                        texts.add(item.getI18NDisplayName());
+                        list.add(item.getI18NDisplayName());
                     }
                 }
                 case APPLE -> {
                     Object o = CodingHandleUtils.parseGameValue(item);
                     if (o instanceof StringValue) {
-                        texts.add(((StringValue) o).get(event, entity));
+                        list.add(((StringValue) o).get(event, entity));
                     }
                 }
                 case MAGMA_CREAM -> {
-                    System.out.println("true");
                     if (item.getItemMeta().hasDisplayName()) {
                         String displayName = item.getItemMeta().getDisplayName();
                         displayName = this.replacePlaceholders(displayName, event, entity);
 
-                        System.out.println(ChatColor.stripColor(displayName) + "//" + event.getPlot().getHandler().getDynamicVariables());
-                        texts.add(new DynamicVariable(ChatColor.stripColor(displayName)).getValue(event.getPlot()) == null ? "" : new DynamicVariable(ChatColor.stripColor(displayName)).getValue(event.getPlot()).toString());
+                        list.add(new DynamicVariable(ChatColor.stripColor(displayName)).getValue(event.getPlot()) == null ? "" : new DynamicVariable(ChatColor.stripColor(displayName)).getValue(event.getPlot()).toString());
                     }
                 }
             }
         }
 
-        return texts;
+        return list;
     }
 
 

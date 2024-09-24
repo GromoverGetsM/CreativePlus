@@ -175,11 +175,10 @@ public class CodeHandler {
 
         FileConfiguration vars = YamlConfiguration.loadConfiguration(varsFile);
 
-        System.out.println(this.dynamicvariables.keySet());
         for (String key : this.dynamicvariables.keySet()) {
             if (key == null || key.trim().isEmpty()) {
                 plugin.getLogger().severe("Skipping dynamic variable with an empty or null key.");
-                continue; // Пропустить пустой или null ключ
+                continue;
             }
 
             ConfigurationSection section = vars.createSection(key);

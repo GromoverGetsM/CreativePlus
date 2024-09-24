@@ -49,8 +49,6 @@ public class PlayerSendMessage extends Action {
             String message = parseMessage(entity, event);
             entity.sendMessage(message);
         }
-
-        System.out.println("DVars SendMessage: " + event.getPlot().getHandler().getDynamicVariables());
     }
 
     private String parseMessage (Entity entity, GameEvent gameEvent) {

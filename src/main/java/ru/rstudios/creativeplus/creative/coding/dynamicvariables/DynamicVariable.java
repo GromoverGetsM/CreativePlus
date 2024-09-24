@@ -36,7 +36,6 @@ public class DynamicVariable {
 
     public Object getValue(Plot plot) {
         DynamicVariable var = plot.getHandler().getDynamicVariables().get(this.getName());
-        System.out.println("SentName: " + this.getName());
         return var != null ? var.value : null;
     }
 

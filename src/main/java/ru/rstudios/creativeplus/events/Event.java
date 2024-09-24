@@ -310,17 +310,19 @@ public class Event implements Listener {
         } else if (event.getItem() != null && !Objects.equals(event.getItem(), new ItemStack(Material.AIR)) && event.getItem().getType() == Material.APPLE) {
             player.openInventory(new GameValues("Игровое значение").getInventory());
         } else if (event.getItem() != null && !Objects.equals(event.getItem(), new ItemStack(Material.AIR)) && event.getItem().getType() == Material.MAGMA_CREAM) {
-            ItemStack eventItem = event.getItem();
-            ItemMeta meta = eventItem.getItemMeta();
-            List<String> lore = meta.getLore();
-            String isSaved = lore.get(0);
-            if (ChatColor.stripColor(isSaved).equalsIgnoreCase("СОХРАНЕНО")) {
-                lore.remove(0);
-            } else {
-                lore.add(0, "§dСОХРАНЕНО");
+            if (player.isSneaking()) {
+                ItemStack eventItem = event.getItem();
+                ItemMeta meta = eventItem.getItemMeta();
+                List<String> lore = meta.getLore();
+                String isSaved = lore.get(0);
+                if (ChatColor.stripColor(isSaved).equalsIgnoreCase("СОХРАНЕНО")) {
+                    lore.remove(0);
+                } else {
+                    lore.add(0, "§dСОХРАНЕНО");
+                }
+                meta.setLore(lore);
+                eventItem.setItemMeta(meta);
             }
-            meta.setLore(lore);
-            eventItem.setItemMeta(meta);
         }
 
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {

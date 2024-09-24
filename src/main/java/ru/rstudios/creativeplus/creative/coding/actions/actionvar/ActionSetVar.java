@@ -12,6 +12,8 @@ import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
+import java.util.Arrays;
+
 public class ActionSetVar extends Action {
 
     private Starter starter;
@@ -46,7 +48,7 @@ public class ActionSetVar extends Action {
     public void execute(GameEvent event) {
         this.initInventorySort();
         ItemStack dynamic = this.getDynamicVariables()[0];
-        ItemStack[] nonnull = this.getNonNullItems();
+        ItemStack[] nonnull = Arrays.copyOf(this.getNonNullItems(), this.getNonNullItems().length);
         nonnull = ArrayUtils.remove(nonnull, 0);
 
         if (dynamic.getItemMeta().hasDisplayName()) {
@@ -71,9 +73,6 @@ public class ActionSetVar extends Action {
                     variable.setValue(event.getPlot(), result);
                 }
             }
-
-            System.out.println("DVars: " + event.getPlot().getHandler().getDynamicVariables());
-
         }
     }
 
