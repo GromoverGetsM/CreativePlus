@@ -63,31 +63,35 @@ public class SwitchItem {
     // Метод для генерации отображения состояний
     private List<String> generateStateLore() {
         List<String> stateLore = new ArrayList<>();
-        int totalStates = states.size();
+        int totalStates = this.states.size();
 
         // Определяем индексы для предыдущих и следующих состояний
-        int startIndex = Math.max(0, currentState - 2);
-        int endIndex = Math.min(totalStates, currentState + 3);
+        int startIndex = Math.max(0, this.currentState - 2);
+        int endIndex = Math.min(totalStates, this.currentState + 3);
 
-        // Если есть состояния перед видимой зоной, добавляем "..."
+        // Если есть состояния перед видимой зоной, добавляем первое состояние и "..."
         if (startIndex > 0) {
+            stateLore.add("§7 ○ " + this.states.get(0));
             stateLore.add("§8 (...)");
         }
 
         for (int i = startIndex; i < endIndex; i++) {
-            if (i == currentState) {
-                stateLore.add("§4 ● " + states.get(i));
+            if (i == this.currentState) {
+                stateLore.add("§4 ● " + this.states.get(i));
             } else {
-                stateLore.add("§7 ○ " + states.get(i));
+                stateLore.add("§7 ○ " + this.states.get(i));
             }
         }
 
+        // Если есть состояния после видимой зоны, добавляем "..." и последнее состояние
         if (endIndex < totalStates) {
-            stateLore.add("§8(...)");
+            stateLore.add("§8 (...)");
+            stateLore.add("§7 ○ " + this.states.get(totalStates - 1));
         }
 
         return stateLore;
     }
+
 
     public void setCurrentState(int currentState) {
         this.currentState = currentState;
@@ -117,5 +121,8 @@ public class SwitchItem {
 
     public String getStateName (int currentState) {
         return this.states.get(currentState);
+    }
+    public List<String> getStates() {
+        return this.states;
     }
 }

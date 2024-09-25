@@ -10,6 +10,7 @@ import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerMessageEq
 import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerMessageStartsWith;
 import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerNameEquals;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerGiveItem;
+import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerPlaySound;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendMessage;
 import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendTitle;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
@@ -20,6 +21,7 @@ import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageEq
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageStartsWith;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.NameEquals;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.GiveItems;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.PlaySound;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.SendMessage;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.SendTitle;
 
@@ -36,6 +38,7 @@ public enum ActionType {
     SEND_MESSAGE("Отправить сообщение", "Отправить сообщение", PlayerSendMessage.class, SendMessage.class, true),
     GIVE_ITEMS("Выдать предметы", "Выдать предметы", PlayerGiveItem.class, GiveItems.class, true),
     SEND_TITLE("Отправить титл", "Отправить титл", PlayerSendTitle.class, SendTitle.class, true),
+    PLAY_SOUND("Проиграть звук", "Проиграть звук", PlayerPlaySound.class, PlaySound.class, true),
     IF_PLAYER_NAME_EQUALS("Имя равно", "Имя равно", PlayerNameEquals.class, NameEquals.class, true),
     IF_PLAYER_MESSAGE_EQUALS("Сообщение равно", "Сообщение равно", PlayerMessageEquals.class, MessageEquals.class, true),
     IF_PLAYER_MESSAGE_STARTS_WITH("Сообщение начинается с", "Начинается с", PlayerMessageStartsWith.class, MessageStartsWith.class, true),
