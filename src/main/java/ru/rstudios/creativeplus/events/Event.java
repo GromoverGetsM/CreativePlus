@@ -19,8 +19,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -92,6 +94,20 @@ public class Event implements Listener {
         }
     }
 
+    @EventHandler
+    public void onInvDrag (InventoryDragEvent event) {
+        ItemStack item = event.getCursor();
+        InventoryHolder holder = event.getInventory().getHolder();
+
+        if (holder instanceof CodingSystemMenu && item != null) {
+            ItemMeta meta = item.getItemMeta();
+
+            if (meta != null && meta.getPersistentDataContainer().has(new NamespacedKey(plugin, "switch_item"), PersistentDataType.INTEGER)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent event) throws InstantiationException, IllegalAccessException {
         Player player = (Player) event.getWhoClicked();
@@ -105,22 +121,23 @@ public class Event implements Listener {
             if (meta != null && meta.getPersistentDataContainer().has(new NamespacedKey(plugin, "switch_item"), PersistentDataType.INTEGER)) {
                 event.setCancelled(true);
 
-                int currentState = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "switch_item"), PersistentDataType.INTEGER);
-                SwitchItem item = SwitchItem.getByConfigName(holder.getClass().getSimpleName() + "#" + event.getSlot());
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    int currentState = meta.getPersistentDataContainer().get(new NamespacedKey(plugin, "switch_item"), PersistentDataType.INTEGER);
+                    SwitchItem item = SwitchItem.getByConfigName(holder.getClass().getSimpleName() + "#" + event.getSlot());
 
-                if (item != null) {
-                    item.setCurrentState(currentState);
+                    if (item != null) {
+                        item.setCurrentState(currentState);
 
-                    if (event.isLeftClick()) {
-                        item.nextState();
-                    } else if (event.isRightClick()) {
-                        item.previousState();
+                        if (event.isLeftClick()) {
+                            item.nextState();
+                        } else if (event.isRightClick()) {
+                            item.previousState();
+                        }
+
+                        event.getInventory().setItem(event.getSlot(), item.getCurrentIcon());
+                        event.setCursor(null);
                     }
-
-                    player.setItemOnCursor(new ItemStack(Material.AIR));
-                    event.getInventory().setItem(event.getSlot(), item.getCurrentIcon());
-                    event.setCancelled(true);
-                }
+                }, 1L);
             }
         }
 
@@ -283,7 +300,7 @@ public class Event implements Listener {
         Block target = player.getTargetBlockExact(5);
         Plot plot = Plot.getByWorld(player.getWorld());
 
-        if (player.getWorld() == plot.getLinkedDevPlot().getWorld() && target != null && target.getType() == Material.OAK_WALL_SIGN) event.setCancelled(true);
+        if (plot != null && player.getWorld() == plot.getLinkedDevPlot().getWorld() && target != null && target.getType() == Material.OAK_WALL_SIGN) event.setCancelled(true);
 
         if (event.getAction().isRightClick() && target != null && target.getType() == Material.CHEST && player.getWorld().getName().endsWith("_dev")) {
             event.setCancelled(true);
