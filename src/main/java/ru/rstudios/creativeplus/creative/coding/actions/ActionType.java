@@ -9,10 +9,7 @@ import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerMessageEn
 import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerMessageEquals;
 import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerMessageStartsWith;
 import ru.rstudios.creativeplus.creative.coding.actions.ifplayer.PlayerNameEquals;
-import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerGiveItem;
-import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerPlaySound;
-import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendMessage;
-import ru.rstudios.creativeplus.creative.coding.actions.player.PlayerSendTitle;
+import ru.rstudios.creativeplus.creative.coding.actions.player.*;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.menus.CreativeSystemMenu;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.actionvar.VarSet;
@@ -20,10 +17,7 @@ import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageEn
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageEquals;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.MessageStartsWith;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifplayer.NameEquals;
-import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.GiveItems;
-import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.PlaySound;
-import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.SendMessage;
-import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.SendTitle;
+import ru.rstudios.creativeplus.creative.menus.coding.actions.playeraction.*;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -35,24 +29,28 @@ import java.util.stream.Collectors;
 
 public enum ActionType {
 
-    SEND_MESSAGE("Отправить сообщение", "Отправить сообщение", PlayerSendMessage.class, SendMessage.class, true),
-    GIVE_ITEMS("Выдать предметы", "Выдать предметы", PlayerGiveItem.class, GiveItems.class, true),
-    SEND_TITLE("Отправить титл", "Отправить титл", PlayerSendTitle.class, SendTitle.class, true),
-    PLAY_SOUND("Проиграть звук", "Проиграть звук", PlayerPlaySound.class, PlaySound.class, true),
-    IF_PLAYER_NAME_EQUALS("Имя равно", "Имя равно", PlayerNameEquals.class, NameEquals.class, true),
-    IF_PLAYER_MESSAGE_EQUALS("Сообщение равно", "Сообщение равно", PlayerMessageEquals.class, MessageEquals.class, true),
-    IF_PLAYER_MESSAGE_STARTS_WITH("Сообщение начинается с", "Начинается с", PlayerMessageStartsWith.class, MessageStartsWith.class, true),
-    IF_PLAYER_MESSAGE_ENDS_WITH("Сообщение заканчивается на", "Заканчивается на", PlayerMessageEndsWith.class, MessageEndsWith.class, true),
-    CANCEL_EVENT("Отменить событие", "Отменить событие", CancelEventAction.class, null, false),
-    ACTION_VAR_SET("Установить (=)", "Установить (=)", ActionSetVar.class, VarSet.class, true);
+    SEND_MESSAGE("Действие игрока", "Отправить сообщение", "Отправить сообщение", PlayerSendMessage.class, SendMessage.class, true),
+    GIVE_ITEMS("Действие игрока", "Выдать предметы", "Выдать предметы", PlayerGiveItem.class, GiveItems.class, true),
+    SEND_TITLE("Действие игрока", "Отправить титл", "Отправить титл", PlayerSendTitle.class, SendTitle.class, true),
+    PLAY_SOUND("Действие игрока", "Проиграть звук", "Проиграть звук", PlayerPlaySound.class, PlaySound.class, true),
+    SHOW_ADVANCEMENT("Действие игрока", "Отправить достижение", "Отправить достижение", PlayerSendAdvancementToast.class, SendAdvancementToast.class, true),
+    IF_PLAYER_NAME_EQUALS("Если игрок", "Имя равно", "Имя равно", PlayerNameEquals.class, NameEquals.class, true),
+    IF_PLAYER_MESSAGE_EQUALS("Если игрок", "Сообщение равно", "Сообщение равно", PlayerMessageEquals.class, MessageEquals.class, true),
+    IF_PLAYER_MESSAGE_STARTS_WITH("Если игрок", "Сообщение начинается с", "Начинается с", PlayerMessageStartsWith.class, MessageStartsWith.class, true),
+    IF_PLAYER_MESSAGE_ENDS_WITH("Если игрок", "Сообщение заканчивается на", "Заканчивается на", PlayerMessageEndsWith.class, MessageEndsWith.class, true),
+    CANCEL_EVENT("Игровое действие", "Отменить событие", "Отменить событие", CancelEventAction.class, null, false),
+    ACTION_VAR_SET("Работа с переменными", "Установить (=)", "Установить (=)", ActionSetVar.class, VarSet.class, true);
 
+
+    private String rootBlock;
     private String displayName;
     private String name;
     private Class<? extends Action> aClass;
     private Class<? extends CreativeSystemMenu> mClass;
     private boolean needChest;
 
-    ActionType (String displayName, String name, Class<? extends Action> aClass, Class<? extends CreativeSystemMenu> mClass, boolean needChest) {
+    ActionType (String rootBlock, String displayName, String name, Class<? extends Action> aClass, Class<? extends CreativeSystemMenu> mClass, boolean needChest) {
+        this.rootBlock = rootBlock;
         this.displayName = displayName;
         this.name = name;
         this.aClass = aClass;
@@ -66,12 +64,12 @@ public enum ActionType {
         return BY_NAME.get(name.toUpperCase(Locale.ROOT));
     }
 
-    public static @Nullable ActionType getByDisplayName (@NotNull String displayName) {
-        return BY_NAME.values().stream().filter((e) -> e.displayName.equalsIgnoreCase(displayName)).findFirst().orElse(null);
+    public static @Nullable ActionType getByDisplayName (@NotNull String rootBlock, @NotNull String displayName) {
+        return BY_NAME.values().stream().filter((e) -> e.displayName.equalsIgnoreCase(displayName) && e.rootBlock.equalsIgnoreCase(rootBlock)).findFirst().orElse(null);
     }
 
-    public static @Nullable ActionType getByCustomName (@NotNull String actionName) {
-        return BY_NAME.values().stream().filter((e) -> e.name.equalsIgnoreCase(actionName)).findFirst().orElse(null);
+    public static @Nullable ActionType getByCustomName (@NotNull String rootBlock, @NotNull String actionName) {
+        return BY_NAME.values().stream().filter((e) -> e.name.equalsIgnoreCase(actionName) && e.rootBlock.equalsIgnoreCase(rootBlock)).findFirst().orElse(null);
     }
 
     public static @Nullable ActionType getByClass(@NotNull Class<? extends Action> aClass) {

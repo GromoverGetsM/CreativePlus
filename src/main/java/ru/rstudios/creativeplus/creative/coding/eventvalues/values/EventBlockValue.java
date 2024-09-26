@@ -13,7 +13,7 @@ public class EventBlockValue extends ItemStackValue {
 
     @Override
     public ItemStack get(GameEvent event, Entity entity) {
-        return event instanceof BlockEvent ? new ItemStack(((BlockEvent) event).getBlock().getType()) : new ItemStack(Material.AIR, 0);
+        return event instanceof BlockEvent ? new ItemStack(((BlockEvent) event).getEventBlock().getType()) : new ItemStack(Material.AIR, 0);
     }
 
 }

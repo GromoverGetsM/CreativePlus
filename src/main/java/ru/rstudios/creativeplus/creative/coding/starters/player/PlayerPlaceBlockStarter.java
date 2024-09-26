@@ -87,13 +87,13 @@ public class PlayerPlaceBlockStarter extends Starter {
         }
 
         @Override
-        public Block getBlock() {
+        public Block getEventBlock() {
             return ((BlockPlaceEvent) this.getHandleEvent()).getBlock();
         }
 
         @Override
         public BlockFace getBlockFace() {
-            return ((BlockPlaceEvent) this.getHandleEvent()).getBlock().getFace(this.getBlock());
+            return ((BlockPlaceEvent) this.getHandleEvent()).getBlock().getFace(this.getEventBlock());
         }
     }
 

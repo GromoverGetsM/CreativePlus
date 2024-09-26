@@ -464,6 +464,15 @@ public class Plot implements Listener {
 
     }
 
+    public void sendCriticalError (String message) {
+
+        for (Player player : this.getPlotOnlineList()) {
+            player.sendMessage("§bCreative+ §8» §f При выполнении действия произошла критическая ошибка!");
+            player.sendMessage(message);
+        }
+
+    }
+
     @EventHandler
     public void onWorldUnloaded (WorldUnloadEvent event) {
         World world = event.getWorld();

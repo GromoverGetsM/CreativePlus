@@ -35,6 +35,7 @@ import ru.rstudios.creativeplus.creative.menus.coding.actions.ActionVar;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.GameAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifPlayer;
+import ru.rstudios.creativeplus.creative.menus.coding.starters.BlockEvent;
 import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
 import ru.rstudios.creativeplus.creative.menus.main.MyWorlds;
 import ru.rstudios.creativeplus.creative.menus.main.WorldsMenu;
@@ -196,7 +197,8 @@ public class Event implements Listener {
         if (targetBlock != null && targetBlock.getType() == Material.OAK_WALL_SIGN) {
             Sign sign = (Sign) targetBlock.getState();
             String itemDisplayName = ChatColor.stripColor(currentItem.getItemMeta().getDisplayName()).trim();
-            ActionType actionType = ActionType.getByDisplayName(itemDisplayName);
+            String rootBlock = sign.getLine(1);
+            ActionType actionType = ActionType.getByDisplayName(rootBlock, itemDisplayName);
             StarterType starterType = actionType == null ? StarterType.getByDisplayName(itemDisplayName) : null;
 
             if (actionType != null || starterType != null) {
@@ -308,7 +310,8 @@ public class Event implements Listener {
 
             if (!Objects.equals(chest.getBlockInventory().getItem(0), new ItemStack(Material.BARRIER))) {
                 String actionDisplayName = ((Sign) target.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState()).getLine(2);
-                Inventory inventory = CodingHandleUtils.loadChestInventory(player.getWorld(), target.getLocation(), actionDisplayName, LoadInventoryReason.PLAYER_CHEST_OPEN);
+                String rootBlock = ((Sign) target.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getState()).getLine(1);
+                Inventory inventory = CodingHandleUtils.loadChestInventory(player.getWorld(), target.getLocation(), rootBlock, actionDisplayName, LoadInventoryReason.PLAYER_CHEST_OPEN);
 
                 if (inventory.getHolder() instanceof CodingSystemMenu) {
                     List<Integer> switches = ((CodingSystemMenu) inventory.getHolder()).getSwitches();
@@ -410,6 +413,7 @@ public class Event implements Listener {
 
             switch (target.getRelative(BlockFace.SOUTH).getType()) {
                 case DIAMOND_BLOCK -> player.openInventory(new PlayerEvent("Событие игрока").getInventory());
+                case NETHERITE_BLOCK -> player.openInventory(new BlockEvent("Событие блока").getInventory());
                 case COBBLESTONE -> player.openInventory(new PlayerAction("Действие игрока").getInventory());
                 case OAK_PLANKS -> player.openInventory(new ifPlayer("Если игрок").getInventory());
                 case NETHER_BRICKS -> player.openInventory(new GameAction("Игровое действие").getInventory());
@@ -535,6 +539,10 @@ public class Event implements Listener {
                     case DIAMOND_BLOCK -> {
                         relativeBlock = Material.DIAMOND_ORE;
                         blockName = "Событие игрока";
+                    }
+                    case NETHERITE_BLOCK -> {
+                        relativeBlock = Material.BLACKSTONE;
+                        blockName = "Событие блока";
                     }
                     case COBBLESTONE -> {
                         relativeBlock = Material.STONE;

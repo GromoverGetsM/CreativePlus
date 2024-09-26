@@ -8,10 +8,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.rstudios.creativeplus.creative.coding.actions.Action;
-import ru.rstudios.creativeplus.creative.coding.events.BlockEvent;
-import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
-import ru.rstudios.creativeplus.creative.coding.events.GamePlayerEvent;
-import ru.rstudios.creativeplus.creative.coding.events.ItemEvent;
+import ru.rstudios.creativeplus.creative.coding.events.*;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
@@ -70,11 +67,11 @@ public class BlockDispenseStarter extends Starter {
         }
     }
 
-    public static class Event extends GamePlayerEvent implements BlockEvent, ItemEvent, Cancellable {
+    public static class Event extends GameBlockEvent implements BlockEvent, ItemEvent, Cancellable {
 
 
-        public Event(Player player, Plot plot, org.bukkit.event.Event event) {
-            super(player, plot, event);
+        public Event(Block block, Plot plot, org.bukkit.event.Event event) {
+            super(block, plot, event);
         }
 
         @Override
@@ -88,7 +85,7 @@ public class BlockDispenseStarter extends Starter {
         }
 
         @Override
-        public Block getBlock() {
+        public Block getEventBlock() {
             return ((BlockDispenseEvent) this.getHandleEvent()).getBlock();
         }
 
@@ -105,6 +102,16 @@ public class BlockDispenseStarter extends Starter {
         @Override
         public void setItem(ItemStack item) {
             ((BlockDispenseEvent) this.getHandleEvent()).setItem(item);
+        }
+
+        @Override
+        public Plot getPlot() {
+            return Plot.getByWorld(this.getBlock().getWorld());
+        }
+
+        @Override
+        public Entity getDefaultEntity() {
+            return null;
         }
     }
 

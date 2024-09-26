@@ -13,10 +13,13 @@ import ru.rstudios.creativeplus.creative.coding.actions.Action;
 import ru.rstudios.creativeplus.creative.coding.actions.ActionType;
 import ru.rstudios.creativeplus.creative.coding.events.GameEvent;
 import ru.rstudios.creativeplus.creative.coding.starters.Starter;
+import ru.rstudios.creativeplus.creative.menus.coding.SwitchItem;
 import ru.rstudios.creativeplus.utils.CodingHandleUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import static ru.rstudios.creativeplus.CreativePlus.plugin;
 
@@ -55,13 +58,24 @@ public class PlayerSendAdvancementToast extends Action {
     public void execute (GameEvent event) {
         List<Entity> selection = starter.getSelection();
 
+        this.initInventorySort();
+
         for (Entity entity : selection) {
             if (entity instanceof Player player) {
-                NamespacedKey key = new NamespacedKey(plugin, event.getPlot().getPlotName() + "/" + entity.getName());
+                NamespacedKey key = new NamespacedKey(plugin, event.getPlot().getPlotName() + "/" + entity.getName() + "/" + UUID.randomUUID());
 
                 String title = CodingHandleUtils.parseText(this.getTexts()[0]);
-                String description = CodingHandleUtils.parseText(this.getTexts()[1]);
-                Material item = this.getNonNullItems()[2] == null ? Material.DIAMOND : this.getNonNullItems()[2].getType();
+                Material item = this.getNonNullItems()[1] == null ? Material.DIAMOND : this.getNonNullItems()[1].getType();
+                String frame = "task";
+
+                SwitchItem switchItem = SwitchItem.getByConfigName("SendAdvancementToast#15");
+
+                if (switchItem != null) {
+                    switch (switchItem.getStateName(switchItem.getCurrentState(this.getNonNullItems()[this.getNonNullItems().length - 1]))) {
+                        case "Цель" -> frame = "goal";
+                        case "Челлендж" -> frame = "challenge";
+                    }
+                }
 
                 String advancementJSON = "{"
                         + "\"criteria\": {"
@@ -74,8 +88,8 @@ public class PlayerSendAdvancementToast extends Action {
                         + "    \"item\": \"" + "minecraft:" + item.name().toLowerCase(Locale.ROOT) + "\""
                         + "  },"
                         + "  \"title\": \"" + title + "\","
-                        + "  \"description\": \"" + description + "\","
-                        + "  \"frame\": \"task\","
+                        + "  \"description\": \"" + "Unknown" + "\","
+                        + "  \"frame\": \"" + frame + "\","
                         + "  \"announce_to_chat\": false,"
                         + "  \"show_toast\": true,"
                         + "  \"hidden\": true"
@@ -90,9 +104,7 @@ public class PlayerSendAdvancementToast extends Action {
 
                     progress.awardCriteria("impossible");
 
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                        Bukkit.getUnsafe().removeAdvancement(key);
-                    }, 2L);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.getUnsafe().removeAdvancement(key), 2L);
                 }
             }
         }

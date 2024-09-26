@@ -6,6 +6,7 @@ import ru.rstudios.creativeplus.creative.menus.coding.actions.ActionVar;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.GameAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.PlayerAction;
 import ru.rstudios.creativeplus.creative.menus.coding.actions.ifPlayer;
+import ru.rstudios.creativeplus.creative.menus.coding.starters.BlockEvent;
 import ru.rstudios.creativeplus.creative.menus.coding.starters.PlayerEvent;
 
 import java.util.Arrays;
@@ -18,6 +19,7 @@ public enum CodingCategoryType {
 
     PLAYER_EVENT_WORLD_INTERACT_CATEGORY("Взаимодействие с миром", PlayerEvent.WorldInteractCategory.class, PlayerEvent.class),
     PLAYER_EVENT_OTHER_CATEGORY("Другое", PlayerEvent.OtherCategory.class, PlayerEvent.class),
+    BLOCK_EVENT_MACHINE_CATEGORY("Механизмы", BlockEvent.MachineCategory.class, BlockEvent.class),
     PLAYER_ACTION_COMMUNICATION_CATEGORY("Коммуникация", PlayerAction.CommunicationCategory.class, PlayerAction.class),
     PLAYER_ACTION_INVENTORY_CATEGORY("Управление инвентарём", PlayerAction.InventoryCategory.class, PlayerAction.class),
     IF_PLAYER_TEXT_CONDS_CATEGORY("Текстовые условия", ifPlayer.TextConditionsCategory.class, ifPlayer.class),

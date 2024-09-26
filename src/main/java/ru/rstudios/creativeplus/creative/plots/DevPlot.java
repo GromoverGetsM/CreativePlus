@@ -92,6 +92,7 @@ public class DevPlot {
     public static List<Material> getStarterBlocks() {
         List<Material> list = new ArrayList<>();
         list.add(Material.DIAMOND_BLOCK);
+        list.add(Material.NETHERITE_BLOCK);
         return list;
     }
 
@@ -183,6 +184,12 @@ public class DevPlot {
         ironMeta.setDisplayName("§eПеременные");
         iron.setItemMeta(ironMeta);
         i.setItem(8, iron);
+
+        ItemStack netherite = new ItemStack(Material.NETHERITE_BLOCK);
+        ItemMeta netheriteMeta = netherite.getItemMeta();
+        netheriteMeta.setDisplayName("§7Событие блока");
+        netherite.setItemMeta(netheriteMeta);
+        i.setItem(27, netherite);
 
         return i;
     }

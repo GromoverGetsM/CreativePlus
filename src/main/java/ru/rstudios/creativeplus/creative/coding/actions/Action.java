@@ -47,14 +47,14 @@ public abstract class Action {
         if (s == null || s.isEmpty()) {
             return null;
         } else {
-            s = StringUtils.replace(s, "%selected%", entity.getName());
-            s = StringUtils.replace(s, "%default%", event.getDefaultEntity().getName());
-            s = StringUtils.replace(s, "%player%", event instanceof GamePlayerEvent ? ((GamePlayerEvent) event).getPlayer().getName() : "");
-            s = StringUtils.replace(s, "%victim%", event instanceof DamageEvent ? ((DamageEvent) event).getVictim().getName() : event instanceof KillEvent ? ((KillEvent) event).getVictim().getName() : "");
-            s = StringUtils.replace(s, "%damager%", event instanceof DamageEvent ? ((DamageEvent) event).getDamager().getName() : "");
-            s = StringUtils.replace(s, "%killer%", event instanceof KillEvent ? ((KillEvent) event).getKiller().getName() : "");
-            s = StringUtils.replace(s, "%shooter%", event instanceof DamageEvent ? ((DamageEvent) event).getShooter().getName() : "");
-            s = StringUtils.replace(s, "%entity%", event instanceof EntityEvent ? ((EntityEvent) event).getEntity().getName() : "");
+            if (s.contains("%selected%")) s = StringUtils.replace(s, "%selected%", entity.getName());
+            if (s.contains("%default%")) s = StringUtils.replace(s, "%default%", event.getDefaultEntity().getName());
+            if (s.contains("%player%")) s = StringUtils.replace(s, "%player%", event instanceof GamePlayerEvent ? ((GamePlayerEvent) event).getPlayer().getName() : "");
+            if (s.contains("%victim%")) s = StringUtils.replace(s, "%victim%", event instanceof DamageEvent ? ((DamageEvent) event).getVictim().getName() : event instanceof KillEvent ? ((KillEvent) event).getVictim().getName() : "");
+            if (s.contains("%damager%")) s = StringUtils.replace(s, "%damager%", event instanceof DamageEvent ? ((DamageEvent) event).getDamager().getName() : "");
+            if (s.contains("%killer%")) s = StringUtils.replace(s, "%killer%", event instanceof KillEvent ? ((KillEvent) event).getKiller().getName() : "");
+            if (s.contains("%shooter%")) s = StringUtils.replace(s, "%shooter%", event instanceof DamageEvent ? ((DamageEvent) event).getShooter().getName() : "");
+            if (s.contains("%entity%")) s = StringUtils.replace(s, "%entity%", event instanceof EntityEvent ? ((EntityEvent) event).getEntity().getName() : "");
             return s;
         }
     }

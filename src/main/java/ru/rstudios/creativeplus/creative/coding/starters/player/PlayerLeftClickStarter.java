@@ -87,7 +87,7 @@ public class PlayerLeftClickStarter extends Starter {
         }
 
         @Override
-        public Block getBlock() {
+        public Block getEventBlock() {
             return ((PlayerInteractEvent) this.getHandleEvent()).getClickedBlock();
         }
 

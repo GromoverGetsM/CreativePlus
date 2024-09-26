@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -102,7 +103,7 @@ public class GlobalEventListener implements Listener {
         Plot plot = Plot.getByWorld(event.getBlock().getWorld());
 
         if (plot != null && plot.getLinkedDevPlot().getWorld() != event.getBlock().getWorld()) {
-            plot.getHandler().sendStarter(new BlockDispenseStarter.Event(plot.getPlotOnlineList().get(new Random().nextInt(0, plot.getPlotOnlineList().size())), plot, event));
+            plot.getHandler().sendStarter(new BlockDispenseStarter.Event(event.getBlock(), plot, event));
         }
     }
 
@@ -113,6 +114,16 @@ public class GlobalEventListener implements Listener {
 
         if (plot != null && player.getWorld() != plot.getLinkedDevPlot().getWorld()) {
             plot.getHandler().sendStarter(new PlayerChattedStarter.Event(player, plot, event));
+        }
+    }
+
+    @EventHandler
+    public void onBlockIgnited (BlockIgniteEvent event) {
+        Player player = event.getPlayer();
+        Plot plot = Plot.getByWorld(event.getBlock().getWorld());
+
+        if (plot != null) {
+            // plot.getHandler().sendStarter();
         }
     }
 

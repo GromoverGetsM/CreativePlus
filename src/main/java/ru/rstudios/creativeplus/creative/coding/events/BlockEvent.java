@@ -5,7 +5,7 @@ import org.bukkit.block.BlockFace;
 
 public interface BlockEvent {
 
-    Block getBlock();
+    Block getEventBlock();
     BlockFace getBlockFace();
 
 }

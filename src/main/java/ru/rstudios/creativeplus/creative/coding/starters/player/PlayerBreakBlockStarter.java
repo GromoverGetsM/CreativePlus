@@ -87,13 +87,13 @@ public class PlayerBreakBlockStarter extends Starter {
         }
 
         @Override
-        public Block getBlock() {
+        public Block getEventBlock() {
             return ((BlockBreakEvent) this.getHandleEvent()).getBlock();
         }
 
         @Override
         public BlockFace getBlockFace() {
-            return ((BlockBreakEvent) this.getHandleEvent()).getBlock().getFace(this.getBlock());
+            return ((BlockBreakEvent) this.getHandleEvent()).getBlock().getFace(this.getEventBlock());
         }
     }
 

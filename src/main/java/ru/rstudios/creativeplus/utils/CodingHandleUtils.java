@@ -152,7 +152,7 @@ public class CodingHandleUtils {
         }
     }
 
-    public static Inventory loadChestInventory (org.bukkit.World world, Location chest, String actionDisplayName, LoadInventoryReason reason) {
+    public static Inventory loadChestInventory (org.bukkit.World world, Location chest, String rootBlock, String actionDisplayName, LoadInventoryReason reason) {
         File chestsFolder = new File(Bukkit.getWorldContainer(), world.getName() + File.separator + "chests");
         File chestFile = new File(chestsFolder, chest.toString() + ".txt");
 
@@ -170,7 +170,7 @@ public class CodingHandleUtils {
                     inv = ItemStackSerializer.inventoryFromBase64(inventory);
                 }
                 if (inv != null && reason == LoadInventoryReason.PLAYER_CHEST_OPEN) {
-                    Inventory cacheInv = ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory();
+                    Inventory cacheInv = ActionType.getByCustomName(rootBlock, actionDisplayName).getmClass().newInstance().getInventory();
                     for (int i = 0; i < cacheInv.getSize(); i++) {
                         ItemStack item = cacheInv.getItem(i);
                         if (item != null && item.getType() != Material.AIR) {
@@ -178,14 +178,14 @@ public class CodingHandleUtils {
                         }
                     }
                 } else if (inv == null && reason == LoadInventoryReason.PLAYER_CHEST_OPEN) {
-                    inv = ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory();
+                    inv = ActionType.getByCustomName(rootBlock, actionDisplayName).getmClass().newInstance().getInventory();
                 }
             } catch (IOException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                inv = ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory();
+                inv = ActionType.getByCustomName(rootBlock, actionDisplayName).getmClass().newInstance().getInventory();
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -196,7 +196,7 @@ public class CodingHandleUtils {
             String name = sign.getLine(2);
             Inventory newInv = null;
             try {
-                newInv = Bukkit.createInventory(ActionType.getByCustomName(actionDisplayName).getmClass().newInstance().getInventory().getHolder(), inv.getSize(), name);
+                newInv = Bukkit.createInventory(ActionType.getByCustomName(rootBlock, actionDisplayName).getmClass().newInstance().getInventory().getHolder(), inv.getSize(), name);
             } catch (InstantiationException | IllegalAccessException e) {
                 plugin.getLogger().severe(e.getLocalizedMessage());
             }
@@ -376,14 +376,14 @@ public class CodingHandleUtils {
         if (s == null || s.isEmpty()) {
             return null;
         } else {
-            s = StringUtils.replace(s, "%selected%", starter.getSelection().stream().map(Entity::getName).collect(Collectors.joining("")));
-            s = StringUtils.replace(s, "%default%", event.getDefaultEntity().getName());
-            s = StringUtils.replace(s, "%player%", event instanceof GamePlayerEvent ? ((GamePlayerEvent) event).getPlayer().getName() : "");
-            s = StringUtils.replace(s, "%victim%", event instanceof DamageEvent ? ((DamageEvent) event).getVictim().getName() : event instanceof KillEvent ? ((KillEvent) event).getVictim().getName() : "");
-            s = StringUtils.replace(s, "%damager%", event instanceof DamageEvent ? ((DamageEvent) event).getDamager().getName() : "");
-            s = StringUtils.replace(s, "%killer%", event instanceof KillEvent ? ((KillEvent) event).getKiller().getName() : "");
-            s = StringUtils.replace(s, "%shooter%", event instanceof DamageEvent ? ((DamageEvent) event).getShooter().getName() : "");
-            s = StringUtils.replace(s, "%entity%", event instanceof EntityEvent ? ((EntityEvent) event).getEntity().getName() : "");
+            if (s.contains("%selected%")) s = StringUtils.replace(s, "%selected%", starter.getSelection().stream().map(Entity::getName).collect(Collectors.joining("")));
+            if (s.contains("%default%")) s = StringUtils.replace(s, "%default%", event.getDefaultEntity().getName());
+            if (s.contains("%player%")) s = StringUtils.replace(s, "%player%", event instanceof GamePlayerEvent ? ((GamePlayerEvent) event).getPlayer().getName() : "");
+            if (s.contains("%victim%")) s = StringUtils.replace(s, "%victim%", event instanceof DamageEvent ? ((DamageEvent) event).getVictim().getName() : event instanceof KillEvent ? ((KillEvent) event).getVictim().getName() : "");
+            if (s.contains("%damager%")) s = StringUtils.replace(s, "%damager%", event instanceof DamageEvent ? ((DamageEvent) event).getDamager().getName() : "");
+            if (s.contains("%killer%")) s = StringUtils.replace(s, "%killer%", event instanceof KillEvent ? ((KillEvent) event).getKiller().getName() : "");
+            if (s.contains("%shooter%")) s = StringUtils.replace(s, "%shooter%", event instanceof DamageEvent ? ((DamageEvent) event).getShooter().getName() : "");
+            if (s.contains("%entity%")) s = StringUtils.replace(s, "%entity%", event instanceof EntityEvent ? ((EntityEvent) event).getEntity().getName() : "");
             return s;
         }
     }

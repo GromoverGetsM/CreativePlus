@@ -1,22 +1,20 @@
 package ru.rstudios.creativeplus.creative.coding.events;
 
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.block.BlockEvent;
 import org.jetbrains.annotations.NotNull;
-import ru.rstudios.creativeplus.creative.coding.CodeHandler;
 import ru.rstudios.creativeplus.creative.plots.Plot;
 
-public class GamePlayerEvent extends PlayerEvent implements HandleEvent, GameEvent {
-
+public class GameBlockEvent extends BlockEvent implements GameEvent, HandleEvent {
     private HandlerList HANDLERS = new HandlerList();
     private Plot plot;
     private Event event;
 
-    public GamePlayerEvent (Player player, Plot plot, Event event) {
-        super(player);
+    public GameBlockEvent(Block block, Plot plot, Event event) {
+        super(block);
         this.plot = plot;
         this.event = event;
     }
@@ -34,7 +32,7 @@ public class GamePlayerEvent extends PlayerEvent implements HandleEvent, GameEve
 
     @Override
     public Entity getDefaultEntity() {
-        return this.getPlayer();
+        return null;
     }
 
     @Override

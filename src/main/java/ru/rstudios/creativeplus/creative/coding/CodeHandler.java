@@ -68,14 +68,13 @@ public class CodeHandler {
 
                 Sign aS = (Sign) actionBlock.getRelative(BlockFace.NORTH).getState();
                 String actionName = aS.getLine(2);
+                String rootBlock = aS.getLine(1);
 
                 Location chest = actionBlock.getRelative(BlockFace.UP).getLocation();
                 Inventory i = null;
 
                 if (chest.getBlock().getType() == Material.CHEST) {
-                    i = CodingHandleUtils.loadChestInventory(chest.getWorld(), chest,
-                            ((Sign) chest.getBlock().getRelative(BlockFace.DOWN)
-                                    .getRelative(BlockFace.NORTH).getState()).getLine(2), LoadInventoryReason.CODE_PARSE);
+                    i = CodingHandleUtils.loadChestInventory(chest.getWorld(), chest, rootBlock, actionName, LoadInventoryReason.CODE_PARSE);
                 }
 
                 Block westBlock = actionBlock.getRelative(BlockFace.WEST);
@@ -92,26 +91,27 @@ public class CodeHandler {
                             if (DevPlot.getActionBlocks().contains(insideBlock.getType())) {
                                 Sign insideSign = (Sign) insideBlock.getRelative(BlockFace.NORTH).getState();
                                 String insideActionName = insideSign.getLine(2);
+                                String insideRootBlock = insideSign.getLine(1);
 
                                 Location insideChest = insideBlock.getRelative(BlockFace.UP).getLocation();
                                 Inventory insideInventory = null;
 
                                 if (insideChest.getBlock().getType() == Material.CHEST) {
                                     insideInventory = CodingHandleUtils.loadChestInventory(insideChest.getWorld(), insideChest,
-                                            ((Sign) insideChest.getBlock().getRelative(BlockFace.DOWN)
-                                                    .getRelative(BlockFace.NORTH).getState()).getLine(2), LoadInventoryReason.CODE_PARSE);
+                                            insideRootBlock, insideActionName, LoadInventoryReason.CODE_PARSE);
                                 }
 
                                 Action insideAct = null;
-                                ActionType insideActionType = ActionType.getByCustomName(insideActionName);
+                                ActionType insideActionType = ActionType.getByCustomName(insideRootBlock, insideActionName);
                                 if (insideActionType != null) insideAct = insideActionType.create(starter, insideInventory);
                                 if (insideAct != null) conditionalActions.add(insideAct);
                             }
                         }
 
                         ActionIf condition = null;
-                        ActionType condType = ActionType.getByCustomName(actionName);
+                        ActionType condType = ActionType.getByCustomName(rootBlock, actionName);
                         if (condType != null) condition = condType.createCondition(starter, i, conditionalActions);
+                        else if (!actionName.isEmpty()) linked.sendCriticalError("Невозможно обработать действие '§c" + starterName + " -> " + actionName + "§f' - Действие не существует");
                         if (condition != null) actions.add(condition);
 
                         dx = closingPiston.getX();
@@ -121,8 +121,12 @@ public class CodeHandler {
 
 
                 Action act = null;
-                ActionType actionType = ActionType.getByCustomName(actionName);
+                ActionType actionType = ActionType.getByCustomName(rootBlock, actionName);
                 if (actionType != null) act = actionType.create(starter, i);
+                else if (!actionName.isEmpty()) linked.sendCriticalError("Невозможно обработать действие '§c" + starterName + " -> " + actionName + "§f' - Действие не существует");
+                if (actionBlock.getType() == Material.PURPUR_BLOCK) {
+
+                }
                 if (act != null) actions.add(act);
             }
 
@@ -130,6 +134,7 @@ public class CodeHandler {
                 starter.setActions(actions);
                 starters.add(starter);
             }
+            else if (!starterName.isEmpty()) linked.sendCriticalError("Невозможно обработать событие '§c" + s.getLine(1) + "/" + starterName + "§f' - Событие не существует");
         }
         this.starters.addAll(starters);
         loadDynamicVariables();
